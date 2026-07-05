@@ -108,6 +108,7 @@ html,body { min-height:100%; background:var(--bg-deep); color:var(--text); font-
 .admin-input { width:100%; background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:10px; padding:10px 12px; color:var(--text); font-size:14px; font-family:'Hind Siliguri',sans-serif; outline:none; margin-bottom:10px; }
 .admin-input::placeholder { color:var(--text-muted); }
 .admin-textarea { min-height:80px; resize:vertical; }
+.admin-textarea.code { min-height:120px; font-family:monospace; font-size:12px; direction:ltr; text-align:left; }
 .admin-label { font-size:12px; color:var(--text-muted); margin-bottom:6px; display:block; }
 .admin-btn { width:100%; padding:12px; border-radius:12px; background:linear-gradient(135deg,var(--purple),var(--accent)); border:none; color:#fff; font-size:15px; font-weight:700; font-family:'Rajdhani',sans-serif; cursor:pointer; letter-spacing:1px; transition:all 0.2s; }
 .admin-btn:active { transform:scale(0.97); }
@@ -247,17 +248,28 @@ html,body { min-height:100%; background:var(--bg-deep); color:var(--text); font-
 
   <div class="admin-tab-content" id="tab-ads">
     <div class="admin-section">
-      <div class="admin-section-title">💰 টাস্ক অ্যাড সেটিংস (গ্লোবাল)</div>
+      <div class="admin-section-title">💰 টাস্ক অ্যাড সেটিংস (আনলক টিকেট)</div>
       <div class="admin-card">
-        <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;line-height:1.5;">ⓘ প্রতিটি ভিডিওতে কতগুলো টাস্ক লাগবে তা আপলোডের সময় সেট হয়। এখানে টাস্ক ১, ২, ৩ এর জন্য অ্যাড লিংক ও টাইমার সেট করুন।</div>
-        <input class="admin-input" id="ad-id-1" placeholder="টাস্ক ১ - Monetag/Gigapub URL বা Zone ID" />
-        <input class="admin-input" id="ad-id-2" placeholder="টাস্ক ২ - Monetag/Gigapub URL বা Zone ID" />
-        <input class="admin-input" id="ad-id-3" placeholder="টাস্ক ৩ - Monetag/Gigapub URL বা Zone ID" />
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;line-height:1.5;">ⓘ প্রতিটি ভিডিওতে কতগুলো টাস্ক লাগবে তা আপলোডের সময় সেট হয়। এখানে টাস্ক ১, ২, ৩ এর জন্য অ্যাড লিংক ও টাইমার সেট করুন। এই লিংকগুলো ইউজার টাস্ক শুরু করলে নতুন ট্যাবে খুলবে।</div>
+        <input class="admin-input" id="ad-id-1" placeholder="টাস্ক ১ - Monetag/Gigapub/Adsterra URL বা Zone ID" />
+        <input class="admin-input" id="ad-id-2" placeholder="টাস্ক ২ - Monetag/Gigapub/Adsterra URL বা Zone ID" />
+        <input class="admin-input" id="ad-id-3" placeholder="টাস্ক ৩ - Monetag/Gigapub/Adsterra URL বা Zone ID" />
         <div style="margin-bottom:10px;">
           <label style="font-size:12px;color:var(--text-muted);">যাচাইকরণ টাইমার (সেকেন্ড)</label>
           <input class="admin-input" id="ad-timer" type="number" placeholder="15" style="margin-top:6px;" />
         </div>
-        <button class="admin-btn ripple" onclick="saveAdIds()">💾 অ্যাড সেটিংস সেভ করুন</button>
+        <button class="admin-btn ripple" onclick="saveAdIds()">💾 টাস্ক অ্যাড সেভ করুন</button>
+      </div>
+    </div>
+
+    <div class="admin-section">
+      <div class="admin-section-title">🖼️ ব্যানার অ্যাড (ভিডিও প্লেয়ারের নিচে)</div>
+      <div class="admin-card">
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;line-height:1.5;">
+          ⓘ তোমার অ্যাড নেটওয়ার্কের ড্যাশবোর্ড থেকে <strong>Banner / Native Banner</strong> ফরম্যাটের কোড (সাধারণত &lt;script&gt; ট্যাগ) কপি করে নিচে পেস্ট করো। এটা ইউজার যখন ভিডিও প্লে করবে তখন প্লেয়ারের নিচে দেখাবে। Monetag, Adsterra, PropellerAds, HilltopAds — সব নেটওয়ার্কের ব্যানার কোড এভাবেই বসানো যায়।
+        </div>
+        <textarea class="admin-input admin-textarea code" id="banner-ad-code" placeholder="যেমন: <script src='https://...'></script>&#10;<div id='ad-zone-xxxx'></div>"></textarea>
+        <button class="admin-btn ripple" onclick="saveBannerAd()">💾 ব্যানার অ্যাড সেভ করুন</button>
       </div>
     </div>
   </div>
@@ -354,6 +366,7 @@ const CAT_LABEL = {all:'সব',trending:'🔥 ট্রেন্ডিং',movi
 const STATE = {
   adIds: { ad1:'', ad2:'', ad3:'' },
   taskTimerDuration: 15,
+  bannerAdCode: '',
   siteName: 'Movi Lover',
   selectedAdsReq: 1,
   allVideos: [],
@@ -402,6 +415,7 @@ window.addEventListener('firebaseReady', async()=>{
 
 async function initAdmin(){
   await loadAdIds();
+  await loadBannerAd();
   await loadSiteName();
   await loadTutorialVideo();
   subscribeVideos();
@@ -526,7 +540,21 @@ async function saveAdIds(){
   STATE.adIds.ad3=document.getElementById('ad-id-3').value.trim();
   STATE.taskTimerDuration=parseInt(document.getElementById('ad-timer').value)||15;
   await fbSet('adids','settings',{ad1:STATE.adIds.ad1,ad2:STATE.adIds.ad2,ad3:STATE.adIds.ad3,timer:STATE.taskTimerDuration});
-  toast('✅ অ্যাড সেটিংস সেভ হয়েছে!');
+  toast('✅ টাস্ক অ্যাড সেটিংস সেভ হয়েছে!');
+}
+
+async function loadBannerAd(){
+  const d=await fbGetDoc('settings','banner_ad');
+  if(d && d.code){
+    STATE.bannerAdCode = d.code;
+    document.getElementById('banner-ad-code').value = d.code;
+  }
+}
+async function saveBannerAd(){
+  const code = document.getElementById('banner-ad-code').value.trim();
+  STATE.bannerAdCode = code;
+  await fbSet('banner_ad','settings',{code});
+  toast('✅ ব্যানার অ্যাড সেভ হয়েছে! ইউজার সাইটে সাথে সাথে দেখাবে।');
 }
 
 async function loadSiteName(){
