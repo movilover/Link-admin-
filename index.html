@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>Movi Lover - অ্যাডমিন প্যানেল</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+
+<!-- Firebase -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, onSnapshot, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDse8sC_hsrHrLx92zUobO7PezW0SUChHQ",
+    authDomain: "movi-vairal.firebaseapp.com",
+    projectId: "movi-vairal",
+    storageBucket: "movi-vairal.firebasestorage.app",
+    messagingSenderId: "343081500219",
+    appId: "1:343081500219:web:072eaec3f2d47a4c36661e",
+    measurementId: "G-LGJJWFXDPX"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const storage = getStorage(app);
+
+  window._db = db;
+  window._storage = storage;
+  window._col = collection;
+  window._addDoc = addDoc;
+  window._getDocs = getDocs;
+  window._doc = doc;
+  window._updateDoc = updateDoc;
+  window._deleteDoc = deleteDoc;
+  window._query = query;
+  window._orderBy = orderBy;
+  window._onSnapshot = onSnapshot;
+  window._setDoc = setDoc;
+  window._getDoc = getDoc;
+
+  window.dispatchEvent(new Event('firebaseReady'));
+</script>
+
+<style>
+:root {
+  --bg-deep: #07060c;
+  --bg-card: #12101c;
+  --bg-card2: #17142590;
+  --accent: #d4283f;
+  --accent2: #ff5470;
+  --gold: #f0c05a;
+  --gold2: #e0a63a;
+  --gold3: #ffe08a;
+  --purple: #6d3fc9;
+  --purple2: #9a6ce8;
+  --green: #23b47a;
+  --text: #f3f0ff;
+  --text-muted: #8b87a6;
+  --border: rgba(154,108,232,0.20);
+  --card-radius: 14px;
+  --btn-radius: 16px;
+}
+body.theme-blue { --accent:#2563eb; --accent2:#60a5fa; --purple:#1d4ed8; --purple2:#3b82f6; --border:rgba(37,99,235,0.22); }
+body.theme-green { --accent:#059669; --accent2:#34d399; --purple:#047857; --purple2:#10b981; --border:rgba(5,150,105,0.22); }
+body.theme-purple { --accent:#7c3aed; --accent2:#a78bfa; --purple:#5b21b6; --purple2:#8b5cf6; --border:rgba(124,58,237,0.3); }
+body.theme-gold { --accent:#d97706; --accent2:#fbbf24; --purple:#92400e; --purple2:#f59e0b; --border:rgba(217,119,6,0.22); }
+body.theme-pink { --accent:#db2777; --accent2:#f472b6; --purple:#9d174d; --purple2:#ec4899; --border:rgba(219,39,119,0.22); }
+body.theme-light { --bg-deep:#f1f0f6; --bg-card:#ffffff; --bg-card2:#f5f5ffcc; --text:#111122; --text-muted:#666688; --border:rgba(0,0,0,0.1); }
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body { min-height:100%; background:var(--bg-deep); color:var(--text); font-family:'Hind Siliguri',sans-serif; }
+
+#login-gate { position:fixed; inset:0; z-index:2000; background:var(--bg-deep); display:flex; align-items:center; justify-content:center; padding:20px; }
+.login-box { background:linear-gradient(145deg,#14112a,#0a0816); border:1px solid var(--border); border-radius:20px; padding:32px 26px; width:100%; max-width:340px; text-align:center; }
+.login-icon { font-size:44px; margin-bottom:10px; }
+.login-title { font-family:'Rajdhani',sans-serif; font-size:22px; font-weight:700; margin-bottom:18px; }
+.login-input { width:100%; background:rgba(255,255,255,0.06); border:1px solid var(--border); border-radius:12px; padding:12px 14px; color:var(--text); font-size:16px; text-align:center; letter-spacing:4px; outline:none; margin-bottom:14px; }
+.login-btn { width:100%; padding:13px; border-radius:12px; border:none; cursor:pointer; background:linear-gradient(135deg,var(--purple),var(--accent)); color:#fff; font-family:'Rajdhani',sans-serif; font-size:16px; font-weight:700; }
+.login-error { color:var(--accent2); font-size:12px; margin-top:10px; display:none; }
+
+#admin-app { display:none; }
+#admin-app.visible { display:block; }
+
+.admin-header { background:linear-gradient(135deg,var(--purple),var(--accent)); padding:20px 16px 16px; display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:10; }
+.admin-title { font-family:'Rajdhani',sans-serif; font-size:22px; font-weight:700; }
+.admin-close { margin-left:auto; cursor:pointer; }
+
+.admin-stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:14px; }
+.admin-stat-card { background:var(--bg-card); border:1px solid var(--border); border-radius:14px; padding:14px 16px; text-align:center; position:relative; overflow:hidden; }
+.admin-stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent),var(--purple)); }
+.admin-stat-val { font-size:28px; font-weight:700; color:var(--accent2); font-family:'Rajdhani',sans-serif; }
+.admin-stat-lbl { font-size:11px; color:var(--text-muted); margin-top:2px; }
+.admin-stat-icon { font-size:28px; margin-bottom:4px; }
+
+.admin-tabs { display:flex; overflow-x:auto; gap:0; border-bottom:1px solid var(--border); margin:0; padding:0 14px; }
+.admin-tabs::-webkit-scrollbar { display:none; }
+.admin-tab { flex-shrink:0; padding:10px 14px; font-size:12px; font-weight:700; font-family:'Rajdhani',sans-serif; color:var(--text-muted); cursor:pointer; border-bottom:2px solid transparent; transition:all 0.2s; letter-spacing:0.5px; }
+.admin-tab.active { color:var(--accent2); border-bottom-color:var(--accent2); }
+.admin-tab-content { display:none; }
+.admin-tab-content.active { display:block; }
+
+.admin-section { margin:14px; }
+.admin-section-title { font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--text-muted); margin-bottom:10px; font-weight:700; }
+.admin-card { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:16px; margin-bottom:10px; }
+.admin-input { width:100%; background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:10px; padding:10px 12px; color:var(--text); font-size:14px; font-family:'Hind Siliguri',sans-serif; outline:none; margin-bottom:10px; }
+.admin-input::placeholder { color:var(--text-muted); }
+.admin-textarea { min-height:80px; resize:vertical; }
+.admin-label { font-size:12px; color:var(--text-muted); margin-bottom:6px; display:block; }
+.admin-btn { width:100%; padding:12px; border-radius:12px; background:linear-gradient(135deg,var(--purple),var(--accent)); border:none; color:#fff; font-size:15px; font-weight:700; font-family:'Rajdhani',sans-serif; cursor:pointer; letter-spacing:1px; transition:all 0.2s; }
+.admin-btn:active { transform:scale(0.97); }
+.admin-btn.danger { background:linear-gradient(135deg,#dc2626,#991b1b); }
+.admin-btn.success { background:linear-gradient(135deg,#059669,#065f46); }
+.admin-btn.sm { width:auto; padding:8px 14px; font-size:13px; border-radius:9px; margin-top:0; }
+
+.ads-req-row { display:flex; gap:8px; margin-bottom:12px; }
+.ads-req-opt { flex:1; text-align:center; padding:12px 6px; border-radius:12px; border:1px solid var(--border); cursor:pointer; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:14px; color:var(--text-muted); transition:all 0.2s; }
+.ads-req-opt.active { background:linear-gradient(135deg,var(--purple),var(--accent)); border-color:transparent; color:#fff; }
+.ads-req-opt .sub { display:block; font-size:10px; font-weight:500; margin-top:2px; opacity:0.8; }
+
+.theme-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:8px; }
+.theme-swatch { height:48px; border-radius:12px; cursor:pointer; border:2px solid transparent; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; font-family:'Rajdhani',sans-serif; color:#fff; letter-spacing:0.5px; transition:all 0.2s; }
+.theme-swatch.active { border-color:#fff; transform:scale(1.05); box-shadow:0 0 16px rgba(255,255,255,0.3); }
+.theme-swatch:active { transform:scale(0.95); }
+
+.video-admin-list { display:flex; flex-direction:column; gap:8px; }
+.video-admin-item { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:12px; display:flex; align-items:center; gap:10px; }
+.vai-thumb { width:56px; height:40px; border-radius:8px; object-fit:cover; background:var(--bg-card); flex-shrink:0; overflow:hidden; display:flex; align-items:center; justify-content:center; font-size:20px; }
+.vai-info { flex:1; min-width:0; }
+.vai-title { font-size:12px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.vai-meta { font-size:11px; color:var(--text-muted); margin-top:2px; }
+.vai-actions { display:flex; gap:6px; }
+.vai-btn { width:30px; height:30px; border-radius:8px; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:16px; transition:all 0.2s; }
+.vai-btn:active { transform:scale(0.88); }
+
+.stats-bar-wrap { margin-top:10px; }
+.stats-bar-item { margin-bottom:8px; }
+.stats-bar-label { display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); margin-bottom:4px; }
+.stats-bar-track { height:8px; border-radius:4px; background:rgba(255,255,255,0.06); overflow:hidden; }
+.stats-bar-fill { height:100%; border-radius:4px; background:linear-gradient(90deg,var(--accent),var(--purple)); transition:width 1s ease; }
+
+#toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--bg-card2); border:1px solid var(--border); padding:10px 20px; border-radius:30px; font-size:13px; opacity:0; transition:all 0.3s; z-index:999; pointer-events:none; white-space:nowrap; max-width:90vw; text-align:center; }
+#toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+.ripple { position:relative; overflow:hidden; }
+.ripple-effect { position:absolute; border-radius:50%; background:rgba(255,255,255,0.12); transform:scale(0); animation:rippleAnim 0.5s linear; pointer-events:none; }
+@keyframes rippleAnim { to { transform:scale(4); opacity:0; } }
+::-webkit-scrollbar { width:3px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+</style>
+</head>
+<body>
+
+<div id="login-gate">
+  <div class="login-box">
+    <div class="login-icon">🔐</div>
+    <div class="login-title">অ্যাডমিন প্যানেল</div>
+    <input type="password" class="login-input" id="pin-input" placeholder="PIN দিন" maxlength="10" inputmode="numeric"/>
+    <button class="login-btn ripple" onclick="checkPin()">প্রবেশ করুন</button>
+    <div class="login-error" id="login-error">❌ ভুল PIN, আবার চেষ্টা করুন</div>
+  </div>
+</div>
+
+<div id="admin-app">
+  <div class="admin-header">
+    <span class="material-icons-round">admin_panel_settings</span>
+    <div class="admin-title">অ্যাডমিন প্যানেল Pro</div>
+    <span class="material-icons-round admin-close ripple" onclick="logoutAdmin()">logout</span>
+  </div>
+
+  <div class="admin-stats-grid">
+    <div class="admin-stat-card"><div class="admin-stat-icon">🎬</div><div class="admin-stat-val" id="astat-videos">0</div><div class="admin-stat-lbl">মোট ভিডিও</div></div>
+    <div class="admin-stat-card"><div class="admin-stat-icon">👁️</div><div class="admin-stat-val" id="astat-views">0</div><div class="admin-stat-lbl">মোট ভিউ</div></div>
+    <div class="admin-stat-card"><div class="admin-stat-icon">🔔</div><div class="admin-stat-val" id="astat-notifs">0</div><div class="admin-stat-lbl">নোটিফিকেশন</div></div>
+    <div class="admin-stat-card"><div class="admin-stat-icon">📢</div><div class="admin-stat-val" id="astat-channels">0</div><div class="admin-stat-lbl">চ্যানেল</div></div>
+  </div>
+
+  <div class="admin-section">
+    <div class="admin-section-title">📊 শীর্ষ ভিডিও পরিসংখ্যান</div>
+    <div class="admin-card">
+      <div class="stats-bar-wrap" id="top-videos-stats"><div style="color:var(--text-muted);font-size:13px;text-align:center;padding:10px;">লোড হচ্ছে...</div></div>
+    </div>
+  </div>
+
+  <div class="admin-tabs">
+    <div class="admin-tab active" onclick="switchAdminTab('upload',this)">📤 আপলোড</div>
+    <div class="admin-tab" onclick="switchAdminTab('videos',this)">📋 ভিডিও</div>
+    <div class="admin-tab" onclick="switchAdminTab('notif',this)">📣 নোটিফিকেশন</div>
+    <div class="admin-tab" onclick="switchAdminTab('ads',this)">💰 অ্যাড</div>
+    <div class="admin-tab" onclick="switchAdminTab('site',this)">🏷️ সাইট</div>
+    <div class="admin-tab" onclick="switchAdminTab('channels',this)">📢 চ্যানেল</div>
+    <div class="admin-tab" onclick="switchAdminTab('theme',this)">🎨 থিম</div>
+    <div class="admin-tab" onclick="switchAdminTab('tutorial',this)">📖 টিউটোরিয়াল</div>
+  </div>
+
+  <div class="admin-tab-content active" id="tab-upload">
+    <div class="admin-section">
+      <div class="admin-section-title">📤 ভিডিও আপলোড</div>
+      <div class="admin-card">
+        <input class="admin-input" id="vid-title" placeholder="ভিডিও শিরোনাম (বাংলায়)" />
+        <input class="admin-input" id="vid-desc" placeholder="বিবরণ (ঐচ্ছিক)" />
+        <input class="admin-input" id="vid-thumb" placeholder="থাম্বনেইল ইমেজ URL" />
+        <input class="admin-input" id="vid-url" placeholder="ভিডিও URL / ড্রাইভ লিংক" />
+        <span class="admin-label">ক্যাটাগরি</span>
+        <select class="admin-input" id="vid-cat" style="cursor:pointer;">
+          <option value="all">সব</option>
+          <option value="trending">🔥 ট্রেন্ডিং</option>
+          <option value="movie">🎬 সিনেমা</option>
+          <option value="drama">🎭 নাটক</option>
+          <option value="new">🆕 নতুন</option>
+          <option value="premium">👑 প্রিমিয়াম</option>
+        </select>
+        <span class="admin-label">এই ভিডিও আনলক করতে কতটি বিজ্ঞাপন লাগবে?</span>
+        <div class="ads-req-row" id="ads-req-row">
+          <div class="ads-req-opt active" data-val="1" onclick="pickAdsReq(1,this)">১<span class="sub">সহজ</span></div>
+          <div class="ads-req-opt" data-val="2" onclick="pickAdsReq(2,this)">২<span class="sub">মাঝারি</span></div>
+          <div class="ads-req-opt" data-val="3" onclick="pickAdsReq(3,this)">৩<span class="sub">প্রিমিয়াম</span></div>
+        </div>
+        <label style="display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:13px;cursor:pointer;">
+          <input type="checkbox" id="vid-featured" style="width:16px;height:16px;" /> ফিচার্ড ভিডিও (NEW ব্যাজ)
+        </label>
+        <button class="admin-btn ripple" onclick="uploadVideo()">📤 ভিডিও আপলোড করুন</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-tab-content" id="tab-videos">
+    <div class="admin-section">
+      <div class="admin-section-title">📋 ভিডিও তালিকা</div>
+      <div class="admin-card"><div class="video-admin-list" id="admin-video-list"><div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px;">লোড হচ্ছে...</div></div></div>
+    </div>
+  </div>
+
+  <div class="admin-tab-content" id="tab-notif">
+    <div class="admin-section">
+      <div class="admin-section-title">📣 নোটিফিকেশন পাঠান</div>
+      <div class="admin-card">
+        <input class="admin-input" id="notif-title-inp" placeholder="নোটিফিকেশন শিরোনাম" />
+        <textarea class="admin-input admin-textarea" id="notif-body-inp" placeholder="নোটিফিকেশন বার্তা"></textarea>
+        <button class="admin-btn success ripple" onclick="sendNotification()">📣 পাঠান</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-tab-content" id="tab-ads">
+    <div class="admin-section">
+      <div class="admin-section-title">💰 টাস্ক অ্যাড সেটিংস (গ্লোবাল)</div>
+      <div class="admin-card">
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;line-height:1.5;">ⓘ প্রতিটি ভিডিওতে কতগুলো টাস্ক লাগবে তা আপলোডের সময় সেট হয়। এখানে টাস্ক ১, ২, ৩ এর জন্য অ্যাড লিংক ও টাইমার সেট করুন।</div>
+        <input class="admin-input" id="ad-id-1" placeholder="টাস্ক ১ - Monetag/Gigapub URL বা Zone ID" />
+        <input class="admin-input" id="ad-id-2" placeholder="টাস্ক ২ - Monetag/Gigapub URL বা Zone ID" />
+        <input class="admin-input" id="ad-id-3" placeholder="টাস্ক ৩ - Monetag/Gigapub URL বা Zone ID" />
+        <div style="margin-bottom:10px;">
+          <label style="font-size:12px;color:var(--text-muted);">যাচাইকরণ টাইমার (সেকেন্ড)</label>
+          <input class="admin-input" id="ad-timer" type="number" placeholder="15" style="margin-top:6px;" />
+        </div>
+        <button class="admin-btn ripple" onclick="saveAdIds()">💾 অ্যাড সেটিংস সেভ করুন</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-tab-content" id="tab-site">
+    <div class="admin-section">
+      <div class="admin-section-title">🏷️ সাইট / ব্র্যান্ড নাম</div>
+      <div class="admin-card">
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">এই নামটি প্রতিটি ভিডিও কার্ড ও প্লেয়ারে দেখানো হবে।</div>
+        <input class="admin-input" id="site-name" placeholder="যেমন: Movi Lover" />
+        <button class="admin-btn ripple" onclick="saveSiteName()">💾 সেভ করুন</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-tab-content" id="tab-channels">
+    <div class="admin-section">
+      <div class="admin-section-title">📢 চ্যানেল যোগ করুন</div>
+      <div class="admin-card">
+        <input class="admin-input" id="ch-name" placeholder="চ্যানেলের নাম" />
+        <input class="admin-input" id="ch-desc" placeholder="চ্যানেলের বিবরণ" />
+        <input class="admin-input" id="ch-url" placeholder="চ্যানেল লিংক (t.me/...)" />
+        <input class="admin-input" id="ch-emoji" placeholder="ইমোজি (যেমন: 📢)" />
+        <button class="admin-btn ripple" onclick="addChannel()">➕ চ্যানেল যোগ করুন</button>
+      </div>
+      <div class="admin-section-title" style="margin-top:16px;">বিদ্যমান চ্যানেল</div>
+      <div class="admin-card"><div class="video-admin-list" id="admin-channel-list"><div style="color:var(--text-muted);font-size:13px;text-align:center;padding:10px;">লোড হচ্ছে...</div></div></div>
+    </div>
+  </div>
+
+  <div class="admin-tab-content" id="tab-theme">
+    <div class="admin-section">
+      <div class="admin-section-title">🎨 থিম কাস্টমাইজেশন</div>
+      <div class="admin-card">
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:10px;">রেডিমেড থিম বেছে নিন:</div>
+        <div class="theme-grid">
+          <div class="theme-swatch active" style="background:linear-gradient(135deg,#d4283f,#6d3fc9);" onclick="applyTheme('default',this)">🔴 ডিফল্ট</div>
+          <div class="theme-swatch" style="background:linear-gradient(135deg,#2563eb,#1d4ed8);" onclick="applyTheme('blue',this)">🔵 ব্লু</div>
+          <div class="theme-swatch" style="background:linear-gradient(135deg,#059669,#047857);" onclick="applyTheme('green',this)">🟢 গ্রিন</div>
+          <div class="theme-swatch" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);" onclick="applyTheme('purple',this)">🟣 পার্পল</div>
+          <div class="theme-swatch" style="background:linear-gradient(135deg,#d97706,#92400e);" onclick="applyTheme('gold',this)">🟡 গোল্ড</div>
+          <div class="theme-swatch" style="background:linear-gradient(135deg,#db2777,#9d174d);" onclick="applyTheme('pink',this)">🩷 পিংক</div>
+        </div>
+        <div style="margin-top:16px;font-size:13px;color:var(--text-muted);margin-bottom:10px;">কাস্টম অ্যাকসেন্ট রঙ:</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="color" id="custom-accent" value="#d4283f" style="width:48px;height:40px;border:none;border-radius:8px;cursor:pointer;background:none;" />
+          <input class="admin-input" id="custom-accent-hex" placeholder="#d4283f" style="margin-bottom:0;flex:1;" />
+          <button class="admin-btn sm ripple" onclick="applyCustomColor()">প্রয়োগ</button>
+        </div>
+        <div style="margin-top:12px;">
+          <label style="font-size:13px;color:var(--text-muted);display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="light-mode-toggle" style="width:16px;height:16px;" onchange="toggleLightMode(this)" /> লাইট মোড
+          </label>
+        </div>
+      </div>
+      <div class="admin-card" style="margin-top:10px;">
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">কার্ড কর্নার রেডিয়াস</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <input type="range" id="card-radius" min="4" max="28" value="16" style="flex:1;" oninput="updateRadius()" />
+          <span id="card-radius-val" style="font-size:13px;color:var(--accent2);min-width:32px;">16px</span>
+        </div>
+        <div style="font-size:13px;color:var(--text-muted);margin:12px 0 8px;">বাটন রেডিয়াস</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <input type="range" id="btn-radius" min="4" max="28" value="16" style="flex:1;" oninput="updateRadius()" />
+          <span id="btn-radius-val" style="font-size:13px;color:var(--accent2);min-width:32px;">16px</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:10px;line-height:1.5;">ⓘ থিম সেভ করলে সেটি Firebase-এ সংরক্ষিত হবে। ইউজার অ্যাপ (index.html) নিজের ডিভাইসে থিম আলাদাভাবে সংরক্ষণ করে।</div>
+        <button class="admin-btn ripple" style="margin-top:12px;" onclick="saveTheme()">💾 থিম সেভ করুন</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-tab-content" id="tab-tutorial">
+    <div class="admin-section">
+      <div class="admin-section-title">📖 টিউটোরিয়াল ভিডিও</div>
+      <div class="admin-card">
+        <input class="admin-input" id="tut-thumb" placeholder="থাম্বনেইল URL (ঐচ্ছিক)" />
+        <input class="admin-input" id="tut-url" placeholder="ভিডিও URL" />
+        <input class="admin-input" id="tut-label" placeholder="লেবেল (যেমন: কিভাবে ব্যবহার করবেন)" />
+        <button class="admin-btn ripple" onclick="saveTutorialVideo()">💾 সেভ করুন</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:40px;"></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const ADMIN_PIN = '1234'; // ⚠️ চাইলে এখানে PIN পরিবর্তন করুন
+const CAT_LABEL = {all:'সব',trending:'🔥 ট্রেন্ডিং',movie:'🎬 সিনেমা',drama:'🎭 নাটক',new:'🆕 নতুন',premium:'👑 প্রিমিয়াম'};
+
+const STATE = {
+  adIds: { ad1:'', ad2:'', ad3:'' },
+  taskTimerDuration: 15,
+  siteName: 'Movi Lover',
+  selectedAdsReq: 1,
+  allVideos: [],
+  notifications: [],
+  channels: [],
+  tutorialVideo: null,
+  theme: 'default',
+};
+
+function checkPin(){
+  const val = document.getElementById('pin-input').value.trim();
+  if(val === ADMIN_PIN){
+    document.getElementById('login-gate').style.display='none';
+    document.getElementById('admin-app').classList.add('visible');
+    sessionStorage.setItem('ml_admin_ok','1');
+    initAdmin();
+  } else {
+    document.getElementById('login-error').style.display='block';
+    document.getElementById('pin-input').value='';
+  }
+}
+document.getElementById('pin-input')?.addEventListener('keydown', e=>{ if(e.key==='Enter') checkPin(); });
+function logoutAdmin(){ sessionStorage.removeItem('ml_admin_ok'); location.reload(); }
+window.addEventListener('DOMContentLoaded', ()=>{
+  if(sessionStorage.getItem('ml_admin_ok')==='1'){
+    document.getElementById('login-gate').style.display='none';
+    document.getElementById('admin-app').classList.add('visible');
+  }
+});
+
+document.addEventListener('click',function(e){
+  const el=e.target.closest('.ripple');
+  if(!el)return;
+  const r=document.createElement('span');
+  r.className='ripple-effect';
+  const rect=el.getBoundingClientRect();
+  const sz=Math.max(rect.width,rect.height);
+  r.style.cssText=`width:${sz}px;height:${sz}px;left:${e.clientX-rect.left-sz/2}px;top:${e.clientY-rect.top-sz/2}px`;
+  el.appendChild(r);
+  setTimeout(()=>r.remove(),500);
+});
+
+window.addEventListener('firebaseReady', async()=>{
+  if(sessionStorage.getItem('ml_admin_ok')==='1') await initAdmin();
+});
+
+async function initAdmin(){
+  await loadAdIds();
+  await loadSiteName();
+  await loadTutorialVideo();
+  subscribeVideos();
+  await loadChannels();
+  await loadNotifications();
+}
+
+function pickAdsReq(val, el){
+  STATE.selectedAdsReq = val;
+  document.querySelectorAll('.ads-req-opt').forEach(o=>o.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function subscribeVideos(){
+  if(!window._onSnapshot || !window._col || !window._db) return;
+  try {
+    const q = window._query(window._col(window._db,'videos'), window._orderBy('createdAt','desc'));
+    window._onSnapshot(q, snap=>{
+      STATE.allVideos = snap.docs.map(d=>({id:d.id,...d.data()}));
+      renderAdminVideos();
+      updateAdminStats();
+    }, ()=>loadVideosFallback());
+  } catch(e) { loadVideosFallback(); }
+}
+async function loadVideosFallback(){
+  STATE.allVideos = await fbGet('videos');
+  STATE.allVideos.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  renderAdminVideos();
+  updateAdminStats();
+}
+
+function updateAdminStats(){
+  const totalViews = STATE.allVideos.reduce((s,v)=>s+(v.views||0),0);
+  document.getElementById('astat-videos').textContent = STATE.allVideos.length;
+  document.getElementById('astat-views').textContent = fmtNum(totalViews);
+  document.getElementById('astat-notifs').textContent = STATE.notifications.length;
+  document.getElementById('astat-channels').textContent = STATE.channels.length;
+  renderTopVideosStats();
+}
+function renderTopVideosStats(){
+  const el = document.getElementById('top-videos-stats');
+  const top = [...STATE.allVideos].sort((a,b)=>(b.views||0)-(a.views||0)).slice(0,5);
+  if(!top.length){ el.innerHTML='<div style="color:var(--text-muted);font-size:13px;text-align:center;">কোনো ডেটা নেই</div>'; return; }
+  const max = top[0].views||1;
+  el.innerHTML = top.map(v=>`
+    <div class="stats-bar-item">
+      <div class="stats-bar-label">
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px;">${escHtml(v.title||'ভিডিও')}</span>
+        <span>👁 ${fmtNum(v.views||0)}</span>
+      </div>
+      <div class="stats-bar-track"><div class="stats-bar-fill" style="width:${Math.round(((v.views||0)/max)*100)}%"></div></div>
+    </div>`).join('');
+}
+
+function switchAdminTab(name, btn){
+  document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.admin-tab-content').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+function applyTheme(name, swatch){
+  document.querySelectorAll('.theme-swatch').forEach(s=>s.classList.remove('active'));
+  swatch.classList.add('active');
+  document.body.className = document.body.className.replace(/theme-\w+/g,'').trim();
+  if(name!=='default') document.body.classList.add('theme-'+name);
+  STATE.theme = name;
+  toast('🎨 থিম প্রিভিউ পরিবর্তন হয়েছে!');
+}
+function applyCustomColor(){
+  const hex = document.getElementById('custom-accent-hex').value.trim() || document.getElementById('custom-accent').value;
+  if(!/^#[0-9a-fA-F]{6}$/.test(hex)){toast('⚠️ সঠিক রঙ কোড দিন (#RRGGBB)');return;}
+  document.documentElement.style.setProperty('--accent', hex);
+  document.getElementById('custom-accent').value = hex;
+  document.getElementById('custom-accent-hex').value = hex;
+  toast('✅ রঙ প্রিভিউ করা হয়েছে!');
+}
+function toggleLightMode(cb){ if(cb.checked){ document.body.classList.add('theme-light'); } else { document.body.classList.remove('theme-light'); } }
+function updateRadius(){
+  const cr = document.getElementById('card-radius').value;
+  const br = document.getElementById('btn-radius').value;
+  document.getElementById('card-radius-val').textContent = cr+'px';
+  document.getElementById('btn-radius-val').textContent = br+'px';
+  document.documentElement.style.setProperty('--card-radius', cr+'px');
+  document.documentElement.style.setProperty('--btn-radius', br+'px');
+}
+async function saveTheme(){
+  const acc = document.getElementById('custom-accent-hex').value;
+  try {
+    await fbSet('theme','settings',{
+      theme:STATE.theme,
+      cardRadius: document.getElementById('card-radius').value,
+      btnRadius: document.getElementById('btn-radius').value,
+      accentColor: acc||'',
+      lightMode: document.getElementById('light-mode-toggle').checked
+    });
+  } catch(e){}
+  toast('💾 থিম সেটিংস Firebase-এ সেভ হয়েছে!');
+}
+
+async function fbGet(col){ try{ const s=await window._getDocs(window._col(window._db,col)); return s.docs.map(d=>({id:d.id,...d.data()})); }catch(e){return [];} }
+async function fbAdd(col,data){ return await window._addDoc(window._col(window._db,col),{...data,createdAt:Date.now()}); }
+async function fbDel(col,id){ await window._deleteDoc(window._doc(window._db,col,id)); }
+async function fbSet(id,col,data){ await window._setDoc(window._doc(window._db,col,id),data); }
+async function fbGetDoc(col,id){ try{ const d=await window._getDoc(window._doc(window._db,col,id)); return d.exists()?{id:d.id,...d.data()}:null; }catch(e){return null;} }
+async function fbUpdate(col,id,data){ await window._updateDoc(window._doc(window._db,col,id),data); }
+
+async function loadAdIds(){
+  const d=await fbGetDoc('settings','adids');
+  if(d){
+    STATE.adIds={ad1:d.ad1||'',ad2:d.ad2||'',ad3:d.ad3||''};
+    STATE.taskTimerDuration = parseInt(d.timer||'15')||15;
+    document.getElementById('ad-id-1').value=STATE.adIds.ad1;
+    document.getElementById('ad-id-2').value=STATE.adIds.ad2;
+    document.getElementById('ad-id-3').value=STATE.adIds.ad3;
+    document.getElementById('ad-timer').value=STATE.taskTimerDuration;
+  }
+}
+async function saveAdIds(){
+  STATE.adIds.ad1=document.getElementById('ad-id-1').value.trim();
+  STATE.adIds.ad2=document.getElementById('ad-id-2').value.trim();
+  STATE.adIds.ad3=document.getElementById('ad-id-3').value.trim();
+  STATE.taskTimerDuration=parseInt(document.getElementById('ad-timer').value)||15;
+  await fbSet('adids','settings',{ad1:STATE.adIds.ad1,ad2:STATE.adIds.ad2,ad3:STATE.adIds.ad3,timer:STATE.taskTimerDuration});
+  toast('✅ অ্যাড সেটিংস সেভ হয়েছে!');
+}
+
+async function loadSiteName(){
+  const d=await fbGetDoc('settings','site');
+  if(d && d.name){ STATE.siteName=d.name; document.getElementById('site-name').value=d.name; }
+  else document.getElementById('site-name').value=STATE.siteName;
+}
+async function saveSiteName(){
+  const name=document.getElementById('site-name').value.trim()||'Movi Lover';
+  STATE.siteName=name;
+  await fbSet('site','settings',{name});
+  toast('✅ সাইট নাম সেভ হয়েছে!');
+}
+
+async function loadTutorialVideo(){
+  const d = await fbGetDoc('settings','tutorial');
+  STATE.tutorialVideo = d;
+  if(d){
+    document.getElementById('tut-url').value = d.url||'';
+    document.getElementById('tut-thumb').value = d.thumb||'';
+    document.getElementById('tut-label').value = d.label||'';
+  }
+}
+async function saveTutorialVideo(){
+  const url=document.getElementById('tut-url').value.trim();
+  if(!url){toast('⚠️ ভিডিও URL দিন');return;}
+  const data={url,thumb:document.getElementById('tut-thumb').value.trim(),label:document.getElementById('tut-label').value.trim()||'কিভাবে ব্যবহার করবেন'};
+  await fbSet('tutorial','settings',data);
+  STATE.tutorialVideo=data;
+  toast('✅ টিউটোরিয়াল সেভ হয়েছে!');
+}
+
+async function uploadVideo(){
+  const title=document.getElementById('vid-title').value.trim();
+  const url=document.getElementById('vid-url').value.trim();
+  if(!title||!url){toast('⚠️ শিরোনাম ও URL দিন');return;}
+  const data={
+    title, url,
+    description:document.getElementById('vid-desc').value.trim(),
+    thumbnail:document.getElementById('vid-thumb').value.trim(),
+    category:document.getElementById('vid-cat').value,
+    adsRequired: STATE.selectedAdsReq,
+    featured:document.getElementById('vid-featured').checked,
+    views:0, likes:0
+  };
+  const btn=document.querySelector('#tab-upload .admin-btn');
+  if(btn){btn.disabled=true;btn.textContent='আপলোড হচ্ছে...';}
+  try{
+    await fbAdd('videos',data);
+    toast('✅ ভিডিও আপলোড হয়েছে!');
+    ['vid-title','vid-desc','vid-thumb','vid-url'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('vid-featured').checked=false;
+    pickAdsReq(1, document.querySelector('.ads-req-opt[data-val="1"]'));
+    await fbAdd('notifications',{title:'🎬 নতুন ভিডিও!',body:`"${data.title}" এখন দেখা যাচ্ছে।`,createdAt:Date.now()});
+  } catch(e){ toast('❌ আপলোড ব্যর্থ: '+e.message); }
+  if(btn){btn.disabled=false;btn.textContent='📤 ভিডিও আপলোড করুন';}
+}
+async function deleteVideo(id){
+  if(!confirm('এই ভিডিও মুছবেন?'))return;
+  await fbDel('videos',id);
+  toast('🗑️ ভিডিও মুছে গেছে');
+}
+function renderAdminVideos(){
+  const list=document.getElementById('admin-video-list');
+  if(!STATE.allVideos.length){list.innerHTML='<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px;">কোনো ভিডিও নেই</div>';return;}
+  list.innerHTML=STATE.allVideos.map(v=>`
+    <div class="video-admin-item">
+      <div class="vai-thumb">${v.thumbnail?`<img src="${escHtml(v.thumbnail)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.textContent='🎬'"/>`:'🎬'}</div>
+      <div class="vai-info">
+        <div class="vai-title">${escHtml(v.title||'')}</div>
+        <div class="vai-meta">${CAT_LABEL[v.category]||'সব'} • 👁 ${fmtNum(v.views||0)} • 📺 ${v.adsRequired||3} অ্যাড ${v.featured?'• ⭐':''}</div>
+      </div>
+      <div class="vai-actions">
+        <button class="vai-btn ripple" style="background:rgba(220,38,38,0.2);color:#f87171;" onclick="deleteVideo('${v.id}')"><span class="material-icons-round" style="font-size:18px;">delete</span></button>
+      </div>
+    </div>`).join('');
+}
+
+const defaultChannels=[
+  {name:'ভাইরাল ভিডিও L!NKS',desc:'মেইন চ্যানেলে জয়েন করুন',url:'https://t.me/',emoji:'📡'},
+  {name:'Movi Lover Official',desc:'অফিশিয়াল চ্যানেল',url:'https://t.me/',emoji:'🎬'},
+];
+async function loadChannels(){
+  const fromDb=await fbGet('channels');
+  STATE.channels=fromDb;
+  renderAdminChannels();
+  updateAdminStats();
+}
+function renderAdminChannels(){
+  const list=document.getElementById('admin-channel-list');
+  const chans = STATE.channels.length ? STATE.channels : defaultChannels;
+  const deletable = STATE.channels.length>0;
+  list.innerHTML = chans.map(ch=>`
+    <div class="video-admin-item">
+      <div class="vai-thumb">${ch.emoji||'📢'}</div>
+      <div class="vai-info">
+        <div class="vai-title">${escHtml(ch.name||'')}</div>
+        <div class="vai-meta">${escHtml(ch.desc||'')}</div>
+      </div>
+      ${deletable && ch.id?`<div class="vai-actions">
+        <button class="vai-btn ripple" style="background:rgba(220,38,38,0.2);color:#f87171;" onclick="deleteChannel('${ch.id}')"><span class="material-icons-round" style="font-size:18px;">delete</span></button>
+      </div>`:''}
+    </div>`).join('');
+}
+async function deleteChannel(id){
+  if(!confirm('এই চ্যানেল মুছবেন?'))return;
+  await fbDel('channels',id);
+  toast('🗑️ চ্যানেল মুছে গেছে');
+  await loadChannels();
+}
+async function addChannel(){
+  const name=document.getElementById('ch-name').value.trim();
+  const url=document.getElementById('ch-url').value.trim();
+  if(!name||!url){toast('⚠️ নাম ও লিংক দিন');return;}
+  await fbAdd('channels',{name,url,desc:document.getElementById('ch-desc').value.trim(),emoji:document.getElementById('ch-emoji').value.trim()||'📢'});
+  toast('✅ চ্যানেল যোগ হয়েছে');
+  ['ch-name','ch-desc','ch-url','ch-emoji'].forEach(id=>document.getElementById(id).value='');
+  await loadChannels();
+}
+
+async function loadNotifications(){
+  STATE.notifications=await fbGet('notifications');
+  STATE.notifications.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  updateAdminStats();
+}
+async function sendNotification(){
+  const title=document.getElementById('notif-title-inp').value.trim();
+  const body=document.getElementById('notif-body-inp').value.trim();
+  if(!title||!body){toast('⚠️ শিরোনাম ও বার্তা দিন');return;}
+  await fbAdd('notifications',{title,body});
+  toast('📣 নোটিফিকেশন পাঠানো হয়েছে!');
+  document.getElementById('notif-title-inp').value='';
+  document.getElementById('notif-body-inp').value='';
+  await loadNotifications();
+}
+
+function toast(msg){
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2600);
+}
+function fmtNum(n){ if(n>=1e6)return(n/1e6).toFixed(1)+'M'; if(n>=1e3)return(n/1e3).toFixed(1)+'K'; return n; }
+function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+</script>
+</body>
+</html>
