@@ -227,10 +227,13 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0
 .user-avatar-sm { width:38px; height:38px; border-radius:11px; background:linear-gradient(135deg,var(--purple),var(--accent)); display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:800; color:#fff; flex-shrink:0; }
 .user-info-col { flex:1; min-width:0; }
 .user-id-txt { font-size:12px; font-family:monospace; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.user-name-txt { font-size:12.5px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
+.user-reg-txt { font-size:10px; color:var(--text-muted); margin-top:2px; }
 .user-sub-row { display:flex; gap:8px; margin-top:4px; flex-wrap:wrap; }
 .user-chip { font-size:10px; padding:2px 8px; border-radius:8px; font-weight:700; display:flex; align-items:center; gap:3px; }
 .user-chip .material-icons-round { font-size:11px; }
 .user-chip.ads { background:rgba(160,108,232,0.15); color:var(--purple2); }
+.user-chip.unlocks { background:rgba(35,180,122,0.15); color:var(--green); }
 .user-chip.strikes { background:rgba(240,192,90,0.15); color:var(--gold3); }
 .user-chip.strikes.danger { background:rgba(212,40,63,0.18); color:var(--accent2); }
 .user-chip.banned { background:rgba(212,40,63,0.22); color:var(--accent2); }
@@ -296,7 +299,7 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0
         </div>
       </div>
       <div class="user-search-wrap">
-        <input class="form-input" id="user-search-input" placeholder="ইউজার আইডি দিয়ে খুঁজুন..." oninput="renderUsersList()" />
+        <input class="form-input" id="user-search-input" placeholder="ইউজার আইডি, নাম বা ইউজারনেম দিয়ে খুঁজুন..." oninput="renderUsersList()" />
       </div>
       <div class="mgr-card" id="users-list" style="margin-top:10px;"></div>
     </div>
@@ -612,7 +615,12 @@ function renderUsersList(){
   const wrap = document.getElementById('users-list');
   const q = (document.getElementById('user-search-input')?.value||'').trim().toLowerCase();
   let list = A.allUsers;
-  if(q) list = list.filter(u=>u.id.toLowerCase().includes(q));
+  if(q) list = list.filter(u=>{
+    const idMatch = u.id.toLowerCase().includes(q);
+    const nameMatch = (u.tgFirstName||'').toLowerCase().includes(q) || (u.tgLastName||'').toLowerCase().includes(q);
+    const userMatch = (u.tgUsername||'').toLowerCase().includes(q);
+    return idMatch || nameMatch || userMatch;
+  });
   if(!list.length){
     wrap.innerHTML = `<div class="empty-hint"><span class="material-icons-round">group_off</span>${q?'কোনো মিল পাওয়া যায়নি।':'এখনো কোনো ইউজার সাইটে ভিজিট করেনি।'}</div>`;
     return;
@@ -620,13 +628,21 @@ function renderUsersList(){
   wrap.innerHTML = list.map(u=>{
     const strikes = u.skipStrikes||0;
     const strikeCls = strikes>=2 ? 'danger' : '';
+    const displayName = [u.tgFirstName,u.tgLastName].filter(Boolean).join(' ').trim();
+    const nameLine = displayName
+      ? `${escHtml(displayName)}${u.tgUsername?' <span style="color:var(--text-muted);">@'+escHtml(u.tgUsername)+'</span>':''}`
+      : '<span style="color:var(--text-muted);">নাম নেই (টেলিগ্রাম ছাড়া ভিজিট)</span>';
+    const regTxt = u.createdAt ? fmtDate(u.createdAt) : '—';
     return `
     <div class="user-row">
-      <div class="user-avatar-sm">${(u.id||'?').replace('u','').slice(0,2).toUpperCase()}</div>
+      <div class="user-avatar-sm">${(u.tgFirstName||u.id||'?').replace('u','').slice(0,2).toUpperCase()}</div>
       <div class="user-info-col">
-        <div class="user-id-txt">${escHtml(u.id)}</div>
+        <div class="user-name-txt">${nameLine}</div>
+        <div class="user-id-txt">${escHtml(u.id)}${u.tgUserId?' · tg:'+escHtml(String(u.tgUserId)):''}</div>
+        <div class="user-reg-txt"><span class="material-icons-round" style="font-size:11px;vertical-align:-2px;">event</span> রেজিস্ট্রেশন: ${regTxt}</div>
         <div class="user-sub-row">
           <span class="user-chip ads"><span class="material-icons-round">smart_display</span>${u.adsWatched||0} অ্যাড দেখেছে</span>
+          <span class="user-chip unlocks"><span class="material-icons-round">lock_open</span>${u.unlockedCount||0} আনলক</span>
           <span class="user-chip strikes ${strikeCls}"><span class="material-icons-round">warning</span>${strikes}/3 স্ট্রাইক</span>
           ${u.banned?'<span class="user-chip banned"><span class="material-icons-round">lock</span>লকড</span>':'<span class="user-chip active"><span class="material-icons-round">check_circle</span>সচল</span>'}
         </div>
@@ -634,6 +650,13 @@ function renderUsersList(){
       ${u.banned?`<button class="unlock-user-btn" onclick="unlockUser('${u.id}')">আনলক</button>`:''}
     </div>`;
   }).join('');
+}
+function fmtDate(ts){
+  if(!ts) return '—';
+  try{
+    const d = new Date(ts);
+    return d.toLocaleDateString('bn-BD',{year:'numeric',month:'short',day:'numeric'}) + ' · ' + d.toLocaleTimeString('bn-BD',{hour:'2-digit',minute:'2-digit'});
+  }catch(e){ return new Date(ts).toISOString().slice(0,16).replace('T',' '); }
 }
 
 /* ---------- file upload (Firebase Storage) ---------- */
