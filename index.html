@@ -213,6 +213,8 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0
 .locked-user-row:last-child { border-bottom:none; }
 .locked-user-id { font-size:12px; font-family:monospace; color:var(--text-muted); flex:1; }
 .unlock-user-btn { padding:8px 14px; border-radius:10px; border:none; background:linear-gradient(135deg,var(--green),#0d9166); color:#fff; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:12px; cursor:pointer; }
+.dormant-note { margin:0 16px 10px; padding:11px 13px; border-radius:12px; border:1px solid rgba(240,192,90,0.3); background:rgba(240,192,90,0.07); font-size:11.5px; color:var(--gold3); line-height:1.6; display:flex; gap:8px; }
+.dormant-note .material-icons-round { font-size:15px; flex-shrink:0; margin-top:1px; color:var(--gold2); }
 
 /* ============ USERS PAGE ============ */
 .users-summary-row { display:flex; gap:10px; margin:10px 16px; }
@@ -234,9 +236,6 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0
 .user-chip .material-icons-round { font-size:11px; }
 .user-chip.ads { background:rgba(160,108,232,0.15); color:var(--purple2); }
 .user-chip.unlocks { background:rgba(35,180,122,0.15); color:var(--green); }
-.user-chip.strikes { background:rgba(240,192,90,0.15); color:var(--gold3); }
-.user-chip.strikes.danger { background:rgba(212,40,63,0.18); color:var(--accent2); }
-.user-chip.banned { background:rgba(212,40,63,0.22); color:var(--accent2); }
 .user-chip.active { background:rgba(35,180,122,0.18); color:var(--green); }
 
 @media (min-width:600px) {
@@ -294,8 +293,8 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0
           <div class="users-summary-lbl">মোট অ্যাড ভিউ</div>
         </div>
         <div class="users-summary-card">
-          <div class="users-summary-val red" id="users-banned-val">0</div>
-          <div class="users-summary-lbl">লকড ইউজার</div>
+          <div class="users-summary-val" id="users-unlocks-val">0</div>
+          <div class="users-summary-lbl">মোট আনলক</div>
         </div>
       </div>
       <div class="user-search-wrap">
@@ -389,8 +388,7 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0
       <div class="mgr-card">
         <div class="form-section">
           <div class="form-group"><div class="form-label"><span class="material-icons-round">badge</span>সাইটের নাম</div><input class="form-input" id="set-site-name" placeholder="Movi Lover" /></div>
-          <div class="form-group"><div class="form-label"><span class="material-icons-round">support_agent</span>এডমিন কন্টাক্ট লিংক (লক হওয়া ইউজারদের জন্য)</div><input class="form-input" id="set-admin-contact" placeholder="https://t.me/yourusername" /></div>
-          <div class="form-group"><div class="form-label"><span class="material-icons-round">timer</span>বিজ্ঞাপন টাইমার (সেকেন্ড, তথ্যমূলক)</div><input class="form-input" type="number" id="set-ad-timer" placeholder="15" /></div>
+          <div class="form-group"><div class="form-label"><span class="material-icons-round">support_agent</span>সাপোর্ট / যোগাযোগ লিংক</div><input class="form-input" id="set-admin-contact" placeholder="https://t.me/yourusername" /><div class="form-hint">ইউজার সাইটের প্রোফাইল পেজে "সাপোর্ট / যোগাযোগ" মেনু আইটেম হিসেবে দেখাবে (খালি রাখলে আইটেমটি লুকানো থাকবে)।</div></div>
           <button class="save-btn" onclick="saveGeneralSettings()"><span class="material-icons-round">save</span>সেভ করুন</button>
         </div>
       </div>
@@ -403,7 +401,7 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0
             <input class="form-input" id="set-gigapub-zone" placeholder="6814" />
           </div>
           <button class="save-btn" onclick="saveAdNetworkSettings()"><span class="material-icons-round">save</span>সেভ করুন</button>
-          <div class="form-hint">সাইট শুধুমাত্র <b>GigaPub</b> ব্যবহার করে — এটিই একমাত্র বিজ্ঞাপন নেটওয়ার্ক যা এই সাইটের কোডে যুক্ত আছে (কোনো Monetag বা অন্য কোনো নেটওয়ার্কের কোড এই সাইটে নেই)। প্রতিটি আনলক ধাপে ঠিক ১টি বিজ্ঞাপন দেখানো হবে। Zone ID পরিবর্তন করলে সাইট পরের বার লোড হলে নতুন Zone ID কার্যকর হবে।</div>
+          <div class="form-hint">সাইট শুধুমাত্র <b>GigaPub</b> ব্যবহার করে। প্রতিটি "বিজ্ঞাপন দেখে আনলক করুন" ট্যাপে ঠিক ১টি বিজ্ঞাপন দেখানো হয় — কোনো লুকানো বা বাড়তি ধাপ নেই। Zone ID পরিবর্তন করলে সাইট পরের বার লোড হলে নতুন Zone ID কার্যকর হবে।</div>
         </div>
       </div>
 
@@ -413,12 +411,6 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0
           <div class="form-group"><input class="form-input" type="password" id="set-new-pass" placeholder="নতুন পাসওয়ার্ড" /></div>
           <button class="save-btn" onclick="changeAdminPassword()"><span class="material-icons-round">key</span>পাসওয়ার্ড পরিবর্তন করুন</button>
         </div>
-      </div>
-      <div class="mgr-card">
-        <div class="page-head" style="padding:14px 14px 4px;">
-          <div class="page-title" style="font-size:14px;">লকড ইউজার<small id="locked-count-sub">লোড হচ্ছে...</small></div>
-        </div>
-        <div id="locked-users-list"></div>
       </div>
     </div>
   </div>
@@ -478,9 +470,9 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0
 
       <div class="form-row2">
         <div class="form-group">
-          <div class="form-label"><span class="material-icons-round">lock_open</span>আনলকে বিজ্ঞাপন সংখ্যা</div>
+          <div class="form-label"><span class="material-icons-round">local_movies</span>আনলকে বিজ্ঞাপন সংখ্যা</div>
           <select class="form-select" id="v-ads-required">
-            <option value="1">১টি</option>
+            <option value="1">১টি (প্রস্তাবিত)</option>
             <option value="2">২টি</option>
             <option value="3" selected>৩টি</option>
           </select>
@@ -490,6 +482,7 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0
           <input class="form-input" type="number" id="v-views" placeholder="0" />
         </div>
       </div>
+      <div class="form-hint" style="margin-top:-8px;margin-bottom:14px;">প্রতিটি সংখ্যা মানে ঠিক ততগুলো আলাদা বিজ্ঞাপন-ট্যাপ — প্রতিবার একটি সত্যিকারের বিজ্ঞাপন দেখানো হয়, কোনো ভুয়া ধাপ নেই।</div>
 
       <div class="form-group">
         <div class="toggle-row">
@@ -529,7 +522,6 @@ const A = {
   channels: [],
   tutorial: null,
   settings: {},
-  lockedUsers: [],
   allUsers: [],
   editingVideoId: null,
   pendingThumbUrl: '',
@@ -570,7 +562,7 @@ function logoutAdmin(){ sessionStorage.removeItem(ADMIN_SESSION_KEY); location.r
 async function enterApp(){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').classList.add('visible');
-  await Promise.all([loadCategories(), loadChannels(), loadTutorial(), loadSettingsForm(), loadAdNetworkSettingsForm(), loadLockedUsers(), loadAllUsers()]);
+  await Promise.all([loadCategories(), loadChannels(), loadTutorial(), loadSettingsForm(), loadAdNetworkSettingsForm(), loadAllUsers()]);
   subscribeVideosAdmin();
 }
 
@@ -594,20 +586,22 @@ function showAdminPage(name){
   if(name==='users') loadAllUsers();
 }
 
-/* ============ USERS (per-user ad-watch counts, total user count) ============
+/* ============ USERS ============
    প্রতিটি ইউজার সাইটে প্রথমবার ঢুকলে "users" কালেকশনে একটি ডকুমেন্ট তৈরি হয়
    (ডকুমেন্ট আইডি = সেই ইউজারের ব্রাউজার-জেনারেটেড আইডি)। প্রতিবার তারা একটি
-   বিজ্ঞাপন সম্পূর্ণ দেখলে সেই ডকুমেন্টের adsWatched ফিল্ড ১ করে বাড়ে। এই পেজ
-   সবগুলো ইউজার, তাদের আইডি, কতগুলো অ্যাড দেখেছে, স্ট্রাইক ও লক অবস্থা দেখায়। */
+   বিজ্ঞাপন সম্পূর্ণ দেখলে সেই ডকুমেন্টের adsWatched ফিল্ড ১ করে বাড়ে, এবং
+   প্রতিটি ভিডিও আনলক হলে unlockedCount বাড়ে। এই পেজ সবগুলো ইউজার ও তাদের
+   পরিসংখ্যান দেখায়। সাইটে এখন আর কোনো অ্যাকাউন্ট-লক ব্যবস্থা নেই — বিজ্ঞাপন
+   মাঝপথে বন্ধ করলে শুধু সেই আনলক-ধাপ অসম্পূর্ণ থাকে, কোনো পেনাল্টি হয় না। */
 async function loadAllUsers(){
   const users = await fbGet('users');
   users.sort((a,b)=>(b.lastAdAt||b.createdAt||0)-(a.lastAdAt||a.createdAt||0));
   A.allUsers = users;
   const totalAds = users.reduce((sum,u)=>sum+(u.adsWatched||0),0);
-  const bannedCount = users.filter(u=>u.banned).length;
+  const totalUnlocks = users.reduce((sum,u)=>sum+(u.unlockedCount||0),0);
   document.getElementById('users-total-val').textContent = users.length;
   document.getElementById('users-ads-val').textContent = fmtNum(totalAds);
-  document.getElementById('users-banned-val').textContent = bannedCount;
+  document.getElementById('users-unlocks-val').textContent = fmtNum(totalUnlocks);
   document.getElementById('users-count-sub').textContent = `মোট ${users.length} জন ইউজার`;
   renderUsersList();
 }
@@ -626,8 +620,6 @@ function renderUsersList(){
     return;
   }
   wrap.innerHTML = list.map(u=>{
-    const strikes = u.skipStrikes||0;
-    const strikeCls = strikes>=2 ? 'danger' : '';
     const displayName = [u.tgFirstName,u.tgLastName].filter(Boolean).join(' ').trim();
     const nameLine = displayName
       ? `${escHtml(displayName)}${u.tgUsername?' <span style="color:var(--text-muted);">@'+escHtml(u.tgUsername)+'</span>':''}`
@@ -643,11 +635,9 @@ function renderUsersList(){
         <div class="user-sub-row">
           <span class="user-chip ads"><span class="material-icons-round">smart_display</span>${u.adsWatched||0} অ্যাড দেখেছে</span>
           <span class="user-chip unlocks"><span class="material-icons-round">lock_open</span>${u.unlockedCount||0} আনলক</span>
-          <span class="user-chip strikes ${strikeCls}"><span class="material-icons-round">warning</span>${strikes}/3 স্ট্রাইক</span>
-          ${u.banned?'<span class="user-chip banned"><span class="material-icons-round">lock</span>লকড</span>':'<span class="user-chip active"><span class="material-icons-round">check_circle</span>সচল</span>'}
+          <span class="user-chip active"><span class="material-icons-round">check_circle</span>সচল</span>
         </div>
       </div>
-      ${u.banned?`<button class="unlock-user-btn" onclick="unlockUser('${u.id}')">আনলক</button>`:''}
     </div>`;
   }).join('');
 }
@@ -862,7 +852,7 @@ function renderVideosList(){
         <div class="vid-title">${escHtml(v.title||'শিরোনামহীন')}</div>
         <div class="vid-meta-row">
           <span class="vid-chip">${catLabelAdmin(v.category)}</span>
-          <span class="vid-chip gold">🔒 ${Math.max(1,Math.min(3,parseInt(v.adsRequired)||3))} বিজ্ঞাপন</span>
+          <span class="vid-chip gold">🎬 ${Math.max(1,Math.min(3,parseInt(v.adsRequired)||3))} বিজ্ঞাপন</span>
           ${partsCount>1?`<span class="vid-chip" style="background:rgba(240,192,90,0.15);color:var(--gold3);">📼 ${partsCount} পার্ট</span>`:''}
           ${v.featured?'<span class="vid-chip" style="background:rgba(35,180,122,0.18);color:var(--green);">NEW</span>':''}
         </div>
@@ -1032,20 +1022,19 @@ function confirmDeleteChannel(id,name){
   });
 }
 
-/* ============ SETTINGS ============ */
+/* ============ SETTINGS ============
+   পুরনো "বিজ্ঞাপন টাইমার" ফিল্ডটি সরিয়ে ফেলা হয়েছে — সেটি পুরনো ভুয়া
+   কাউন্টডাউন সিস্টেমের অংশ ছিল, যা এখন আর সাইটে ব্যবহৃত হয় না। এখন প্রতিটি
+   বিজ্ঞাপন সরাসরি GigaPub SDK-এর প্রকৃত দৈর্ঘ্য অনুযায়ী চলে। */
 async function loadSettingsForm(){
   const site = await fbGetDoc('settings','site');
-  const taskads = await fbGetDoc('settings','taskads');
   if(site){ document.getElementById('set-site-name').value = site.name||''; document.getElementById('set-admin-contact').value = site.adminContactUrl||''; }
-  if(taskads){ document.getElementById('set-ad-timer').value = taskads.timer||15; }
 }
 async function saveGeneralSettings(){
   const name = document.getElementById('set-site-name').value.trim() || 'Movi Lover';
   const adminContactUrl = document.getElementById('set-admin-contact').value.trim();
-  const timer = parseInt(document.getElementById('set-ad-timer').value)||15;
   try{
     await fbSet('settings','site',{name, adminContactUrl});
-    await fbSet('settings','taskads',{timer});
     toast('✅ সেটিংস সেভ হয়েছে!');
   }catch(e){ toast('⚠️ সেভ করতে সমস্যা হয়েছে।'); }
 }
@@ -1067,28 +1056,6 @@ async function changeAdminPassword(){
     await fbSet('settings','admin',{password:val});
     document.getElementById('set-new-pass').value='';
     toast('✅ পাসওয়ার্ড পরিবর্তন হয়েছে!');
-  }catch(e){ toast('⚠️ সমস্যা হয়েছে।'); }
-}
-
-/* ============ LOCKED USERS ============ */
-async function loadLockedUsers(){
-  const users = await fbGet('users');
-  A.lockedUsers = users.filter(u=>u.banned);
-  document.getElementById('locked-count-sub').textContent = A.lockedUsers.length ? `মোট ${A.lockedUsers.length} জন লকড` : 'কেউ লকড নেই';
-  const wrap = document.getElementById('locked-users-list');
-  if(!A.lockedUsers.length){ wrap.innerHTML = `<div class="empty-hint" style="padding:20px;"><span class="material-icons-round" style="font-size:30px;">lock_open</span>কোনো ইউজার লকড নেই।</div>`; return; }
-  wrap.innerHTML = A.lockedUsers.map(u=>`
-    <div class="locked-user-row">
-      <div class="locked-user-id">${escHtml(u.id)}</div>
-      <button class="unlock-user-btn" onclick="unlockUser('${u.id}')">আনলক করুন</button>
-    </div>`).join('');
-}
-async function unlockUser(id){
-  try{
-    await fbSet('users', id, {banned:false, skipStrikes:0});
-    toast('✅ ইউজার আনলক হয়েছে!');
-    loadLockedUsers();
-    loadAllUsers();
   }catch(e){ toast('⚠️ সমস্যা হয়েছে।'); }
 }
 
