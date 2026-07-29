@@ -209,13 +209,6 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0
 .tut-preview-thumb img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
 .tut-preview-label { padding:12px 14px; font-size:13.5px; font-weight:700; }
 
-.locked-user-row { display:flex; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid var(--border); }
-.locked-user-row:last-child { border-bottom:none; }
-.locked-user-id { font-size:12px; font-family:monospace; color:var(--text-muted); flex:1; }
-.unlock-user-btn { padding:8px 14px; border-radius:10px; border:none; background:linear-gradient(135deg,var(--green),#0d9166); color:#fff; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:12px; cursor:pointer; }
-.dormant-note { margin:0 16px 10px; padding:11px 13px; border-radius:12px; border:1px solid rgba(240,192,90,0.3); background:rgba(240,192,90,0.07); font-size:11.5px; color:var(--gold3); line-height:1.6; display:flex; gap:8px; }
-.dormant-note .material-icons-round { font-size:15px; flex-shrink:0; margin-top:1px; color:var(--gold2); }
-
 /* ============ USERS PAGE ============ */
 .users-summary-row { display:flex; gap:10px; margin:10px 16px; }
 .users-summary-card { flex:1; background:linear-gradient(180deg,var(--bg-card),#0e0c18); border:1px solid var(--border); border-radius:14px; padding:14px; text-align:center; }
@@ -237,10 +230,25 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0
 .user-chip.ads { background:rgba(160,108,232,0.15); color:var(--purple2); }
 .user-chip.unlocks { background:rgba(35,180,122,0.15); color:var(--green); }
 .user-chip.active { background:rgba(35,180,122,0.18); color:var(--green); }
+.user-chip.tg { background:rgba(64,158,255,0.16); color:#63b3ff; }
+.user-chip.notg { background:rgba(139,135,166,0.14); color:var(--text-muted); }
+
+/* ============ BROADCAST PAGE ============ */
+.bc-stats-row { display:flex; gap:10px; margin:10px 16px; }
+.bc-stat-card { flex:1; background:linear-gradient(180deg,var(--bg-card),#0e0c18); border:1px solid var(--border); border-radius:14px; padding:12px; text-align:center; }
+.bc-stat-val { font-family:'Rajdhani',sans-serif; font-size:20px; font-weight:800; color:#63b3ff; }
+.bc-stat-lbl { font-size:10px; color:var(--text-muted); margin-top:2px; }
+.bc-progress-wrap { margin:0 16px 10px; }
+.bc-progress-bar { height:8px; border-radius:6px; background:rgba(255,255,255,0.06); overflow:hidden; }
+.bc-progress-fill { height:100%; width:0%; background:linear-gradient(135deg,#409eff,#63b3ff); transition:width 0.2s; }
+.bc-progress-txt { font-size:11px; color:var(--text-muted); margin-top:6px; text-align:center; }
+.tg-badge { display:inline-flex; align-items:center; gap:5px; font-size:10.5px; font-weight:700; padding:3px 10px; border-radius:8px; }
+.tg-badge.on { background:rgba(35,180,122,0.16); color:var(--green); }
+.tg-badge.off { background:rgba(212,40,63,0.16); color:var(--accent2); }
 
 @media (min-width:600px) {
-  .mgr-card, .page-head, .tut-preview-card, .users-summary-row { max-width:560px; margin-left:auto; margin-right:auto; }
-  .page-head, .users-summary-row { max-width:560px; }
+  .mgr-card, .page-head, .tut-preview-card, .users-summary-row, .bc-stats-row { max-width:560px; margin-left:auto; margin-right:auto; }
+  .page-head, .users-summary-row, .bc-stats-row { max-width:560px; }
 }
 
 #toast { position:fixed; bottom:calc(var(--nav-h) + 14px); left:50%; transform:translateX(-50%) translateY(20px); background:var(--bg-card2); border:1px solid var(--border); padding:10px 20px; border-radius:30px; font-size:13px; opacity:0; transition:all 0.3s; z-index:999; pointer-events:none; white-space:nowrap; max-width:90vw; text-align:center; backdrop-filter:blur(6px); }
@@ -380,6 +388,55 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0
       <div class="mgr-card" id="channels-mgr-list"></div>
     </div>
 
+    <!-- BROADCAST -->
+    <div class="page" id="page-broadcast">
+      <div class="page-head">
+        <div class="page-title">টেলিগ্রাম ব্রডকাস্ট<small>বট এর মাধ্যমে সকল ইউজারের কাছে বার্তা পাঠান</small></div>
+      </div>
+
+      <div class="mgr-card" style="padding:14px 16px;">
+        <span class="tg-badge off" id="bc-tg-status"><span class="material-icons-round" style="font-size:13px;">link_off</span>বট সংযুক্ত নেই</span>
+        <div class="form-hint" style="margin-top:8px;">বট টোকেন বসাতে ও সংযুক্ত করতে "সেটিংস" পেজে যান। শুধুমাত্র যেসব ইউজার আগে বটে গিয়ে <b>/start</b> চেপেছে (এবং সাইটে টেলিগ্রাম দিয়ে ঢুকেছে), তাদের কাছেই বার্তা পাঠানো সম্ভব — এটি টেলিগ্রামের নিজস্ব নিয়ম।</div>
+      </div>
+
+      <div class="bc-stats-row">
+        <div class="bc-stat-card">
+          <div class="bc-stat-val" id="bc-total-users">0</div>
+          <div class="bc-stat-lbl">মোট ইউজার</div>
+        </div>
+        <div class="bc-stat-card">
+          <div class="bc-stat-val" id="bc-tg-users">0</div>
+          <div class="bc-stat-lbl">টেলিগ্রাম পাওয়া যাবে</div>
+        </div>
+      </div>
+
+      <div class="mgr-card">
+        <div class="form-section">
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">image</span>ছবি (ঐচ্ছিক)</div>
+            <div class="thumb-upload-box" id="bc-thumb-box" onclick="document.getElementById('bc-thumb-file').click()">
+              <span class="upl-icon material-icons-round">add_photo_alternate</span>
+              <span class="upl-txt">ছবি আপলোড করতে ট্যাপ করুন (না দিলে শুধু টেক্সট মেসেজ যাবে)</span>
+              <div class="upl-overlay">পরিবর্তন করতে ট্যাপ করুন</div>
+              <div class="thumb-progress" id="bc-thumb-progress"></div>
+            </div>
+            <input type="file" accept="image/*" id="bc-thumb-file" style="display:none;" onchange="handleThumbUpload(this,'bc')" />
+            <div class="form-hint">অথবা ছবির সরাসরি লিংক:</div>
+            <input class="form-input" id="bc-thumb-url" placeholder="https://..." style="margin-top:8px;" oninput="A.pendingBcThumbUrl=this.value.trim()" />
+          </div>
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">message</span>বার্তা লিখুন</div>
+            <textarea class="form-textarea" id="bc-message" placeholder="এখানে আপনার বার্তা লিখুন..." style="min-height:110px;"></textarea>
+          </div>
+          <button class="save-btn" id="bc-send-btn" onclick="sendManualBroadcast()"><span class="material-icons-round">send</span>সবার কাছে পাঠান</button>
+          <div class="bc-progress-wrap" id="bc-progress-wrap" style="display:none;margin-top:14px;">
+            <div class="bc-progress-bar"><div class="bc-progress-fill" id="bc-progress-fill"></div></div>
+            <div class="bc-progress-txt" id="bc-progress-txt">০ / ০ পাঠানো হয়েছে</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- SETTINGS -->
     <div class="page" id="page-settings">
       <div class="page-head">
@@ -395,13 +452,33 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0
 
       <div class="mgr-card">
         <div class="form-section">
+          <div class="form-label" style="margin-bottom:12px;"><span class="material-icons-round">smart_toy</span>টেলিগ্রাম বট সংযোগ</div>
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">key</span>বট টোকেন (Bot Token)</div>
+            <input class="form-input" type="password" id="set-bot-token" placeholder="123456789:AA...................." />
+            <div class="form-hint">@BotFather থেকে পাওয়া আপনার বটের টোকেন এখানে বসান। এই টোকেন দিয়ে বট সরাসরি ব্রাউজার থেকেই ইউজারদের মেসেজ/ছবি পাঠাবে।</div>
+          </div>
+          <div class="form-group">
+            <div class="toggle-row">
+              <div class="toggle-label"><span class="material-icons-round" style="color:var(--purple2);font-size:18px;">notifications_active</span>নতুন ভিডিও আপলোড হলে স্বয়ংক্রিয়ভাবে সবাইকে জানাও</div>
+              <label class="switch"><input type="checkbox" id="set-auto-notify"/><span class="slider-tg"></span></label>
+            </div>
+            <div class="form-hint">চালু থাকলে, নতুন ভিডিও যুক্ত করার সাথে সাথেই থাম্বনেইল ও টাইটেল সহ একটি বার্তা সব টেলিগ্রাম-ইউজারের কাছে চলে যাবে।</div>
+          </div>
+          <button class="save-btn" onclick="saveTelegramSettings()"><span class="material-icons-round">save</span>বট সেভ করুন</button>
+          <div class="form-hint" style="margin-top:10px;">কাস্টম বার্তা বা ছবি সহ বার্তা যেকোনো সময় পাঠাতে চাইলে নিচের নেভিগেশনের "ব্রডকাস্ট" পেজে যান।</div>
+        </div>
+      </div>
+
+      <div class="mgr-card">
+        <div class="form-section">
           <div class="form-label" style="margin-bottom:12px;"><span class="material-icons-round">campaign</span>বিজ্ঞাপন নেটওয়ার্ক — GigaPub</div>
           <div class="form-group">
             <div class="form-label"><span class="material-icons-round">tag</span>GigaPub Zone ID</div>
             <input class="form-input" id="set-gigapub-zone" placeholder="6814" />
           </div>
           <button class="save-btn" onclick="saveAdNetworkSettings()"><span class="material-icons-round">save</span>সেভ করুন</button>
-          <div class="form-hint">সাইট শুধুমাত্র <b>GigaPub</b> ব্যবহার করে। প্রতিটি "বিজ্ঞাপন দেখে আনলক করুন" ট্যাপে ঠিক ১টি বিজ্ঞাপন দেখানো হয় — কোনো লুকানো বা বাড়তি ধাপ নেই। Zone ID পরিবর্তন করলে সাইট পরের বার লোড হলে নতুন Zone ID কার্যকর হবে।</div>
+          <div class="form-hint">সাইট শুধুমাত্র <b>GigaPub</b> ব্যবহার করে। প্রতিটি "বিজ্ঞাপন দেখে আনলক করুন" ট্যাপে ঠিক ১টি বিজ্ঞাপন দেখানো হয় — কোনো লুকানো বা বাড়তি ধাপ নেই। Zone ID পরিবর্তন করলে সাইট পরের বার লোড হলে নতুন Zone ID কার্যকর হবে। প্রতিটি ভিডিওতে কতগুলো বিজ্ঞাপন লাগবে তা এখন ভিডিও ফর্মে ইচ্ছেমতো (৩টির বেশিও) বসানো যাবে।</div>
         </div>
       </div>
 
@@ -421,6 +498,7 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0
     <div class="nav-item" data-page="categories" onclick="showAdminPage('categories')"><span class="material-icons-round">category</span>ক্যাটাগরি</div>
     <div class="nav-item" data-page="tutorial" onclick="showAdminPage('tutorial')"><span class="material-icons-round">menu_book</span>টিউটোরিয়াল</div>
     <div class="nav-item" data-page="channels" onclick="showAdminPage('channels')"><span class="material-icons-round">send</span>চ্যানেল</div>
+    <div class="nav-item" data-page="broadcast" onclick="showAdminPage('broadcast')"><span class="material-icons-round">campaign</span>ব্রডকাস্ট</div>
     <div class="nav-item" data-page="settings" onclick="showAdminPage('settings')"><span class="material-icons-round">settings</span>সেটিংস</div>
   </nav>
 </div>
@@ -471,18 +549,14 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0
       <div class="form-row2">
         <div class="form-group">
           <div class="form-label"><span class="material-icons-round">local_movies</span>আনলকে বিজ্ঞাপন সংখ্যা</div>
-          <select class="form-select" id="v-ads-required">
-            <option value="1">১টি (প্রস্তাবিত)</option>
-            <option value="2">২টি</option>
-            <option value="3" selected>৩টি</option>
-          </select>
+          <input class="form-input" type="number" id="v-ads-required" min="1" step="1" value="3" placeholder="৩" />
         </div>
         <div class="form-group">
           <div class="form-label"><span class="material-icons-round">visibility</span>ভিউ (ঐচ্ছিক)</div>
           <input class="form-input" type="number" id="v-views" placeholder="0" />
         </div>
       </div>
-      <div class="form-hint" style="margin-top:-8px;margin-bottom:14px;">প্রতিটি সংখ্যা মানে ঠিক ততগুলো আলাদা বিজ্ঞাপন-ট্যাপ — প্রতিবার একটি সত্যিকারের বিজ্ঞাপন দেখানো হয়, কোনো ভুয়া ধাপ নেই।</div>
+      <div class="form-hint" style="margin-top:-8px;margin-bottom:14px;">প্রতিটি সংখ্যা মানে ঠিক ততগুলো আলাদা বিজ্ঞাপন-ট্যাপ — প্রতিবার একটি সত্যিকারের বিজ্ঞাপন দেখানো হয়, কোনো ভুয়া ধাপ নেই। এখন প্রয়োজন অনুযায়ী ৩টির বেশি সংখ্যাও বসাতে পারবেন।</div>
 
       <div class="form-group">
         <div class="toggle-row">
@@ -522,12 +596,14 @@ const A = {
   channels: [],
   tutorial: null,
   settings: {},
+  telegram: { botToken:'', autoNotify:false },
   allUsers: [],
   editingVideoId: null,
   pendingThumbUrl: '',
   pendingVideoUrl: '',
   pendingTutThumbUrl: '',
   pendingTutVideoUrl: '',
+  pendingBcThumbUrl: '',
   confirmCb: null,
 };
 
@@ -562,7 +638,7 @@ function logoutAdmin(){ sessionStorage.removeItem(ADMIN_SESSION_KEY); location.r
 async function enterApp(){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').classList.add('visible');
-  await Promise.all([loadCategories(), loadChannels(), loadTutorial(), loadSettingsForm(), loadAdNetworkSettingsForm(), loadAllUsers()]);
+  await Promise.all([loadCategories(), loadChannels(), loadTutorial(), loadSettingsForm(), loadAdNetworkSettingsForm(), loadTelegramSettings(), loadAllUsers()]);
   subscribeVideosAdmin();
 }
 
@@ -584,6 +660,7 @@ function showAdminPage(name){
   document.getElementById('page-'+name).classList.add('active');
   document.querySelector(`.nav-item[data-page="${name}"]`).classList.add('active');
   if(name==='users') loadAllUsers();
+  if(name==='broadcast') refreshBroadcastStats();
 }
 
 /* ============ USERS ============
@@ -591,8 +668,12 @@ function showAdminPage(name){
    (ডকুমেন্ট আইডি = সেই ইউজারের ব্রাউজার-জেনারেটেড আইডি)। প্রতিবার তারা একটি
    বিজ্ঞাপন সম্পূর্ণ দেখলে সেই ডকুমেন্টের adsWatched ফিল্ড ১ করে বাড়ে, এবং
    প্রতিটি ভিডিও আনলক হলে unlockedCount বাড়ে। এই পেজ সবগুলো ইউজার ও তাদের
-   পরিসংখ্যান দেখায়। সাইটে এখন আর কোনো অ্যাকাউন্ট-লক ব্যবস্থা নেই — বিজ্ঞাপন
-   মাঝপথে বন্ধ করলে শুধু সেই আনলক-ধাপ অসম্পূর্ণ থাকে, কোনো পেনাল্টি হয় না। */
+   পরিসংখ্যান দেখায়।
+
+   গুরুত্বপূর্ণ: সাইটে কোনো ইউজার-লক / একাউন্ট-লক ব্যবস্থা নেই এবং কখনোই
+   কোনো ইউজার আইডি কোনোভাবে লক করা হয় না। বিজ্ঞাপন মাঝপথে বন্ধ করলে শুধু সেই
+   আনলক-ধাপ অসম্পূর্ণ থাকে, কোনো পেনাল্টি বা লক হয় না — এই এডমিন প্যানেলে
+   ইউজার লক করা বা আনলক করার মতো কোনো বাটন/ফিচার ইচ্ছাকৃতভাবে রাখা হয়নি। */
 async function loadAllUsers(){
   const users = await fbGet('users');
   users.sort((a,b)=>(b.lastAdAt||b.createdAt||0)-(a.lastAdAt||a.createdAt||0));
@@ -636,6 +717,7 @@ function renderUsersList(){
           <span class="user-chip ads"><span class="material-icons-round">smart_display</span>${u.adsWatched||0} অ্যাড দেখেছে</span>
           <span class="user-chip unlocks"><span class="material-icons-round">lock_open</span>${u.unlockedCount||0} আনলক</span>
           <span class="user-chip active"><span class="material-icons-round">check_circle</span>সচল</span>
+          ${u.tgUserId?'<span class="user-chip tg"><span class="material-icons-round">send</span>বট সংযুক্ত</span>':'<span class="user-chip notg"><span class="material-icons-round">block</span>বট নেই</span>'}
         </div>
       </div>
     </div>`;
@@ -668,8 +750,8 @@ function uploadToStorage(file, folder, onProgressEl){
 function handleThumbUpload(input, ctx){
   const file = input.files[0];
   if(!file) return;
-  const boxId = ctx==='v' ? 'v-thumb-box' : 'tut-thumb-box';
-  const progId = ctx==='v' ? 'v-thumb-progress' : 'tut-thumb-progress';
+  const boxId = ctx==='v' ? 'v-thumb-box' : (ctx==='bc' ? 'bc-thumb-box' : 'tut-thumb-box');
+  const progId = ctx==='v' ? 'v-thumb-progress' : (ctx==='bc' ? 'bc-thumb-progress' : 'tut-thumb-progress');
   const box = document.getElementById(boxId);
   const prog = document.getElementById(progId);
   const localUrl = URL.createObjectURL(file);
@@ -677,6 +759,7 @@ function handleThumbUpload(input, ctx){
   toast('থাম্বনেইল আপলোড হচ্ছে...');
   uploadToStorage(file,'thumbnails',prog).then(url=>{
     if(ctx==='v'){ A.pendingThumbUrl = url; document.getElementById('v-thumb-url').value = url; }
+    else if(ctx==='bc'){ A.pendingBcThumbUrl = url; document.getElementById('bc-thumb-url').value = url; }
     else { A.pendingTutThumbUrl = url; }
     setThumbPreview(box, url);
     toast('✅ থাম্বনেইল আপলোড সম্পন্ন!');
@@ -845,6 +928,7 @@ function renderVideosList(){
   }
   wrap.innerHTML = A.videos.map(v=>{
     const partsCount = (v.parts && v.parts.length) ? v.parts.length : 1;
+    const adsN = Math.max(1, parseInt(v.adsRequired)||3);
     return `
     <div class="vid-row" style="border-bottom:1px solid var(--border);">
       <div class="vid-thumb">${v.thumbnail?`<img src="${escHtml(v.thumbnail)}" onerror="this.style.display='none'"/>`:'🎬'}</div>
@@ -852,7 +936,7 @@ function renderVideosList(){
         <div class="vid-title">${escHtml(v.title||'শিরোনামহীন')}</div>
         <div class="vid-meta-row">
           <span class="vid-chip">${catLabelAdmin(v.category)}</span>
-          <span class="vid-chip gold">🎬 ${Math.max(1,Math.min(3,parseInt(v.adsRequired)||3))} বিজ্ঞাপন</span>
+          <span class="vid-chip gold">🎬 ${adsN} বিজ্ঞাপন</span>
           ${partsCount>1?`<span class="vid-chip" style="background:rgba(240,192,90,0.15);color:var(--gold3);">📼 ${partsCount} পার্ট</span>`:''}
           ${v.featured?'<span class="vid-chip" style="background:rgba(35,180,122,0.18);color:var(--green);">NEW</span>':''}
         </div>
@@ -895,7 +979,7 @@ function openVideoForm(id){
       document.getElementById('v-thumb-url').value = v.thumbnail||'';
       document.getElementById('v-views').value = v.views||0;
       document.getElementById('v-featured').checked = !!v.featured;
-      document.getElementById('v-ads-required').value = String(Math.max(1,Math.min(3,parseInt(v.adsRequired)||3)));
+      document.getElementById('v-ads-required').value = String(Math.max(1,parseInt(v.adsRequired)||3));
       if(v.thumbnail) setThumbPreview(box, v.thumbnail);
       const partsData = (v.parts && v.parts.length) ? v.parts : (v.url ? [{url:v.url}] : [{}]);
       partsData.forEach(p=>createPartBlock(p));
@@ -920,14 +1004,17 @@ async function saveVideo(){
   if(!parts.length){ toast('⚠️ অন্তত একটি ভিডিও পার্ট (আপলোড বা লিংক) দিন।'); return; }
   const btn = document.getElementById('v-save-btn');
   btn.disabled = true; btn.innerHTML = '<span class="material-icons-round">hourglass_top</span>সেভ হচ্ছে...';
+  const isNew = !A.editingVideoId;
+  const thumbnail = document.getElementById('v-thumb-url').value.trim();
+  const description = document.getElementById('v-desc').value.trim();
   const data = {
     title,
-    description: document.getElementById('v-desc').value.trim(),
+    description,
     parts,
     url: parts[0].url, // backward-compat single-video field
-    thumbnail: document.getElementById('v-thumb-url').value.trim(),
+    thumbnail,
     category: document.getElementById('v-category').value,
-    adsRequired: parseInt(document.getElementById('v-ads-required').value)||3,
+    adsRequired: Math.max(1, parseInt(document.getElementById('v-ads-required').value)||3),
     views: parseInt(document.getElementById('v-views').value)||0,
     featured: document.getElementById('v-featured').checked,
   };
@@ -941,6 +1028,10 @@ async function saveVideo(){
       toast('✅ নতুন ভিডিও যুক্ত হয়েছে! ইউজার সাইটে এটির জন্য এখনই একটি আলাদা শেয়ার লিংক তৈরি হয়ে যাবে।');
     }
     closeFormModal();
+    if(isNew && A.telegram.autoNotify && A.telegram.botToken){
+      const caption = `🎬 নতুন ভিডিও যুক্ত হয়েছে!\n\n${title}${description?'\n\n'+description:''}`;
+      runBroadcast(caption, thumbnail, true);
+    }
   }catch(e){ toast('⚠️ সেভ করতে সমস্যা হয়েছে।'); }
   btn.disabled = false; btn.innerHTML = '<span class="material-icons-round">save</span>সেভ করুন';
 }
@@ -1022,7 +1113,114 @@ function confirmDeleteChannel(id,name){
   });
 }
 
-/* ============ SETTINGS ============
+/* ============ TELEGRAM BOT / BROADCAST ============
+   বট টোকেন settings/telegram ডকুমেন্টে সেভ থাকে। ব্রডকাস্ট সরাসরি ব্রাউজার
+   থেকে Telegram Bot API (api.telegram.org) কল করে পাঠানো হয় — কোনো আলাদা
+   সার্ভার দরকার হয় না। শুধুমাত্র যেসব ইউজার আগে বটে গিয়ে চ্যাট শুরু করেছে
+   (tgUserId আছে) তাদের কাছেই মেসেজ যেতে পারবে — এটি টেলিগ্রামের নিয়ম। */
+async function loadTelegramSettings(){
+  const cfg = await fbGetDoc('settings','telegram');
+  A.telegram = { botToken:(cfg&&cfg.botToken)||'', autoNotify: !!(cfg&&cfg.autoNotify) };
+  document.getElementById('set-bot-token').value = A.telegram.botToken;
+  document.getElementById('set-auto-notify').checked = A.telegram.autoNotify;
+  updateBcTgStatus();
+}
+async function saveTelegramSettings(){
+  const botToken = document.getElementById('set-bot-token').value.trim();
+  const autoNotify = document.getElementById('set-auto-notify').checked;
+  try{
+    await fbSet('settings','telegram',{botToken,autoNotify});
+    A.telegram = {botToken,autoNotify};
+    updateBcTgStatus();
+    toast('✅ টেলিগ্রাম বট সেভ হয়েছে!');
+  }catch(e){ toast('⚠️ সমস্যা হয়েছে।'); }
+}
+function updateBcTgStatus(){
+  const el = document.getElementById('bc-tg-status');
+  if(!el) return;
+  if(A.telegram.botToken){
+    el.className = 'tg-badge on';
+    el.innerHTML = '<span class="material-icons-round" style="font-size:13px;">check_circle</span>বট সংযুক্ত আছে';
+  } else {
+    el.className = 'tg-badge off';
+    el.innerHTML = '<span class="material-icons-round" style="font-size:13px;">link_off</span>বট সংযুক্ত নেই — সেটিংসে গিয়ে টোকেন বসান';
+  }
+}
+function refreshBroadcastStats(){
+  updateBcTgStatus();
+  const tgUsers = A.allUsers.filter(u=>u.tgUserId);
+  document.getElementById('bc-total-users').textContent = A.allUsers.length;
+  document.getElementById('bc-tg-users').textContent = tgUsers.length;
+}
+
+/* Send a single Telegram message/photo to one chat id. Resolves true/false. */
+async function tgSendOne(chatId, text, photoUrl){
+  const token = A.telegram.botToken;
+  if(!token) return false;
+  try{
+    if(photoUrl){
+      const res = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`,{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ chat_id: chatId, photo: photoUrl, caption: text })
+      });
+      const j = await res.json();
+      if(j.ok) return true;
+      // fall back to plain text if photo send fails (e.g. bad url)
+      const res2 = await fetch(`https://api.telegram.org/bot${token}/sendMessage`,{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ chat_id: chatId, text })
+      });
+      const j2 = await res2.json();
+      return !!j2.ok;
+    } else {
+      const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`,{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ chat_id: chatId, text })
+      });
+      const j = await res.json();
+      return !!j.ok;
+    }
+  }catch(e){ return false; }
+}
+
+/* Broadcast to every user with a tgUserId, with a small delay between sends
+   to stay comfortably within Telegram's rate limits. Updates the progress
+   bar on the broadcast page if it's visible. */
+async function runBroadcast(text, photoUrl, silent){
+  if(!A.telegram.botToken){ if(!silent) toast('⚠️ আগে সেটিংসে গিয়ে বট টোকেন বসান।'); return; }
+  const targets = A.allUsers.filter(u=>u.tgUserId);
+  if(!targets.length){ if(!silent) toast('⚠️ টেলিগ্রাম দিয়ে ঢোকা কোনো ইউজার এখনো পাওয়া যায়নি।'); return; }
+
+  const progWrap = document.getElementById('bc-progress-wrap');
+  const progFill = document.getElementById('bc-progress-fill');
+  const progTxt = document.getElementById('bc-progress-txt');
+  if(progWrap){ progWrap.style.display='block'; progFill.style.width='0%'; }
+
+  let sent=0, failed=0;
+  for(let i=0;i<targets.length;i++){
+    const ok = await tgSendOne(targets[i].tgUserId, text, photoUrl);
+    if(ok) sent++; else failed++;
+    const pct = Math.round(((i+1)/targets.length)*100);
+    if(progFill){ progFill.style.width = pct+'%'; }
+    if(progTxt){ progTxt.textContent = `${i+1} / ${targets.length} পাঠানো হয়েছে (সফল: ${sent}, ব্যর্থ: ${failed})`; }
+    await new Promise(r=>setTimeout(r,45)); // ~22/sec, safely under Telegram limits
+  }
+  toast(`✅ ব্রডকাস্ট শেষ! সফল: ${sent}, ব্যর্থ: ${failed}`);
+  return {sent,failed};
+}
+
+async function sendManualBroadcast(){
+  const text = document.getElementById('bc-message').value.trim();
+  const photoUrl = document.getElementById('bc-thumb-url').value.trim() || A.pendingBcThumbUrl || '';
+  if(!text){ toast('⚠️ একটি বার্তা লিখুন।'); return; }
+  if(!A.telegram.botToken){ toast('⚠️ আগে সেটিংসে গিয়ে বট টোকেন বসান।'); return; }
+  const btn = document.getElementById('bc-send-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="material-icons-round">hourglass_top</span>পাঠানো হচ্ছে...';
+  await runBroadcast(text, photoUrl, false);
+  btn.disabled = false; btn.innerHTML = '<span class="material-icons-round">send</span>সবার কাছে পাঠান';
+}
+
+/* ============ GENERAL SETTINGS ============
    পুরনো "বিজ্ঞাপন টাইমার" ফিল্ডটি সরিয়ে ফেলা হয়েছে — সেটি পুরনো ভুয়া
    কাউন্টডাউন সিস্টেমের অংশ ছিল, যা এখন আর সাইটে ব্যবহৃত হয় না। এখন প্রতিটি
    বিজ্ঞাপন সরাসরি GigaPub SDK-এর প্রকৃত দৈর্ঘ্য অনুযায়ী চলে। */
