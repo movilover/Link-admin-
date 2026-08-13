@@ -472,13 +472,29 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0
 
       <div class="mgr-card">
         <div class="form-section">
-          <div class="form-label" style="margin-bottom:12px;"><span class="material-icons-round">campaign</span>বিজ্ঞাপন নেটওয়ার্ক — GigaPub</div>
+          <div class="form-label" style="margin-bottom:12px;"><span class="material-icons-round">campaign</span>বিজ্ঞাপন নেটওয়ার্ক</div>
+
           <div class="form-group">
+            <div class="toggle-row">
+              <div class="toggle-label"><span class="material-icons-round" style="color:var(--gold3);font-size:18px;">swap_horiz</span>মনিট্যাগ (Monetag) চালু করুন</div>
+              <label class="switch"><input type="checkbox" id="set-use-monetag" onchange="toggleAdNetworkFields()"/><span class="slider-tg"></span></label>
+            </div>
+            <div class="form-hint">সুইচ <b>বন্ধ</b> থাকলে সাইটে শুধু <b>GigaPub</b>-এর বিজ্ঞাপন দেখানো হবে — Monetag-এর স্ক্রিপ্টই লোড হবে না। সুইচ <b>চালু</b> করলে সাইট থেকে GigaPub সরাসরি ও সম্পূর্ণভাবে বন্ধ হয়ে যাবে এবং শুধু <b>Monetag</b>-এর বিজ্ঞাপন দেখানো হবে। যেকোনো সময় সুইচ পরিবর্তন করে আবার আগেরটায় ফেরত যেতে পারবেন।</div>
+          </div>
+
+          <div class="form-group" id="gigapub-zone-group">
             <div class="form-label"><span class="material-icons-round">tag</span>GigaPub Zone ID</div>
             <input class="form-input" id="set-gigapub-zone" placeholder="6814" />
           </div>
+
+          <div class="form-group" id="monetag-zone-group" style="display:none;">
+            <div class="form-label"><span class="material-icons-round">tag</span>Monetag Zone ID</div>
+            <input class="form-input" id="set-monetag-zone" placeholder="যেমন: 123456" />
+            <div class="form-hint">Monetag ড্যাশবোর্ড থেকে পাওয়া Zone ID এখানে বসান। Monetag চালু থাকা অবস্থায় প্রতিটি বিজ্ঞাপন কমপক্ষে <b>১৫ সেকেন্ড</b> দেখানো হবে, এরপর একটি ক্রস (✕) আইকন দেখা যাবে যা দিয়ে ইউজার বিজ্ঞাপনটি বন্ধ করতে পারবে।</div>
+          </div>
+
           <button class="save-btn" onclick="saveAdNetworkSettings()"><span class="material-icons-round">save</span>সেভ করুন</button>
-          <div class="form-hint">সাইট শুধুমাত্র <b>GigaPub</b> ব্যবহার করে। প্রতিটি "বিজ্ঞাপন দেখে আনলক করুন" ট্যাপে ঠিক ১টি বিজ্ঞাপন দেখানো হয় — কোনো লুকানো বা বাড়তি ধাপ নেই। Zone ID পরিবর্তন করলে সাইট পরের বার লোড হলে নতুন Zone ID কার্যকর হবে। প্রতিটি ভিডিওতে কতগুলো বিজ্ঞাপন লাগবে তা এখন ভিডিও ফর্মে ইচ্ছেমতো (৩টির বেশিও) বসানো যাবে।</div>
+          <div class="form-hint">প্রতিটি "বিজ্ঞাপন দেখে আনলক করুন" ট্যাপে ঠিক ১টি বিজ্ঞাপন দেখানো হয় — কোনো লুকানো বা বাড়তি ধাপ নেই। নেটওয়ার্ক সুইচ পরিবর্তন করলে সাইট পরের বার লোড হলে নতুন নেটওয়ার্ক কার্যকর হবে। প্রতিটি ভিডিওতে কতগুলো বিজ্ঞাপন লাগবে তা ভিডিও ফর্মে ইচ্ছেমতো বসানো যাবে।</div>
         </div>
       </div>
 
@@ -1253,14 +1269,29 @@ async function saveGeneralSettings(){
     toast('✅ সেটিংস সেভ হয়েছে!');
   }catch(e){ toast('⚠️ সেভ করতে সমস্যা হয়েছে।'); }
 }
+
+/* ============ AD NETWORK SETTINGS (GigaPub <-> Monetag switch) ============ */
+function toggleAdNetworkFields(){
+  const useMonetag = document.getElementById('set-use-monetag').checked;
+  document.getElementById('gigapub-zone-group').style.display = useMonetag ? 'none' : '';
+  document.getElementById('monetag-zone-group').style.display = useMonetag ? '' : 'none';
+}
 async function loadAdNetworkSettingsForm(){
   const cfg = await fbGetDoc('settings','adnetwork');
   document.getElementById('set-gigapub-zone').value = (cfg && cfg.gigapubZoneId) || '6814';
+  document.getElementById('set-monetag-zone').value = (cfg && cfg.monetagZoneId) || '';
+  const useMonetag = !!(cfg && cfg.activeNetwork === 'monetag');
+  document.getElementById('set-use-monetag').checked = useMonetag;
+  toggleAdNetworkFields();
 }
 async function saveAdNetworkSettings(){
   const gigapubZoneId = document.getElementById('set-gigapub-zone').value.trim() || '6814';
+  const monetagZoneId = document.getElementById('set-monetag-zone').value.trim();
+  const useMonetag = document.getElementById('set-use-monetag').checked;
+  if(useMonetag && !monetagZoneId){ toast('⚠️ Monetag চালু করতে হলে Monetag Zone ID দিন।'); return; }
+  const activeNetwork = useMonetag ? 'monetag' : 'gigapub';
   try{
-    await fbSet('settings','adnetwork',{gigapubZoneId});
+    await fbSet('settings','adnetwork',{gigapubZoneId, monetagZoneId, activeNetwork});
     toast('✅ বিজ্ঞাপন নেটওয়ার্ক সেভ হয়েছে! ইউজার সাইট পরের বার লোড হলে এটি কার্যকর হবে।');
   }catch(e){ toast('⚠️ সমস্যা হয়েছে।'); }
 }
