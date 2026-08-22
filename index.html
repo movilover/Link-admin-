@@ -49,23 +49,23 @@
 
 <style>
 :root {
-  --bg-deep: #0a0812;
-  --bg-card: #15121f;
-  --bg-card2: #1c1830c0;
-  --accent: #d4283f;
-  --accent2: #ff5470;
-  --gold: #f0c05a;
-  --gold2: #e0a63a;
-  --gold3: #ffe08a;
-  --purple: #7b3fe4;
-  --purple2: #a06ce8;
-  --pink: #ff3d81;
+  --bg-deep: #0f0a0d;
+  --bg-card: #1a1214;
+  --bg-card2: #241a1ec0;
+  --accent: #b8203a;
+  --accent2: #e8425e;
+  --gold: #d9a53f;
+  --gold2: #c8902e;
+  --gold3: #f0c874;
+  --purple: #8a2f42;
+  --purple2: #b8546b;
+  --pink: #c9435f;
   --green: #23b47a;
   --red: #e84855;
-  --text: #f3f0ff;
-  --text-muted: #8b87a6;
-  --border: rgba(160,108,232,0.22);
-  --glow: rgba(212,40,63,0.45);
+  --text: #f7f0e8;
+  --text-muted: #a08f86;
+  --border: rgba(217,165,63,0.18);
+  --glow: rgba(184,32,58,0.45);
   --nav-h: 66px;
   --header-h: 60px;
   --card-radius: 18px;
@@ -79,8 +79,8 @@ html,body { height:100%; overflow:hidden; background:var(--bg-deep); color:var(-
 ::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
 
 /* ============ LOGIN ============ */
-#login-screen { position:fixed; inset:0; z-index:9999; background:radial-gradient(ellipse at 50% 20%, #1b1332 0%, var(--bg-deep) 70%); display:flex; align-items:center; justify-content:center; padding:24px; }
-.login-box { width:100%; max-width:340px; background:linear-gradient(180deg,#191530,#0d0a19); border:1px solid var(--border); border-radius:22px; padding:30px 24px; text-align:center; }
+#login-screen { position:fixed; inset:0; z-index:9999; background:radial-gradient(ellipse at 50% 20%, #241318 0%, var(--bg-deep) 70%); display:flex; align-items:center; justify-content:center; padding:24px; }
+.login-box { width:100%; max-width:340px; background:linear-gradient(180deg,#1f1517,#100a0c); border:1px solid var(--border); border-radius:22px; padding:30px 24px; text-align:center; }
 .login-logo { font-family:'Cinzel Decorative',serif; font-size:26px; font-weight:900; margin-bottom:4px; }
 .login-logo span { color:var(--accent); text-shadow:0 0 20px var(--glow); }
 .login-sub { font-size:12px; color:var(--text-muted); margin-bottom:22px; letter-spacing:1px; }
@@ -93,11 +93,11 @@ html,body { height:100%; overflow:hidden; background:var(--bg-deep); color:var(-
 /* ============ APP SHELL ============ */
 #app { height:100%; display:flex; flex-direction:column; opacity:0; transition:opacity 0.4s; }
 #app.visible { opacity:1; }
-header { height:var(--header-h); flex-shrink:0; background:linear-gradient(135deg,#0c0a1a 0%,#150f28 100%); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 16px; }
+header { height:var(--header-h); flex-shrink:0; background:linear-gradient(135deg,#130d0f 0%,#1c1316 100%); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 16px; }
 .header-logo { font-family:'Cinzel Decorative',serif; font-size:19px; font-weight:900; }
 .header-logo span { color:var(--accent); }
-.header-logo small { display:block; font-family:'Rajdhani',sans-serif; font-size:10px; color:var(--purple2); letter-spacing:2px; font-weight:700; }
-.logout-btn { width:36px; height:36px; border-radius:50%; background:rgba(212,40,63,0.15); border:1px solid rgba(212,40,63,0.3); display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--accent2); }
+.header-logo small { display:block; font-family:'Rajdhani',sans-serif; font-size:10px; color:var(--gold3); letter-spacing:2px; font-weight:700; }
+.logout-btn { width:36px; height:36px; border-radius:50%; background:rgba(184,32,58,0.15); border:1px solid rgba(184,32,58,0.3); display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--accent2); }
 
 #pages { flex:1; overflow:hidden; position:relative; }
 .page { position:absolute; inset:0; overflow-y:auto; padding-bottom:calc(var(--nav-h) + 16px); display:none; }
@@ -107,40 +107,55 @@ header { height:var(--header-h); flex-shrink:0; background:linear-gradient(135de
 .page-head { padding:16px 16px 6px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
 .page-title { font-family:'Rajdhani',sans-serif; font-size:19px; font-weight:700; }
 .page-title small { display:block; font-family:'Hind Siliguri',sans-serif; font-size:11px; color:var(--text-muted); font-weight:400; margin-top:2px; }
-.add-fab { display:flex; align-items:center; gap:6px; padding:10px 16px; border-radius:14px; border:none; background:var(--grad-btn); color:#fff; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:13.5px; cursor:pointer; box-shadow:0 6px 18px rgba(123,63,228,0.35); flex-shrink:0; }
+.add-fab { display:flex; align-items:center; gap:6px; padding:10px 16px; border-radius:14px; border:none; background:var(--grad-btn); color:#fff; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:13.5px; cursor:pointer; box-shadow:0 6px 18px rgba(138,47,66,0.35); flex-shrink:0; }
 
-nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a081b 0%,#0d0a22 100%); border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-around; overflow-x:auto; }
+nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d090b 0%,#120c0f 100%); border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-around; overflow-x:auto; }
 .nav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; cursor:pointer; padding:6px 2px; color:var(--text-muted); font-size:9px; font-weight:600; min-width:52px; }
 .nav-item .material-icons-round { font-size:20px; }
 .nav-item.active { color:var(--accent2); }
 .nav-item.active .material-icons-round { filter:drop-shadow(0 0 8px var(--glow)); }
 
 /* ============ CARDS / LISTS ============ */
-.mgr-card { margin:10px 16px; background:linear-gradient(180deg,var(--bg-card),#0e0c18); border:1px solid var(--border); border-radius:16px; overflow:hidden; box-shadow:0 6px 20px rgba(0,0,0,0.35); }
+.mgr-card { margin:10px 16px; background:linear-gradient(180deg,var(--bg-card),#130d0f); border:1px solid var(--border); border-radius:16px; overflow:hidden; box-shadow:0 6px 20px rgba(0,0,0,0.35); }
 .vid-row { display:flex; gap:12px; padding:12px; }
-.vid-thumb { width:96px; height:72px; border-radius:12px; object-fit:cover; background:linear-gradient(135deg,#211d3d,#120f22); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:22px; overflow:hidden; position:relative; border:1px solid var(--border); }
+.vid-thumb { width:96px; height:72px; border-radius:12px; object-fit:cover; background:linear-gradient(135deg,#291b1f,#160f11); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:22px; overflow:hidden; position:relative; border:1px solid var(--border); }
 .vid-thumb img { width:100%; height:100%; object-fit:cover; }
 .vid-body { flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; gap:3px; }
 .vid-title { font-size:13.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .vid-meta-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-.vid-chip { font-size:10px; padding:2px 8px; border-radius:8px; background:rgba(160,108,232,0.15); color:var(--purple2); font-weight:700; }
-.vid-chip.gold { background:rgba(240,192,90,0.15); color:var(--gold3); }
+.vid-chip { font-size:10px; padding:2px 8px; border-radius:8px; background:rgba(184,84,107,0.15); color:var(--purple2); font-weight:700; }
+.vid-chip.gold { background:rgba(217,165,63,0.15); color:var(--gold3); }
+.vid-chip.pin { background:rgba(217,165,63,0.2); color:var(--gold3); }
 .vid-stat-sm { font-size:10.5px; color:var(--text-muted); display:flex; align-items:center; gap:3px; }
 .vid-actions { display:flex; gap:6px; align-items:flex-start; flex-shrink:0; }
 .icon-action { width:32px; height:32px; border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer; border:1px solid var(--border); background:rgba(255,255,255,0.03); color:var(--text-muted); }
-.icon-action.edit { color:var(--purple2); border-color:rgba(160,108,232,0.3); }
-.icon-action.del { color:var(--accent2); border-color:rgba(212,40,63,0.3); }
+.icon-action.edit { color:var(--purple2); border-color:rgba(184,84,107,0.3); }
+.icon-action.del { color:var(--accent2); border-color:rgba(184,32,58,0.3); }
+.icon-action.pin-on { color:var(--gold3); border-color:rgba(217,165,63,0.4); background:rgba(217,165,63,0.12); }
 .icon-action .material-icons-round { font-size:16px; }
 
 .cat-row, .chan-row { display:flex; align-items:center; gap:12px; padding:13px 14px; border-bottom:1px solid var(--border); }
 .cat-row:last-child, .chan-row:last-child { border-bottom:none; }
-.cat-emoji-box { width:38px; height:38px; border-radius:11px; background:rgba(160,108,232,0.12); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+.cat-emoji-box { width:38px; height:38px; border-radius:11px; background:rgba(184,84,107,0.12); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
 .cat-info { flex:1; min-width:0; }
 .cat-name { font-size:13.5px; font-weight:700; }
 .cat-key { font-size:10.5px; color:var(--text-muted); font-family:monospace; }
 
 .empty-hint { padding:40px 20px; text-align:center; color:var(--text-muted); font-size:13px; }
 .empty-hint .material-icons-round { font-size:40px; opacity:0.3; display:block; margin:0 auto 10px; }
+
+/* ============ PINNED VIDEOS MANAGER ============ */
+.pin-list-row { display:flex; align-items:center; gap:10px; padding:10px 14px; border-bottom:1px solid var(--border); }
+.pin-list-row:last-child { border-bottom:none; }
+.pin-rank-badge { width:26px; height:26px; border-radius:8px; background:var(--grad-btn); color:#fff; font-family:'Rajdhani',sans-serif; font-weight:800; font-size:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.pin-list-thumb { width:44px; height:32px; border-radius:7px; object-fit:cover; background:#241a1e; flex-shrink:0; overflow:hidden; }
+.pin-list-thumb img { width:100%; height:100%; object-fit:cover; }
+.pin-list-title { flex:1; min-width:0; font-size:12.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pin-order-btns { display:flex; gap:4px; flex-shrink:0; }
+.pin-order-btn { width:26px; height:26px; border-radius:7px; border:1px solid var(--border); background:rgba(255,255,255,0.03); color:var(--text-muted); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+.pin-order-btn .material-icons-round { font-size:15px; }
+.pin-unpin-btn { width:26px; height:26px; border-radius:7px; border:1px solid rgba(184,32,58,0.3); background:rgba(184,32,58,0.1); color:var(--accent2); display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; }
+.pin-unpin-btn .material-icons-round { font-size:14px; }
 
 /* ============ FORMS ============ */
 .form-section { padding:16px; }
@@ -173,15 +188,15 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0
 .save-btn { width:100%; padding:14px; border-radius:14px; border:none; background:var(--grad-btn); color:#fff; font-family:'Rajdhani',sans-serif; font-size:15px; font-weight:700; letter-spacing:1px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:6px; }
 .save-btn:disabled { opacity:0.5; }
 .cancel-btn { width:100%; padding:12px; border-radius:14px; border:1px solid var(--border); background:transparent; color:var(--text-muted); font-family:'Hind Siliguri',sans-serif; font-size:13.5px; font-weight:600; cursor:pointer; margin-top:8px; }
-.del-btn-inline { width:100%; padding:12px; border-radius:14px; border:1px solid rgba(212,40,63,0.35); background:rgba(212,40,63,0.1); color:var(--accent2); font-family:'Hind Siliguri',sans-serif; font-size:13.5px; font-weight:700; cursor:pointer; margin-top:8px; display:flex; align-items:center; justify-content:center; gap:6px; }
+.del-btn-inline { width:100%; padding:12px; border-radius:14px; border:1px solid rgba(184,32,58,0.35); background:rgba(184,32,58,0.1); color:var(--accent2); font-family:'Hind Siliguri',sans-serif; font-size:13.5px; font-weight:700; cursor:pointer; margin-top:8px; display:flex; align-items:center; justify-content:center; gap:6px; }
 
 /* ============ PART BLOCKS (multi-part video) ============ */
 .part-block { border:1px solid var(--border); border-radius:14px; padding:12px; margin-bottom:10px; background:rgba(255,255,255,0.02); }
 .part-block-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
 .part-block-title { font-size:12.5px; font-weight:700; color:var(--purple2); display:flex; align-items:center; gap:6px; }
 .part-block-title .material-icons-round { font-size:15px; }
-.part-remove { cursor:pointer; color:var(--accent2); font-size:19px; width:26px; height:26px; border-radius:8px; display:flex; align-items:center; justify-content:center; background:rgba(212,40,63,0.1); }
-.add-part-btn { width:100%; padding:12px; border-radius:12px; border:1.5px dashed var(--border); background:rgba(160,108,232,0.06); color:var(--purple2); font-family:'Hind Siliguri',sans-serif; font-size:13px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; }
+.part-remove { cursor:pointer; color:var(--accent2); font-size:19px; width:26px; height:26px; border-radius:8px; display:flex; align-items:center; justify-content:center; background:rgba(184,32,58,0.1); }
+.add-part-btn { width:100%; padding:12px; border-radius:12px; border:1.5px dashed var(--border); background:rgba(184,84,107,0.06); color:var(--purple2); font-family:'Hind Siliguri',sans-serif; font-size:13px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; }
 
 /* ============ DIRECT LINK AD SLOTS (per-video, per-step) ============ */
 .direct-slot-row { border:1px solid var(--border); border-radius:12px; padding:10px 12px; margin-bottom:8px; background:rgba(255,255,255,0.02); }
@@ -190,7 +205,7 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0
 .direct-slot-url { margin-top:8px; }
 
 /* ============ MODAL ============ */
-#form-modal { display:none; position:fixed; inset:0; z-index:800; background:rgba(4,3,10,0.92); backdrop-filter:blur(8px); }
+#form-modal { display:none; position:fixed; inset:0; z-index:800; background:rgba(8,4,6,0.94); backdrop-filter:blur(8px); }
 #form-modal.open { display:flex; flex-direction:column; animation:fadeIn 0.2s; }
 @keyframes fadeIn { from{opacity:0} to{opacity:1} }
 .modal-header { height:56px; flex-shrink:0; display:flex; align-items:center; justify-content:space-between; padding:0 16px; border-bottom:1px solid var(--border); background:var(--bg-deep); }
@@ -201,7 +216,7 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0
 /* ============ CONFIRM ============ */
 #confirm-modal { display:none; position:fixed; inset:0; z-index:850; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; padding:24px; }
 #confirm-modal.open { display:flex; animation:fadeIn 0.15s; }
-.confirm-box { width:100%; max-width:300px; background:linear-gradient(180deg,#191530,#0d0a19); border:1px solid var(--border); border-radius:20px; padding:22px; text-align:center; }
+.confirm-box { width:100%; max-width:300px; background:linear-gradient(180deg,#1f1517,#100a0c); border:1px solid var(--border); border-radius:20px; padding:22px; text-align:center; }
 .confirm-icon { font-size:38px; margin-bottom:10px; }
 .confirm-text { font-size:13.5px; color:var(--text-muted); margin-bottom:16px; line-height:1.5; }
 .confirm-actions { display:flex; gap:8px; }
@@ -211,13 +226,13 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0
 
 /* ============ TUTORIAL / SETTINGS PREVIEW ============ */
 .tut-preview-card { margin:10px 16px; border-radius:16px; overflow:hidden; background:var(--bg-card); border:1px solid var(--border); }
-.tut-preview-thumb { width:100%; aspect-ratio:16/9; background:linear-gradient(135deg,#211d40,#0e0c1f); position:relative; overflow:hidden; }
+.tut-preview-thumb { width:100%; aspect-ratio:16/9; background:linear-gradient(135deg,#291b20,#140d0f); position:relative; overflow:hidden; }
 .tut-preview-thumb img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
 .tut-preview-label { padding:12px 14px; font-size:13.5px; font-weight:700; }
 
 /* ============ USERS PAGE ============ */
 .users-summary-row { display:flex; gap:10px; margin:10px 16px; }
-.users-summary-card { flex:1; background:linear-gradient(180deg,var(--bg-card),#0e0c18); border:1px solid var(--border); border-radius:14px; padding:14px; text-align:center; }
+.users-summary-card { flex:1; background:linear-gradient(180deg,var(--bg-card),#130d0f); border:1px solid var(--border); border-radius:14px; padding:14px; text-align:center; }
 .users-summary-val { font-family:'Rajdhani',sans-serif; font-size:22px; font-weight:800; color:var(--purple2); }
 .users-summary-val.gold { color:var(--gold3); }
 .users-summary-val.red { color:var(--accent2); }
@@ -233,15 +248,15 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0
 .user-sub-row { display:flex; gap:8px; margin-top:4px; flex-wrap:wrap; }
 .user-chip { font-size:10px; padding:2px 8px; border-radius:8px; font-weight:700; display:flex; align-items:center; gap:3px; }
 .user-chip .material-icons-round { font-size:11px; }
-.user-chip.ads { background:rgba(160,108,232,0.15); color:var(--purple2); }
+.user-chip.ads { background:rgba(184,84,107,0.15); color:var(--purple2); }
 .user-chip.unlocks { background:rgba(35,180,122,0.15); color:var(--green); }
 .user-chip.active { background:rgba(35,180,122,0.18); color:var(--green); }
 .user-chip.tg { background:rgba(64,158,255,0.16); color:#63b3ff; }
-.user-chip.notg { background:rgba(139,135,166,0.14); color:var(--text-muted); }
+.user-chip.notg { background:rgba(160,143,134,0.14); color:var(--text-muted); }
 
 /* ============ BROADCAST PAGE ============ */
 .bc-stats-row { display:flex; gap:10px; margin:10px 16px; }
-.bc-stat-card { flex:1; background:linear-gradient(180deg,var(--bg-card),#0e0c18); border:1px solid var(--border); border-radius:14px; padding:12px; text-align:center; }
+.bc-stat-card { flex:1; background:linear-gradient(180deg,var(--bg-card),#130d0f); border:1px solid var(--border); border-radius:14px; padding:12px; text-align:center; }
 .bc-stat-val { font-family:'Rajdhani',sans-serif; font-size:20px; font-weight:800; color:#63b3ff; }
 .bc-stat-lbl { font-size:10px; color:var(--text-muted); margin-top:2px; }
 .bc-progress-wrap { margin:0 16px 10px; }
@@ -250,7 +265,7 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0
 .bc-progress-txt { font-size:11px; color:var(--text-muted); margin-top:6px; text-align:center; }
 .tg-badge { display:inline-flex; align-items:center; gap:5px; font-size:10.5px; font-weight:700; padding:3px 10px; border-radius:8px; }
 .tg-badge.on { background:rgba(35,180,122,0.16); color:var(--green); }
-.tg-badge.off { background:rgba(212,40,63,0.16); color:var(--accent2); }
+.tg-badge.off { background:rgba(184,32,58,0.16); color:var(--accent2); }
 
 @media (min-width:600px) {
   .mgr-card, .page-head, .tut-preview-card, .users-summary-row, .bc-stats-row { max-width:560px; margin-left:auto; margin-right:auto; }
@@ -288,6 +303,15 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0
       <div class="page-head">
         <div class="page-title">ভিডিও ম্যানেজমেন্ট<small id="video-count-sub">লোড হচ্ছে...</small></div>
         <button class="add-fab" onclick="openVideoForm()"><span class="material-icons-round" style="font-size:18px;">add</span>নতুন ভিডিও</button>
+      </div>
+
+      <div class="page-head" style="padding-top:2px;">
+        <div class="page-title" style="font-size:14px;"><span class="material-icons-round" style="font-size:15px;vertical-align:-3px;color:var(--gold3);">push_pin</span> পিন করা ভিডিও<small>ইউজার সাইটের হোম পেজের সবার উপরে এই ক্রমে দেখাবে</small></div>
+      </div>
+      <div class="mgr-card" id="pinned-mgr-list"></div>
+
+      <div class="page-head" style="padding-top:2px;">
+        <div class="page-title" style="font-size:14px;">সকল ভিডিও</div>
       </div>
       <div class="mgr-card" id="videos-list"></div>
     </div>
@@ -597,6 +621,14 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0
         </div>
       </div>
 
+      <div class="form-group">
+        <div class="toggle-row">
+          <div class="toggle-label"><span class="material-icons-round" style="color:var(--gold3);font-size:18px;">push_pin</span>হোম পেজের সবার উপরে পিন করুন</div>
+          <label class="switch"><input type="checkbox" id="v-pinned"/><span class="slider-tg"></span></label>
+        </div>
+        <div class="form-hint">পিন করলে এই ভিডিওটি ইউজার সাইটের হোম পেজের সবচেয়ে উপরে একটি আলাদা সারিতে দেখাবে (সাধারণ তালিকাতেও থাকবে, লুকাবে না)। কোন ভিডিও আগে/পরে দেখাবে তা "ভিডিও" পেজের "পিন করা ভিডিও" তালিকা থেকে ↑ ↓ দিয়ে সাজানো যাবে।</div>
+      </div>
+
       <button class="save-btn" id="v-save-btn" onclick="saveVideo()"><span class="material-icons-round">save</span>সেভ করুন</button>
       <button class="del-btn-inline" id="v-del-btn" style="display:none;" onclick="confirmDeleteVideo()"><span class="material-icons-round">delete</span>ভিডিও ডিলিট করুন</button>
       <button class="cancel-btn" onclick="closeFormModal()">বাতিল করুন</button>
@@ -773,11 +805,7 @@ function uploadToStorage(file, folder, onProgressEl){
   });
 }
 
-/* ---------- image upload (ImgBB — থাম্বনেইলের জন্য) ----------
-   গ্যালারি/ফাইল-ম্যানেজার থেকে বাছাই করা ছবি সরাসরি ImgBB API-তে POST করা
-   হয়। XMLHttpRequest ব্যবহার করা হয়েছে যাতে আপলোডের প্রকৃত প্রোগ্রেস
-   প্রোগ্রেস-বার-এ দেখানো যায়। সফল হলে ImgBB-এর রেসপন্স থেকে data.url
-   (না থাকলে data.display_url) বের করে রিটার্ন করা হয়। */
+/* ---------- image upload (ImgBB — থাম্বনেইলের জন্য) ---------- */
 function uploadToImgBB(file, onProgressEl){
   return new Promise((resolve, reject)=>{
     const fd = new FormData();
@@ -912,12 +940,7 @@ function handlePartVideoUpload(input){
   }).catch(()=>{ statusEl.textContent='⚠️ আপলোড ব্যর্থ হয়েছে, লিংক ব্যবহার করুন'; toast('⚠️ ভিডিও আপলোড ব্যর্থ হয়েছে।'); });
 }
 
-/* ============ DIRECT LINK AD SLOTS (per-video, per-step) =====================
-   For each of the video's "adsRequired" steps, the admin can flip a slot to
-   "direct link" mode and provide a URL. Only the flipped/filled slots get
-   saved into the video's `directLinks` map (key = step number as string).
-   Any step without an entry keeps behaving as a normal network ad on the
-   user site — this is the exact contract user-site.html's runAdStep() reads. */
+/* ============ DIRECT LINK AD SLOTS (per-video, per-step) ============ */
 function getCurrentDirectSlotsState(){
   const rows = document.querySelectorAll('#v-direct-slots-wrap .direct-slot-row');
   const state = [];
@@ -932,7 +955,6 @@ function renderDirectSlots(prefillMap){
   const wrap = document.getElementById('v-direct-slots-wrap');
   if(!wrap) return;
   const n = Math.max(1, parseInt(document.getElementById('v-ads-required').value)||1);
-  // Preserve whatever the admin already typed/toggled when the count changes live.
   const existingState = getCurrentDirectSlotsState();
 
   let rowsHtml = '';
@@ -1014,6 +1036,7 @@ function subscribeVideosAdmin(){
     window._onSnapshot(q, snap=>{
       A.videos = snap.docs.map(d=>({id:d.id,...d.data()}));
       renderVideosList();
+      renderPinnedManagerList();
     }, ()=>loadVideosFallback());
   }catch(e){ loadVideosFallback(); }
 }
@@ -1021,6 +1044,7 @@ async function loadVideosFallback(){
   A.videos = await fbGet('videos');
   A.videos.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
   renderVideosList();
+  renderPinnedManagerList();
 }
 function catLabelAdmin(key){
   if(key==='all'||!key) return 'সব';
@@ -1045,19 +1069,76 @@ function renderVideosList(){
         '<div class="vid-meta-row">' +
           '<span class="vid-chip">' + catLabelAdmin(v.category) + '</span>' +
           '<span class="vid-chip gold">🎬 ' + adsN + ' বিজ্ঞাপন</span>' +
-          (partsCount>1?('<span class="vid-chip" style="background:rgba(240,192,90,0.15);color:var(--gold3);">📼 ' + partsCount + ' পার্ট</span>'):'') +
+          (partsCount>1?('<span class="vid-chip" style="background:rgba(217,165,63,0.15);color:var(--gold3);">📼 ' + partsCount + ' পার্ট</span>'):'') +
           (directLinkCount>0?('<span class="vid-chip" style="background:rgba(35,180,122,0.16);color:var(--green);">🔗 ' + directLinkCount + ' ডাইরেক্ট লিংক</span>'):'') +
           (v.featured?'<span class="vid-chip" style="background:rgba(35,180,122,0.18);color:var(--green);">NEW</span>':'') +
+          (v.pinned?'<span class="vid-chip pin"><span class="material-icons-round" style="font-size:11px;vertical-align:-2px;">push_pin</span> পিন করা</span>':'') +
         '</div>' +
         '<span class="vid-stat-sm"><span class="material-icons-round" style="font-size:13px;">visibility</span>' + fmtNum(v.views||0) + '</span>' +
       '</div>' +
       '<div class="vid-actions">' +
+        '<div class="icon-action ' + (v.pinned?'pin-on':'') + '" onclick="togglePinVideo(\'' + v.id + '\')" title="পিন করুন/আনপিন করুন"><span class="material-icons-round">push_pin</span></div>' +
         '<div class="icon-action edit" onclick="openVideoForm(\'' + v.id + '\')"><span class="material-icons-round">edit</span></div>' +
         '<div class="icon-action del" onclick="confirmDeleteVideoRow(\'' + v.id + '\',\'' + escHtml(v.title||'ভিডিও') + '\')"><span class="material-icons-round">delete</span></div>' +
       '</div>' +
     '</div>';
   }).join('');
   wrap.lastElementChild.style.borderBottom='none';
+}
+
+/* ============ PINNED VIDEOS MANAGER (top-of-home ordering) =====================
+   Shows only the pinned videos, sorted by pinOrder, with ↑ ↓ buttons to
+   reorder them and a quick unpin button. Pinning from the main list (the
+   push_pin icon) appends the video to the end of this order automatically. */
+function getPinnedSorted(){
+  return A.videos.filter(v=>v.pinned).sort((a,b)=>(a.pinOrder||0)-(b.pinOrder||0));
+}
+function renderPinnedManagerList(){
+  const wrap = document.getElementById('pinned-mgr-list');
+  if(!wrap) return;
+  const pinned = getPinnedSorted();
+  if(!pinned.length){
+    wrap.innerHTML = '<div class="empty-hint" style="padding:22px 20px;"><span class="material-icons-round" style="font-size:30px;">push_pin</span>এখনো কোনো ভিডিও পিন করা হয়নি। নিচের তালিকায় যেকোনো ভিডিওর 📌 আইকনে ট্যাপ করুন।</div>';
+    return;
+  }
+  wrap.innerHTML = pinned.map((v,i)=>
+    '<div class="pin-list-row">' +
+      '<div class="pin-rank-badge">' + (i+1) + '</div>' +
+      '<div class="pin-list-thumb">' + (v.thumbnail?('<img src="'+escHtml(v.thumbnail)+'" onerror="this.style.display=\'none\'"/>'):'') + '</div>' +
+      '<div class="pin-list-title">' + escHtml(v.title||'ভিডিও') + '</div>' +
+      '<div class="pin-order-btns">' +
+        '<div class="pin-order-btn" onclick="movePinOrder(\'' + v.id + '\',-1)" title="উপরে সরান"><span class="material-icons-round">keyboard_arrow_up</span></div>' +
+        '<div class="pin-order-btn" onclick="movePinOrder(\'' + v.id + '\',1)" title="নিচে সরান"><span class="material-icons-round">keyboard_arrow_down</span></div>' +
+      '</div>' +
+      '<div class="pin-unpin-btn" onclick="togglePinVideo(\'' + v.id + '\')" title="আনপিন করুন"><span class="material-icons-round">close</span></div>' +
+    '</div>').join('');
+}
+async function togglePinVideo(id){
+  const v = A.videos.find(x=>x.id===id);
+  if(!v) return;
+  try{
+    if(v.pinned){
+      await fbUpdate('videos', id, { pinned:false });
+      toast('✅ আনপিন করা হয়েছে।');
+    } else {
+      const maxOrder = A.videos.filter(x=>x.pinned).reduce((m,x)=>Math.max(m,x.pinOrder||0),0);
+      await fbUpdate('videos', id, { pinned:true, pinOrder: maxOrder+1 });
+      toast('📌 হোম পেজের উপরে পিন করা হয়েছে!');
+    }
+  }catch(e){ toast('⚠️ সমস্যা হয়েছে।'); }
+}
+async function movePinOrder(id, dir){
+  const pinned = getPinnedSorted();
+  const idx = pinned.findIndex(x=>x.id===id);
+  if(idx<0) return;
+  const swapIdx = idx+dir;
+  if(swapIdx<0 || swapIdx>=pinned.length) return;
+  const a = pinned[idx], b = pinned[swapIdx];
+  const aOrder = a.pinOrder||0, bOrder = b.pinOrder||0;
+  try{
+    await fbUpdate('videos', a.id, { pinOrder: bOrder });
+    await fbUpdate('videos', b.id, { pinOrder: aOrder });
+  }catch(e){ toast('⚠️ ক্রম পরিবর্তন ব্যর্থ হয়েছে।'); }
 }
 
 function openVideoForm(id){
@@ -1074,6 +1155,7 @@ function openVideoForm(id){
   document.getElementById('v-thumb-url').value='';
   document.getElementById('v-views').value='';
   document.getElementById('v-featured').checked=false;
+  document.getElementById('v-pinned').checked=false;
   document.getElementById('v-ads-required').value='3';
   document.getElementById('v-direct-wait').value='5';
 
@@ -1089,6 +1171,7 @@ function openVideoForm(id){
       document.getElementById('v-thumb-url').value = v.thumbnail||'';
       document.getElementById('v-views').value = v.views||0;
       document.getElementById('v-featured').checked = !!v.featured;
+      document.getElementById('v-pinned').checked = !!v.pinned;
       document.getElementById('v-ads-required').value = String(Math.max(1,parseInt(v.adsRequired)||3));
       document.getElementById('v-direct-wait').value = String(Math.max(1,parseInt(v.directLinkWaitSeconds)||5));
       if(v.thumbnail) setThumbPreview(box, v.thumbnail);
@@ -1116,7 +1199,6 @@ async function saveVideo(){
   if(!title){ toast('⚠️ ভিডিওর টাইটেল দিন।'); return; }
   if(!parts.length){ toast('⚠️ অন্তত একটি ভিডিও পার্ট (আপলোড বা লিংক) দিন।'); return; }
 
-  // Gather per-slot direct links, and validate that every toggled-on slot has a URL.
   const directLinks = {};
   let missingSlot = null;
   document.querySelectorAll('#v-direct-slots-wrap .direct-slot-row').forEach(row=>{
@@ -1136,6 +1218,14 @@ async function saveVideo(){
   const isNew = !A.editingVideoId;
   const thumbnail = document.getElementById('v-thumb-url').value.trim();
   const description = document.getElementById('v-desc').value.trim();
+  const wantPinned = document.getElementById('v-pinned').checked;
+  const existing = A.editingVideoId ? A.videos.find(x=>x.id===A.editingVideoId) : null;
+  const wasPinned = existing ? !!existing.pinned : false;
+  let pinOrder = existing ? (existing.pinOrder||0) : 0;
+  if(wantPinned && !wasPinned){
+    const maxOrder = A.videos.filter(x=>x.pinned).reduce((m,x)=>Math.max(m,x.pinOrder||0),0);
+    pinOrder = maxOrder+1;
+  }
   const data = {
     title,
     description,
@@ -1148,6 +1238,8 @@ async function saveVideo(){
     directLinkWaitSeconds,
     views: parseInt(document.getElementById('v-views').value)||0,
     featured: document.getElementById('v-featured').checked,
+    pinned: wantPinned,
+    pinOrder: wantPinned ? pinOrder : 0,
   };
   try{
     if(A.editingVideoId){
