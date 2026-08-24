@@ -12,6 +12,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, onSnapshot, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDse8sC_hsrHrLx92zUobO7PezW0SUChHQ",
@@ -26,9 +27,15 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   const storage = getStorage(app);
+  const auth = getAuth(app);
 
   window._db = db;
   window._storage = storage;
+  window._auth = auth;
+  window._signIn = signInWithEmailAndPassword;
+  window._signOut = signOut;
+  window._onAuthStateChanged = onAuthStateChanged;
+  window._updatePassword = updatePassword;
   window._col = collection;
   window._addDoc = addDoc;
   window._getDocs = getDocs;
@@ -207,6 +214,8 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
 /* ============ MODAL ============ */
 #form-modal { display:none; position:fixed; inset:0; z-index:800; background:rgba(8,4,6,0.94); backdrop-filter:blur(8px); }
 #form-modal.open { display:flex; flex-direction:column; animation:fadeIn 0.2s; }
+#task-form-modal { display:none; position:fixed; inset:0; z-index:800; background:rgba(8,4,6,0.94); backdrop-filter:blur(8px); }
+#task-form-modal.open { display:flex; flex-direction:column; animation:fadeIn 0.2s; }
 @keyframes fadeIn { from{opacity:0} to{opacity:1} }
 .modal-header { height:56px; flex-shrink:0; display:flex; align-items:center; justify-content:space-between; padding:0 16px; border-bottom:1px solid var(--border); background:var(--bg-deep); }
 .modal-title { font-size:15.5px; font-weight:700; }
@@ -283,10 +292,11 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
   <div class="login-box">
     <div class="login-logo">Movi <span>Lover</span></div>
     <div class="login-sub">এডমিন প্যানেল</div>
-    <input type="password" class="login-input" id="login-pass" placeholder="পাসওয়ার্ড দিন" />
-    <button class="login-btn" onclick="tryLogin()">প্রবেশ করুন</button>
+    <input type="email" class="login-input" id="login-email" placeholder="এডমিন ইমেইল" style="letter-spacing:normal;text-align:left;" autocomplete="username" />
+    <input type="password" class="login-input" id="login-pass" placeholder="পাসওয়ার্ড দিন" style="margin-top:0;" autocomplete="current-password" />
+    <button class="login-btn" onclick="tryLogin()" style="margin-top:12px;">প্রবেশ করুন</button>
     <div class="login-err" id="login-err"></div>
-    <div class="login-hint">প্রথমবার ব্যবহারে ডিফল্ট পাসওয়ার্ড: <b>admin123</b><br/>সেটিংস থেকে পরে পরিবর্তন করে নিন।</div>
+    <div class="login-hint">এই লগইন Firebase Authentication দিয়ে সুরক্ষিত। এডমিন অ্যাকাউন্ট Firebase Console → Authentication ট্যাব থেকে তৈরি করতে হবে (নিচের নির্দেশনা দেখুন)।</div>
   </div>
 </div>
 
@@ -418,6 +428,37 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
       <div class="mgr-card" id="channels-mgr-list"></div>
     </div>
 
+    <!-- TASKS -->
+    <div class="page" id="page-tasks">
+      <div class="page-head">
+        <div class="page-title">টাস্ক ম্যানেজমেন্ট<small id="task-count-sub">লোড হচ্ছে...</small></div>
+        <button class="add-fab" onclick="openTaskForm()"><span class="material-icons-round" style="font-size:18px;">add</span>নতুন টাস্ক</button>
+      </div>
+      <div class="mgr-card" id="tasks-list"></div>
+    </div>
+
+    <!-- WITHDRAWALS -->
+    <div class="page" id="page-withdrawals">
+      <div class="page-head">
+        <div class="page-title">উইথড্র রিকুয়েস্ট<small id="withdraw-count-sub">লোড হচ্ছে...</small></div>
+      </div>
+      <div class="users-summary-row">
+        <div class="users-summary-card">
+          <div class="users-summary-val" id="wd-pending-val">0</div>
+          <div class="users-summary-lbl">পেন্ডিং</div>
+        </div>
+        <div class="users-summary-card">
+          <div class="users-summary-val gold" id="wd-approved-val">0</div>
+          <div class="users-summary-lbl">অনুমোদিত</div>
+        </div>
+        <div class="users-summary-card">
+          <div class="users-summary-val" id="wd-paid-val">৳0</div>
+          <div class="users-summary-lbl">মোট পরিশোধিত</div>
+        </div>
+      </div>
+      <div class="mgr-card" id="withdrawals-list"></div>
+    </div>
+
     <!-- BROADCAST -->
     <div class="page" id="page-broadcast">
       <div class="page-head">
@@ -530,6 +571,56 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
 
       <div class="mgr-card">
         <div class="form-section">
+          <div class="form-label" style="margin-bottom:12px;"><span class="material-icons-round">account_balance_wallet</span>উইথড্র সেটিংস</div>
+
+          <div class="form-row2">
+            <div class="form-group">
+              <div class="form-label"><span class="material-icons-round">payments</span>সর্বনিম্ন উত্তোলন (৳)</div>
+              <input class="form-input" type="number" id="set-min-withdraw" placeholder="100" />
+            </div>
+            <div class="form-group">
+              <div class="form-label"><span class="material-icons-round">group</span>ন্যূনতম রেফার (ঐচ্ছিক)</div>
+              <input class="form-input" type="number" id="set-min-referrals" placeholder="0" />
+            </div>
+          </div>
+          <div class="form-hint" style="margin-top:-8px;margin-bottom:14px;">রেফার শর্ত ০ রাখলে কোনো রেফার শর্ত ছাড়াই যেকেউ উত্তোলন করতে পারবে।</div>
+
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">image</span>বিকাশ লোগো</div>
+            <div class="thumb-upload-box" style="aspect-ratio:auto;padding:12px;flex-direction:row;gap:10px;" id="wd-bkash-box" onclick="document.getElementById('wd-bkash-file').click()">
+              <span class="upl-icon material-icons-round" style="font-size:20px;">add_photo_alternate</span>
+              <span class="upl-txt">লোগো আপলোড করুন</span>
+            </div>
+            <input type="file" accept="image/*" id="wd-bkash-file" style="display:none;" onchange="handleThumbUpload(this,'wd_bkash')" />
+            <input class="form-input" id="wd-bkash-url" placeholder="https://... (অথবা সরাসরি লিংক)" style="margin-top:8px;" />
+          </div>
+
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">image</span>নগদ লোগো</div>
+            <div class="thumb-upload-box" style="aspect-ratio:auto;padding:12px;flex-direction:row;gap:10px;" id="wd-nagad-box" onclick="document.getElementById('wd-nagad-file').click()">
+              <span class="upl-icon material-icons-round" style="font-size:20px;">add_photo_alternate</span>
+              <span class="upl-txt">লোগো আপলোড করুন</span>
+            </div>
+            <input type="file" accept="image/*" id="wd-nagad-file" style="display:none;" onchange="handleThumbUpload(this,'wd_nagad')" />
+            <input class="form-input" id="wd-nagad-url" placeholder="https://... (অথবা সরাসরি লিংক)" style="margin-top:8px;" />
+          </div>
+
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">image</span>রকেট লোগো</div>
+            <div class="thumb-upload-box" style="aspect-ratio:auto;padding:12px;flex-direction:row;gap:10px;" id="wd-rocket-box" onclick="document.getElementById('wd-rocket-file').click()">
+              <span class="upl-icon material-icons-round" style="font-size:20px;">add_photo_alternate</span>
+              <span class="upl-txt">লোগো আপলোড করুন</span>
+            </div>
+            <input type="file" accept="image/*" id="wd-rocket-file" style="display:none;" onchange="handleThumbUpload(this,'wd_rocket')" />
+            <input class="form-input" id="wd-rocket-url" placeholder="https://... (অথবা সরাসরি লিংক)" style="margin-top:8px;" />
+          </div>
+
+          <button class="save-btn" onclick="saveWithdrawSettings()"><span class="material-icons-round">save</span>সেভ করুন</button>
+        </div>
+      </div>
+
+      <div class="mgr-card">
+        <div class="form-section">
           <div class="form-label" style="margin-bottom:12px;"><span class="material-icons-round">lock_reset</span>এডমিন পাসওয়ার্ড পরিবর্তন</div>
           <div class="form-group"><input class="form-input" type="password" id="set-new-pass" placeholder="নতুন পাসওয়ার্ড" /></div>
           <button class="save-btn" onclick="changeAdminPassword()"><span class="material-icons-round">key</span>পাসওয়ার্ড পরিবর্তন করুন</button>
@@ -544,6 +635,8 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
     <div class="nav-item" data-page="categories" onclick="showAdminPage('categories')"><span class="material-icons-round">category</span>ক্যাটাগরি</div>
     <div class="nav-item" data-page="tutorial" onclick="showAdminPage('tutorial')"><span class="material-icons-round">menu_book</span>টিউটোরিয়াল</div>
     <div class="nav-item" data-page="channels" onclick="showAdminPage('channels')"><span class="material-icons-round">send</span>চ্যানেল</div>
+    <div class="nav-item" data-page="tasks" onclick="showAdminPage('tasks')"><span class="material-icons-round">payments</span>টাস্ক</div>
+    <div class="nav-item" data-page="withdrawals" onclick="showAdminPage('withdrawals')"><span class="material-icons-round">account_balance_wallet</span>উইথড্র</div>
     <div class="nav-item" data-page="broadcast" onclick="showAdminPage('broadcast')"><span class="material-icons-round">campaign</span>ব্রডকাস্ট</div>
     <div class="nav-item" data-page="settings" onclick="showAdminPage('settings')"><span class="material-icons-round">settings</span>সেটিংস</div>
   </nav>
@@ -636,6 +729,75 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
   </div>
 </div>
 
+<!-- ============ TASK FORM MODAL ============ -->
+<div id="task-form-modal">
+  <div class="modal-header">
+    <div class="modal-title" id="task-modal-title-text">নতুন টাস্ক</div>
+    <div class="modal-close" onclick="closeTaskFormModal()"><span class="material-icons-round">close</span></div>
+  </div>
+  <div class="modal-body">
+    <div class="form-section">
+      <div class="form-group">
+        <div class="form-label"><span class="material-icons-round">image</span>আইকন (ঐচ্ছিক)</div>
+        <div class="thumb-upload-box" style="aspect-ratio:auto;padding:14px;flex-direction:row;gap:10px;" id="t-icon-box" onclick="document.getElementById('t-icon-file').click()">
+          <span class="upl-icon material-icons-round" style="font-size:20px;">add_photo_alternate</span>
+          <span class="upl-txt">আইকন আপলোড করতে ট্যাপ করুন</span>
+        </div>
+        <input type="file" accept="image/*" id="t-icon-file" style="display:none;" onchange="handleThumbUpload(this,'t')" />
+        <input class="form-input" id="t-icon-url" placeholder="https://... (অথবা সরাসরি লিংক)" style="margin-top:8px;" />
+      </div>
+
+      <div class="form-group">
+        <div class="form-label"><span class="material-icons-round">title</span>টাস্কের নাম</div>
+        <input class="form-input" id="t-title" placeholder="যেমন: Facebook Page লাইক করুন" />
+      </div>
+
+      <div class="form-group">
+        <div class="form-label"><span class="material-icons-round">link</span>ডাইরেক্ট লিংক</div>
+        <input class="form-input" id="t-link" placeholder="https://..." />
+        <div class="form-hint">ইউজার "শুরু করুন" চাপলে এই লিংকটি নতুন ট্যাবে খুলবে।</div>
+      </div>
+
+      <div class="form-row2">
+        <div class="form-group">
+          <div class="form-label"><span class="material-icons-round">payments</span>রিওয়ার্ড (৳)</div>
+          <input class="form-input" type="number" step="0.01" id="t-reward" placeholder="5.00" />
+        </div>
+        <div class="form-group">
+          <div class="form-label"><span class="material-icons-round">timer</span>টাইমার (সেকেন্ড)</div>
+          <input class="form-input" type="number" id="t-wait" value="15" placeholder="১৫" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label"><span class="material-icons-round">event_repeat</span>টাস্কের ধরন</div>
+        <select class="form-select" id="t-type">
+          <option value="once">একবার (Once)</option>
+          <option value="daily">প্রতিদিন (Daily)</option>
+        </select>
+        <div class="form-hint">"প্রতিদিন" সিলেক্ট করলে ইউজার প্রতিদিন একবার করে এই টাস্কটি আবার করতে পারবে।</div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label"><span class="material-icons-round">label</span>ব্যাজ টেক্সট (ঐচ্ছিক)</div>
+        <input class="form-input" id="t-badge" placeholder="যেমন: স্পেশাল অফার" />
+      </div>
+
+      <div class="form-group">
+        <div class="toggle-row">
+          <div class="toggle-label"><span class="material-icons-round" style="color:var(--green);font-size:18px;">visibility</span>টাস্কটি চালু রাখুন</div>
+          <label class="switch"><input type="checkbox" id="t-active" checked/><span class="slider-tg"></span></label>
+        </div>
+        <div class="form-hint">বন্ধ করলে টাস্কটি ইউজার সাইটে দেখানো বন্ধ হবে, কিন্তু ডিলিট হবে না।</div>
+      </div>
+
+      <button class="save-btn" id="t-save-btn" onclick="saveTask()"><span class="material-icons-round">save</span>সেভ করুন</button>
+      <button class="del-btn-inline" id="t-del-btn" style="display:none;" onclick="confirmDeleteTask()"><span class="material-icons-round">delete</span>টাস্ক ডিলিট করুন</button>
+      <button class="cancel-btn" onclick="closeTaskFormModal()">বাতিল করুন</button>
+    </div>
+  </div>
+</div>
+
 <!-- ============ CONFIRM MODAL ============ -->
 <div id="confirm-modal">
   <div class="confirm-box">
@@ -651,9 +813,6 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
 <div id="toast"></div>
 
 <script>
-const ADMIN_SESSION_KEY = 'ml_admin_session';
-const DEFAULT_ADMIN_PASS = 'admin123';
-
 /* ============ ImgBB (থাম্বনেইল আপলোডের জন্য) ============ */
 const IMGBB_API_KEY = 'a14906d3055e23b95b4568eacf472af5';
 const IMGBB_ENDPOINT = 'https://api.imgbb.com/1/upload';
@@ -673,41 +832,63 @@ const A = {
   pendingTutVideoUrl: '',
   pendingBcThumbUrl: '',
   confirmCb: null,
+  tasks: [],
+  editingTaskId: null,
+  withdrawals: [],
+  withdrawSettings: {},
 };
 
 let partCounter = 0;
 
-/* ---------- boot ---------- */
-window.addEventListener('firebaseReady', async ()=>{
-  const sess = sessionStorage.getItem(ADMIN_SESSION_KEY);
-  if(sess === '1'){ enterApp(); }
+/* ---------- boot / auth ----------
+   Real Firebase Authentication (email/password). onAuthStateChanged fires
+   once when the SDK is ready and again on every sign-in/out, so it both
+   restores a returning admin's session automatically AND reacts to fresh
+   logins — no more plaintext password stored in Firestore. */
+let A_isEntered = false;
+window.addEventListener('firebaseReady', ()=>{
+  window._onAuthStateChanged(window._auth, (user)=>{
+    if(user){
+      if(!A_isEntered) enterApp();
+    } else {
+      A_isEntered = false;
+      document.getElementById('login-screen').style.display='flex';
+      document.getElementById('app').classList.remove('visible');
+    }
+  });
 });
 document.getElementById('login-pass').addEventListener('keydown', e=>{ if(e.key==='Enter') tryLogin(); });
+document.getElementById('login-email').addEventListener('keydown', e=>{ if(e.key==='Enter') tryLogin(); });
 
 async function tryLogin(){
-  const val = document.getElementById('login-pass').value.trim();
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
   const errEl = document.getElementById('login-err');
   errEl.textContent = '';
-  if(!window._db){ errEl.textContent = 'সংযোগ লোড হচ্ছে, একটু পর চেষ্টা করুন।'; return; }
+  if(!window._auth){ errEl.textContent = 'সংযোগ লোড হচ্ছে, একটু পর চেষ্টা করুন।'; return; }
+  if(!email || !pass){ errEl.textContent = 'ইমেইল ও পাসওয়ার্ড দুটোই দিন।'; return; }
   try{
-    let doc_ = await fbGetDoc('settings','admin');
-    let realPass = doc_ && doc_.password ? doc_.password : DEFAULT_ADMIN_PASS;
-    if(!doc_){ await fbSet('settings','admin',{password:DEFAULT_ADMIN_PASS}); }
-    if(val === realPass){
-      sessionStorage.setItem(ADMIN_SESSION_KEY,'1');
-      enterApp();
+    await window._signIn(window._auth, email, pass);
+    // onAuthStateChanged handles entering the app on success.
+  }catch(e){
+    if(e.code==='auth/invalid-credential' || e.code==='auth/wrong-password' || e.code==='auth/user-not-found'){
+      errEl.textContent = 'ইমেইল বা পাসওয়ার্ড ভুল।';
+    } else if(e.code==='auth/too-many-requests'){
+      errEl.textContent = 'অনেকবার চেষ্টা হয়েছে — একটু পর আবার চেষ্টা করুন।';
     } else {
-      errEl.textContent = 'পাসওয়ার্ড ভুল হয়েছে, আবার চেষ্টা করুন।';
+      errEl.textContent = 'লগইন ব্যর্থ হয়েছে। (' + (e.code||'unknown') + ')';
     }
-  }catch(e){ errEl.textContent = 'সমস্যা হয়েছে, আবার চেষ্টা করুন।'; }
+  }
 }
-function logoutAdmin(){ sessionStorage.removeItem(ADMIN_SESSION_KEY); location.reload(); }
+function logoutAdmin(){ window._signOut(window._auth).then(()=>location.reload()); }
 
 async function enterApp(){
+  A_isEntered = true;
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').classList.add('visible');
-  await Promise.all([loadCategories(), loadChannels(), loadTutorial(), loadSettingsForm(), loadAdNetworkSettingsForm(), loadTelegramSettings(), loadAllUsers()]);
+  await Promise.all([loadCategories(), loadChannels(), loadTutorial(), loadSettingsForm(), loadAdNetworkSettingsForm(), loadWithdrawSettingsForm(), loadTelegramSettings(), loadAllUsers(), loadTasks()]);
   subscribeVideosAdmin();
+  subscribeWithdrawals();
 }
 
 /* ---------- firestore helpers ---------- */
@@ -729,6 +910,8 @@ function showAdminPage(name){
   document.querySelector('.nav-item[data-page="'+name+'"]').classList.add('active');
   if(name==='users') loadAllUsers();
   if(name==='broadcast') refreshBroadcastStats();
+  if(name==='tasks') loadTasks();
+  if(name==='withdrawals') renderWithdrawalsList();
 }
 
 /* ============ USERS ============ */
@@ -835,25 +1018,34 @@ function uploadToImgBB(file, onProgressEl){
   });
 }
 
+const THUMB_CTX_MAP = {
+  v:   { box:'v-thumb-box',   prog:'v-thumb-progress',   url:'v-thumb-url' },
+  bc:  { box:'bc-thumb-box',  prog:'bc-thumb-progress',  url:'bc-thumb-url' },
+  tut: { box:'tut-thumb-box', prog:'tut-thumb-progress', url:null },
+  t:   { box:'t-icon-box',    prog:null,                 url:'t-icon-url' },
+  wd_bkash:  { box:'wd-bkash-box',  prog:null, url:'wd-bkash-url' },
+  wd_nagad:  { box:'wd-nagad-box',  prog:null, url:'wd-nagad-url' },
+  wd_rocket: { box:'wd-rocket-box', prog:null, url:'wd-rocket-url' },
+};
 function handleThumbUpload(input, ctx){
   const file = input.files[0];
   if(!file) return;
-  const boxId = ctx==='v' ? 'v-thumb-box' : (ctx==='bc' ? 'bc-thumb-box' : 'tut-thumb-box');
-  const progId = ctx==='v' ? 'v-thumb-progress' : (ctx==='bc' ? 'bc-thumb-progress' : 'tut-thumb-progress');
-  const box = document.getElementById(boxId);
-  const prog = document.getElementById(progId);
+  const map = THUMB_CTX_MAP[ctx] || THUMB_CTX_MAP.tut;
+  const box = document.getElementById(map.box);
+  const prog = map.prog ? document.getElementById(map.prog) : null;
   const localUrl = URL.createObjectURL(file);
   setThumbPreview(box, localUrl);
-  toast('থাম্বনেইল ImgBB-তে আপলোড হচ্ছে...');
+  toast('ছবি ImgBB-তে আপলোড হচ্ছে...');
   uploadToImgBB(file, prog).then(url=>{
     if(ctx==='v'){ A.pendingThumbUrl = url; document.getElementById('v-thumb-url').value = url; }
     else if(ctx==='bc'){ A.pendingBcThumbUrl = url; document.getElementById('bc-thumb-url').value = url; }
-    else { A.pendingTutThumbUrl = url; }
+    else if(ctx==='tut'){ A.pendingTutThumbUrl = url; }
+    else if(map.url){ document.getElementById(map.url).value = url; }
     setThumbPreview(box, url);
-    toast('✅ থাম্বনেইল ImgBB-তে আপলোড সম্পন্ন!');
+    toast('✅ ছবি ImgBB-তে আপলোড সম্পন্ন!');
   }).catch(err=>{
     console.error('ImgBB upload error:', err);
-    toast('⚠️ থাম্বনেইল আপলোড ব্যর্থ হয়েছে। ' + (err && err.message ? err.message : ''));
+    toast('⚠️ আপলোড ব্যর্থ হয়েছে। ' + (err && err.message ? err.message : ''));
   });
 }
 function setThumbPreview(box, url){
@@ -1336,6 +1528,204 @@ function confirmDeleteChannel(id,name){
   });
 }
 
+/* ============ TASKS ============ */
+async function loadTasks(){
+  A.tasks = await fbGet('tasks');
+  A.tasks.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  renderTasksList();
+}
+function renderTasksList(){
+  const wrap = document.getElementById('tasks-list');
+  const sub = document.getElementById('task-count-sub');
+  if(sub) sub.textContent = 'মোট ' + A.tasks.length + 'টি টাস্ক';
+  if(!wrap) return;
+  if(!A.tasks.length){
+    wrap.innerHTML = '<div class="empty-hint"><span class="material-icons-round">payments</span>এখনো কোনো টাস্ক যুক্ত করা হয়নি। "+ নতুন টাস্ক" চেপে শুরু করুন।</div>';
+    return;
+  }
+  wrap.innerHTML = A.tasks.map(t=>
+    '<div class="vid-row" style="border-bottom:1px solid var(--border);">' +
+      '<div class="vid-thumb">' + (t.icon?('<img src="'+escHtml(t.icon)+'" onerror="this.style.display=\'none\'"/>'):'🗒️') + '</div>' +
+      '<div class="vid-body">' +
+        '<div class="vid-title">' + escHtml(t.title||'শিরোনামহীন') + '</div>' +
+        '<div class="vid-meta-row">' +
+          '<span class="vid-chip gold">৳ ' + (t.reward||0).toFixed(2) + '</span>' +
+          '<span class="vid-chip">⏱ ' + (t.waitSeconds||15) + 'সে</span>' +
+          (t.type==='daily'?'<span class="vid-chip pin">প্রতিদিন</span>':'<span class="vid-chip">একবার</span>') +
+          (t.active===false?'<span class="vid-chip" style="background:rgba(179,37,60,0.14);color:var(--accent2);">বন্ধ</span>':'') +
+        '</div>' +
+      '</div>' +
+      '<div class="vid-actions">' +
+        '<div class="icon-action edit" onclick="openTaskForm(\'' + t.id + '\')"><span class="material-icons-round">edit</span></div>' +
+        '<div class="icon-action del" onclick="confirmDeleteTaskRow(\'' + t.id + '\',\'' + escHtml(t.title||'টাস্ক') + '\')"><span class="material-icons-round">delete</span></div>' +
+      '</div>' +
+    '</div>').join('');
+  wrap.lastElementChild.style.borderBottom='none';
+}
+function openTaskForm(id){
+  A.editingTaskId = id || null;
+  const box = document.getElementById('t-icon-box');
+  box.classList.remove('has-img');
+  const img = box.querySelector('img'); if(img) img.remove();
+  const icon = box.querySelector('.upl-icon'); if(icon) icon.style.display='';
+  const txt = box.querySelector('.upl-txt'); if(txt) txt.style.display='';
+
+  document.getElementById('t-title').value='';
+  document.getElementById('t-link').value='';
+  document.getElementById('t-icon-url').value='';
+  document.getElementById('t-reward').value='';
+  document.getElementById('t-wait').value='15';
+  document.getElementById('t-type').value='once';
+  document.getElementById('t-badge').value='';
+  document.getElementById('t-active').checked=true;
+
+  if(id){
+    const t = A.tasks.find(x=>x.id===id);
+    if(t){
+      document.getElementById('task-modal-title-text').textContent = 'টাস্ক এডিট করুন';
+      document.getElementById('t-title').value = t.title||'';
+      document.getElementById('t-link').value = t.link||'';
+      document.getElementById('t-icon-url').value = t.icon||'';
+      document.getElementById('t-reward').value = t.reward||'';
+      document.getElementById('t-wait').value = t.waitSeconds||15;
+      document.getElementById('t-type').value = t.type||'once';
+      document.getElementById('t-badge').value = t.badge||'';
+      document.getElementById('t-active').checked = t.active!==false;
+      if(t.icon) setThumbPreview(box, t.icon);
+      document.getElementById('t-del-btn').style.display='block';
+    }
+  } else {
+    document.getElementById('task-modal-title-text').textContent = 'নতুন টাস্ক যুক্ত করুন';
+    document.getElementById('t-del-btn').style.display='none';
+  }
+  document.getElementById('task-form-modal').classList.add('open');
+}
+function closeTaskFormModal(){ document.getElementById('task-form-modal').classList.remove('open'); }
+async function saveTask(){
+  const title = document.getElementById('t-title').value.trim();
+  const link = document.getElementById('t-link').value.trim();
+  const reward = parseFloat(document.getElementById('t-reward').value);
+  if(!title){ toast('⚠️ টাস্কের নাম দিন।'); return; }
+  if(!link){ toast('⚠️ ডাইরেক্ট লিংক দিন।'); return; }
+  if(!reward || reward<=0){ toast('⚠️ সঠিক রিওয়ার্ড পরিমাণ দিন।'); return; }
+  const data = {
+    title, link, reward,
+    icon: document.getElementById('t-icon-url').value.trim(),
+    waitSeconds: Math.max(1, parseInt(document.getElementById('t-wait').value)||15),
+    type: document.getElementById('t-type').value,
+    badge: document.getElementById('t-badge').value.trim(),
+    active: document.getElementById('t-active').checked,
+  };
+  const btn = document.getElementById('t-save-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="material-icons-round">hourglass_top</span>সেভ হচ্ছে...';
+  try{
+    if(A.editingTaskId){ await fbUpdate('tasks', A.editingTaskId, data); toast('✅ টাস্ক আপডেট হয়েছে!'); }
+    else { await fbAdd('tasks', data); toast('✅ নতুন টাস্ক যুক্ত হয়েছে!'); }
+    closeTaskFormModal();
+    loadTasks();
+  }catch(e){ toast('⚠️ সেভ করতে সমস্যা হয়েছে।'); }
+  btn.disabled = false; btn.innerHTML = '<span class="material-icons-round">save</span>সেভ করুন';
+}
+function confirmDeleteTask(){ confirmDeleteTaskRow(A.editingTaskId, document.getElementById('t-title').value||'টাস্ক'); }
+function confirmDeleteTaskRow(id,title){
+  openConfirm('"' + title + '" টাস্কটি স্থায়ীভাবে ডিলিট করতে চান?', async ()=>{
+    try{ await fbDelete('tasks', id); toast('✅ টাস্ক ডিলিট হয়েছে।'); closeTaskFormModal(); loadTasks(); }
+    catch(e){ toast('⚠️ ডিলিট ব্যর্থ হয়েছে।'); }
+  });
+}
+
+/* ============ WITHDRAWALS =====================
+   Rejecting a request needs no separate "refund" step: the user site
+   computes balance as (sum of task rewards) minus (sum of NON-rejected
+   withdrawals), so marking a request rejected here automatically stops
+   it from being subtracted — the balance corrects itself on next load. */
+function subscribeWithdrawals(){
+  if(!window._onSnapshot){ loadWithdrawalsFallback(); return; }
+  try{
+    const q = window._query(window._col(window._db,'withdrawals'), window._orderBy('createdAt','desc'));
+    window._onSnapshot(q, snap=>{
+      A.withdrawals = snap.docs.map(d=>({id:d.id,...d.data()}));
+      renderWithdrawalsList();
+    }, ()=>loadWithdrawalsFallback());
+  }catch(e){ loadWithdrawalsFallback(); }
+}
+async function loadWithdrawalsFallback(){
+  A.withdrawals = await fbGet('withdrawals');
+  A.withdrawals.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  renderWithdrawalsList();
+}
+function renderWithdrawalsList(){
+  const wrap = document.getElementById('withdrawals-list');
+  const sub = document.getElementById('withdraw-count-sub');
+  if(!wrap) return;
+  const pending = A.withdrawals.filter(w=>w.status==='pending'||!w.status);
+  const approved = A.withdrawals.filter(w=>w.status==='approved');
+  const paidTotal = approved.reduce((s,w)=>s+(w.amount||0),0);
+  if(sub) sub.textContent = 'মোট ' + A.withdrawals.length + 'টি রিকুয়েস্ট';
+  const pendingEl = document.getElementById('wd-pending-val'); if(pendingEl) pendingEl.textContent = pending.length;
+  const approvedEl = document.getElementById('wd-approved-val'); if(approvedEl) approvedEl.textContent = approved.length;
+  const paidEl = document.getElementById('wd-paid-val'); if(paidEl) paidEl.textContent = '৳' + fmtNum(paidTotal);
+
+  if(!A.withdrawals.length){
+    wrap.innerHTML = '<div class="empty-hint"><span class="material-icons-round">account_balance_wallet</span>এখনো কোনো উইথড্র রিকুয়েস্ট আসেনি।</div>';
+    return;
+  }
+  const methodNames = { bkash:'বিকাশ', nagad:'নগদ', rocket:'রকেট' };
+  const statusLabel = { pending:'পেন্ডিং', approved:'অনুমোদিত', rejected:'বাতিল' };
+  wrap.innerHTML = A.withdrawals.map(w=>{
+    const status = w.status||'pending';
+    const chipColor = status==='approved' ? 'style="background:rgba(35,180,122,0.16);color:var(--green);"' : (status==='rejected' ? 'style="background:rgba(179,37,60,0.16);color:var(--accent2);"' : 'style="background:rgba(217,171,85,0.16);color:var(--gold3);"');
+    const actionBtns = status==='pending'
+      ? '<div class="icon-action" style="color:var(--green);border-color:rgba(35,180,122,0.3);" onclick="setWithdrawStatus(\''+w.id+'\',\'approved\')" title="অনুমোদন করুন"><span class="material-icons-round">check</span></div>' +
+        '<div class="icon-action del" onclick="setWithdrawStatus(\''+w.id+'\',\'rejected\')" title="বাতিল করুন"><span class="material-icons-round">close</span></div>'
+      : '';
+    return '<div class="vid-row" style="border-bottom:1px solid var(--border);">' +
+      '<div class="vid-body" style="padding:2px 0;">' +
+        '<div class="vid-title">৳ ' + (w.amount||0).toFixed(2) + ' — ' + (methodNames[w.method]||w.method||'') + '</div>' +
+        '<div class="vid-meta-row"><span class="vid-chip" ' + chipColor + '>' + (statusLabel[status]||status) + '</span><span class="vid-stat-sm">' + escHtml(w.number||'') + '</span></div>' +
+        '<div class="vid-stat-sm" style="margin-top:3px;"><span class="material-icons-round" style="font-size:12px;">person</span>' + escHtml(w.userId||'') + '</div>' +
+      '</div>' +
+      '<div class="vid-actions">' + actionBtns + '</div>' +
+    '</div>';
+  }).join('');
+  wrap.lastElementChild.style.borderBottom='none';
+}
+async function setWithdrawStatus(id, status){
+  const label = status==='approved' ? 'অনুমোদন' : 'বাতিল';
+  openConfirm('এই রিকুয়েস্টটি ' + label + ' করতে চান?', async ()=>{
+    try{ await fbUpdate('withdrawals', id, { status, updatedAt: Date.now() }); toast('✅ ' + label + ' করা হয়েছে।'); }
+    catch(e){ toast('⚠️ সমস্যা হয়েছে।'); }
+  });
+}
+
+/* ============ WITHDRAW SETTINGS (payment logos, min amount/referrals) ============ */
+async function loadWithdrawSettingsForm(){
+  const s = await fbGetDoc('settings','withdraw');
+  A.withdrawSettings = s || {};
+  document.getElementById('set-min-withdraw').value = (s && s.minWithdraw) || 100;
+  document.getElementById('set-min-referrals').value = (s && s.minReferrals) || 0;
+  document.getElementById('wd-bkash-url').value = (s && s.bkashLogo) || '';
+  document.getElementById('wd-nagad-url').value = (s && s.nagadLogo) || '';
+  document.getElementById('wd-rocket-url').value = (s && s.rocketLogo) || '';
+  if(s && s.bkashLogo) setThumbPreview(document.getElementById('wd-bkash-box'), s.bkashLogo);
+  if(s && s.nagadLogo) setThumbPreview(document.getElementById('wd-nagad-box'), s.nagadLogo);
+  if(s && s.rocketLogo) setThumbPreview(document.getElementById('wd-rocket-box'), s.rocketLogo);
+}
+async function saveWithdrawSettings(){
+  const data = {
+    minWithdraw: Math.max(1, parseFloat(document.getElementById('set-min-withdraw').value)||100),
+    minReferrals: Math.max(0, parseInt(document.getElementById('set-min-referrals').value)||0),
+    bkashLogo: document.getElementById('wd-bkash-url').value.trim(),
+    nagadLogo: document.getElementById('wd-nagad-url').value.trim(),
+    rocketLogo: document.getElementById('wd-rocket-url').value.trim(),
+  };
+  try{
+    await fbSet('settings','withdraw', data);
+    A.withdrawSettings = data;
+    toast('✅ উইথড্র সেটিংস সেভ হয়েছে!');
+  }catch(e){ toast('⚠️ সমস্যা হয়েছে।'); }
+}
+
 /* ============ TELEGRAM BOT / BROADCAST ============ */
 async function loadTelegramSettings(){
   const cfg = await fbGetDoc('settings','telegram');
@@ -1475,12 +1865,15 @@ async function saveAdNetworkSettings(){
 }
 async function changeAdminPassword(){
   const val = document.getElementById('set-new-pass').value.trim();
-  if(val.length < 4){ toast('⚠️ কমপক্ষে ৪ অক্ষরের পাসওয়ার্ড দিন।'); return; }
+  if(val.length < 6){ toast('⚠️ কমপক্ষে ৬ অক্ষরের পাসওয়ার্ড দিন।'); return; }
   try{
-    await fbSet('settings','admin',{password:val});
+    await window._updatePassword(window._auth.currentUser, val);
     document.getElementById('set-new-pass').value='';
     toast('✅ পাসওয়ার্ড পরিবর্তন হয়েছে!');
-  }catch(e){ toast('⚠️ সমস্যা হয়েছে।'); }
+  }catch(e){
+    if(e.code==='auth/requires-recent-login'){ toast('⚠️ নিরাপত্তার জন্য আগে লগআউট করে আবার লগইন করুন, তারপর পাসওয়ার্ড বদলান।'); }
+    else { toast('⚠️ সমস্যা হয়েছে। (' + (e.code||'') + ')'); }
+  }
 }
 
 /* ============ CONFIRM MODAL ============ */
