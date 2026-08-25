@@ -573,17 +573,10 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
         <div class="form-section">
           <div class="form-label" style="margin-bottom:12px;"><span class="material-icons-round">account_balance_wallet</span>উইথড্র সেটিংস</div>
 
-          <div class="form-row2">
-            <div class="form-group">
-              <div class="form-label"><span class="material-icons-round">payments</span>সর্বনিম্ন উত্তোলন (৳)</div>
-              <input class="form-input" type="number" id="set-min-withdraw" placeholder="100" />
-            </div>
-            <div class="form-group">
-              <div class="form-label"><span class="material-icons-round">group</span>ন্যূনতম রেফার (ঐচ্ছিক)</div>
-              <input class="form-input" type="number" id="set-min-referrals" placeholder="0" />
-            </div>
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">payments</span>সর্বনিম্ন উত্তোলন (৳)</div>
+            <input class="form-input" type="number" id="set-min-withdraw" placeholder="100" />
           </div>
-          <div class="form-hint" style="margin-top:-8px;margin-bottom:14px;">রেফার শর্ত ০ রাখলে কোনো রেফার শর্ত ছাড়াই যেকেউ উত্তোলন করতে পারবে।</div>
 
           <div class="form-group">
             <div class="form-label"><span class="material-icons-round">image</span>বিকাশ লোগো</div>
@@ -1703,7 +1696,6 @@ async function loadWithdrawSettingsForm(){
   const s = await fbGetDoc('settings','withdraw');
   A.withdrawSettings = s || {};
   document.getElementById('set-min-withdraw').value = (s && s.minWithdraw) || 100;
-  document.getElementById('set-min-referrals').value = (s && s.minReferrals) || 0;
   document.getElementById('wd-bkash-url').value = (s && s.bkashLogo) || '';
   document.getElementById('wd-nagad-url').value = (s && s.nagadLogo) || '';
   document.getElementById('wd-rocket-url').value = (s && s.rocketLogo) || '';
@@ -1714,7 +1706,6 @@ async function loadWithdrawSettingsForm(){
 async function saveWithdrawSettings(){
   const data = {
     minWithdraw: Math.max(1, parseFloat(document.getElementById('set-min-withdraw').value)||100),
-    minReferrals: Math.max(0, parseInt(document.getElementById('set-min-referrals').value)||0),
     bkashLogo: document.getElementById('wd-bkash-url').value.trim(),
     nagadLogo: document.getElementById('wd-nagad-url').value.trim(),
     rocketLogo: document.getElementById('wd-rocket-url').value.trim(),
