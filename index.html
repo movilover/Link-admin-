@@ -182,7 +182,7 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
 .thumb-upload-box .upl-overlay { position:absolute; inset:0; background:rgba(0,0,0,0.45); display:none; align-items:center; justify-content:center; color:#fff; font-size:12px; font-weight:700; }
 .thumb-upload-box.has-img .upl-overlay { display:flex; }
 #t-icon-box { position:relative; }
-#t-icon-box img { position:static; width:44px; height:44px; border-radius:50%; flex-shrink:0; object-fit:cover; }
+#t-icon-box img { position:static; width:44px; height:44px; border-radius:13px; flex-shrink:0; object-fit:cover; }
 .thumb-progress { position:absolute; bottom:0; left:0; height:3px; background:var(--grad-btn); width:0%; transition:width 0.2s; }
 
 .toggle-row { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:12px; }
@@ -399,7 +399,8 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
               <span class="upl-txt" id="tut-video-status">ভিডিও ফাইল আপলোড করতে ট্যাপ করুন</span>
             </div>
             <input type="file" accept="video/*" id="tut-video-file" style="display:none;" onchange="handleVideoUpload(this,'tut')" />
-            <div class="form-hint">অথবা নিচে সরাসরি ভিডিও লিংক (URL) বসাতে পারেন:</div>
+            <div class="form-hint">অথবা নিচে সরাসরি ভিডিও লিংক (URL) বসাতে পারেন — এখন <b>YouTube লিংক</b> (যেমন youtube.com/watch?v=... বা youtu.be/...), <b>Blogger-এর ভিডিও এম্বেড লিংক</b> (blogger.com/video.g?token=...), অথবা সরাসরি .mp4 ফাইল লিংক — তিনটাই সাপোর্ট করবে, সাইটের ভিতরেই প্লে হবে।</div>
+            <div class="form-hint" style="color:var(--gold3);">Blogger-এ ভিডিও আপলোড করার পর পোস্টের সাধারণ URL কপি করলে চলবে না (এটা একটা ওয়েবপেজ, ভিডিও ফাইল না)। সঠিক লিংক পেতে: পোস্ট এডিটরে গিয়ে উপরে ডান দিকে <b>"HTML view"</b>-এ ক্লিক করুন, তারপর <code>&lt;iframe ... src="https://www.blogger.com/video.g?token=..."&gt;</code> — এই অংশ থেকে শুধু <b>src="..."</b>-এর ভেতরের লিংকটা কপি করে এখানে বসান।</div>
             <input class="form-input" id="tut-video-url" placeholder="https://..." style="margin-top:8px;" />
           </div>
           <div class="form-group">
@@ -579,38 +580,31 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
             <div class="form-label"><span class="material-icons-round">payments</span>সর্বনিম্ন উত্তোলন (৳)</div>
             <input class="form-input" type="number" id="set-min-withdraw" placeholder="100" />
           </div>
-
-          <div class="form-group">
-            <div class="form-label"><span class="material-icons-round">image</span>বিকাশ লোগো</div>
-            <div class="thumb-upload-box" style="aspect-ratio:auto;padding:12px;flex-direction:row;gap:10px;" id="wd-bkash-box" onclick="document.getElementById('wd-bkash-file').click()">
-              <span class="upl-icon material-icons-round" style="font-size:20px;">add_photo_alternate</span>
-              <span class="upl-txt">লোগো আপলোড করুন</span>
-            </div>
-            <input type="file" accept="image/*" id="wd-bkash-file" style="display:none;" onchange="handleThumbUpload(this,'wd_bkash')" />
-            <input class="form-input" id="wd-bkash-url" placeholder="https://... (অথবা সরাসরি লিংক)" style="margin-top:8px;" />
-          </div>
-
-          <div class="form-group">
-            <div class="form-label"><span class="material-icons-round">image</span>নগদ লোগো</div>
-            <div class="thumb-upload-box" style="aspect-ratio:auto;padding:12px;flex-direction:row;gap:10px;" id="wd-nagad-box" onclick="document.getElementById('wd-nagad-file').click()">
-              <span class="upl-icon material-icons-round" style="font-size:20px;">add_photo_alternate</span>
-              <span class="upl-txt">লোগো আপলোড করুন</span>
-            </div>
-            <input type="file" accept="image/*" id="wd-nagad-file" style="display:none;" onchange="handleThumbUpload(this,'wd_nagad')" />
-            <input class="form-input" id="wd-nagad-url" placeholder="https://... (অথবা সরাসরি লিংক)" style="margin-top:8px;" />
-          </div>
-
-          <div class="form-group">
-            <div class="form-label"><span class="material-icons-round">image</span>রকেট লোগো</div>
-            <div class="thumb-upload-box" style="aspect-ratio:auto;padding:12px;flex-direction:row;gap:10px;" id="wd-rocket-box" onclick="document.getElementById('wd-rocket-file').click()">
-              <span class="upl-icon material-icons-round" style="font-size:20px;">add_photo_alternate</span>
-              <span class="upl-txt">লোগো আপলোড করুন</span>
-            </div>
-            <input type="file" accept="image/*" id="wd-rocket-file" style="display:none;" onchange="handleThumbUpload(this,'wd_rocket')" />
-            <input class="form-input" id="wd-rocket-url" placeholder="https://... (অথবা সরাসরি লিংক)" style="margin-top:8px;" />
-          </div>
-
           <button class="save-btn" onclick="saveWithdrawSettings()"><span class="material-icons-round">save</span>সেভ করুন</button>
+        </div>
+      </div>
+
+      <div class="mgr-card">
+        <div class="form-section">
+          <div class="form-label" style="margin-bottom:12px;"><span class="material-icons-round">credit_card</span>পেমেন্ট মেথড ম্যানেজমেন্ট<span style="font-weight:400;color:var(--text-muted);font-size:11px;display:block;margin-top:3px;">বিকাশ, নগদ, রকেট, ব্যাংক — যত ইচ্ছা মেথড যোগ করুন</span></div>
+
+          <div id="wd-methods-list"></div>
+
+          <div class="form-hint" style="margin:14px 0 8px;font-weight:700;color:var(--gold3);">নতুন মেথড যোগ করুন</div>
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">label</span>মেথডের নাম</div>
+            <input class="form-input" id="new-wd-name" placeholder="যেমন: ব্যাংক ট্রান্সফার" />
+          </div>
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">image</span>লোগো</div>
+            <div class="thumb-upload-box" style="aspect-ratio:auto;padding:12px;flex-direction:row;gap:10px;" id="wd-new-box" onclick="document.getElementById('wd-new-file').click()">
+              <span class="upl-icon material-icons-round" style="font-size:20px;">add_photo_alternate</span>
+              <span class="upl-txt">লোগো আপলোড করুন</span>
+            </div>
+            <input type="file" accept="image/*" id="wd-new-file" style="display:none;" onchange="handleThumbUpload(this,'wd_new')" />
+            <input class="form-input" id="new-wd-logo" placeholder="https://... (অথবা সরাসরি লিংক)" style="margin-top:8px;" />
+          </div>
+          <button class="save-btn" onclick="addWithdrawMethod()"><span class="material-icons-round">add_circle</span>মেথড যুক্ত করুন</button>
         </div>
       </div>
 
@@ -745,6 +739,12 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
       <div class="form-group">
         <div class="form-label"><span class="material-icons-round">title</span>টাস্কের নাম</div>
         <input class="form-input" id="t-title" placeholder="যেমন: Facebook Page লাইক করুন" />
+      </div>
+
+      <div class="form-group">
+        <div class="form-label"><span class="material-icons-round">notes</span>ছোট বিবরণ (ঐচ্ছিক)</div>
+        <input class="form-input" id="t-desc" placeholder="যেমন: লিংকে গিয়ে ১০ সেকেন্ড ওয়েট করুন" />
+        <div class="form-hint">টাস্কের নামের ঠিক নিচে ছোট করে দেখাবে।</div>
       </div>
 
       <div class="form-group">
@@ -1018,9 +1018,7 @@ const THUMB_CTX_MAP = {
   bc:  { box:'bc-thumb-box',  prog:'bc-thumb-progress',  url:'bc-thumb-url' },
   tut: { box:'tut-thumb-box', prog:'tut-thumb-progress', url:null },
   t:   { box:'t-icon-box',    prog:null,                 url:'t-icon-url' },
-  wd_bkash:  { box:'wd-bkash-box',  prog:null, url:'wd-bkash-url' },
-  wd_nagad:  { box:'wd-nagad-box',  prog:null, url:'wd-nagad-url' },
-  wd_rocket: { box:'wd-rocket-box', prog:null, url:'wd-rocket-url' },
+  wd_new:    { box:'wd-new-box',    prog:null, url:'new-wd-logo' },
 };
 function handleThumbUpload(input, ctx){
   const file = input.files[0];
@@ -1566,6 +1564,7 @@ function openTaskForm(id){
   const txt = box.querySelector('.upl-txt'); if(txt) txt.style.display='';
 
   document.getElementById('t-title').value='';
+  document.getElementById('t-desc').value='';
   document.getElementById('t-link').value='';
   document.getElementById('t-icon-url').value='';
   document.getElementById('t-reward').value='';
@@ -1579,6 +1578,7 @@ function openTaskForm(id){
     if(t){
       document.getElementById('task-modal-title-text').textContent = 'টাস্ক এডিট করুন';
       document.getElementById('t-title').value = t.title||'';
+      document.getElementById('t-desc').value = t.description||'';
       document.getElementById('t-link').value = t.link||'';
       document.getElementById('t-icon-url').value = t.icon||'';
       document.getElementById('t-reward').value = t.reward||'';
@@ -1605,6 +1605,7 @@ async function saveTask(){
   if(!reward || reward<=0){ toast('⚠️ সঠিক রিওয়ার্ড পরিমাণ দিন।'); return; }
   const data = {
     title, link, reward,
+    description: document.getElementById('t-desc').value.trim(),
     icon: document.getElementById('t-icon-url').value.trim(),
     waitSeconds: Math.max(1, parseInt(document.getElementById('t-wait').value)||15),
     type: document.getElementById('t-type').value,
@@ -1665,7 +1666,8 @@ function renderWithdrawalsList(){
     wrap.innerHTML = '<div class="empty-hint"><span class="material-icons-round">account_balance_wallet</span>এখনো কোনো উইথড্র রিকুয়েস্ট আসেনি।</div>';
     return;
   }
-  const methodNames = { bkash:'বিকাশ', nagad:'নগদ', rocket:'রকেট' };
+  const methods = (A.withdrawSettings && A.withdrawSettings.methods) || DEFAULT_WD_METHODS;
+  const methodNames = {}; methods.forEach(m=>{ methodNames[m.key] = m.name; });
   const statusLabel = { pending:'পেন্ডিং', approved:'অনুমোদিত', rejected:'বাতিল' };
   wrap.innerHTML = A.withdrawals.map(w=>{
     const status = w.status||'pending';
@@ -1693,28 +1695,79 @@ async function setWithdrawStatus(id, status){
   });
 }
 
-/* ============ WITHDRAW SETTINGS (payment logos, min amount/referrals) ============ */
+/* ============ WITHDRAW SETTINGS =====================
+   Payment methods are now a free-form list the admin builds themselves
+   (bKash, Nagad, Rocket, Bank, or anything else) instead of three fixed
+   fields — stored as settings/withdraw.methods = [{key,name,logo}, ...].
+   If a site has never been touched with this new UI yet, we seed the
+   three familiar defaults once so nothing looks empty on first load. */
+const DEFAULT_WD_METHODS = [
+  { key:'bkash',  name:'বিকাশ', logo:'' },
+  { key:'nagad',  name:'নগদ',   logo:'' },
+  { key:'rocket', name:'রকেট',  logo:'' },
+];
 async function loadWithdrawSettingsForm(){
   const s = await fbGetDoc('settings','withdraw');
   A.withdrawSettings = s || {};
   document.getElementById('set-min-withdraw').value = (s && s.minWithdraw) || 100;
-  document.getElementById('wd-bkash-url').value = (s && s.bkashLogo) || '';
-  document.getElementById('wd-nagad-url').value = (s && s.nagadLogo) || '';
-  document.getElementById('wd-rocket-url').value = (s && s.rocketLogo) || '';
-  if(s && s.bkashLogo) setThumbPreview(document.getElementById('wd-bkash-box'), s.bkashLogo);
-  if(s && s.nagadLogo) setThumbPreview(document.getElementById('wd-nagad-box'), s.nagadLogo);
-  if(s && s.rocketLogo) setThumbPreview(document.getElementById('wd-rocket-box'), s.rocketLogo);
+  A.withdrawSettings.methods = (s && Array.isArray(s.methods) && s.methods.length) ? s.methods : DEFAULT_WD_METHODS.slice();
+  renderWithdrawMethodsManager();
+}
+function renderWithdrawMethodsManager(){
+  const wrap = document.getElementById('wd-methods-list');
+  const methods = A.withdrawSettings.methods || [];
+  if(!methods.length){
+    wrap.innerHTML = '<div class="empty-hint" style="padding:18px;"><span class="material-icons-round" style="font-size:28px;">credit_card_off</span>কোনো পেমেন্ট মেথড নেই — নিচে থেকে যোগ করুন।</div>';
+    return;
+  }
+  wrap.innerHTML = methods.map((m,i)=>
+    '<div class="cat-row">' +
+      '<div class="cat-emoji-box">' + (m.logo?('<img src="'+escHtml(m.logo)+'" style="width:100%;height:100%;object-fit:contain;border-radius:11px;" onerror="this.parentElement.textContent=\'💳\'"/>'):'💳') + '</div>' +
+      '<div class="cat-info"><div class="cat-name">' + escHtml(m.name) + '</div><div class="cat-key">key: ' + escHtml(m.key) + '</div></div>' +
+      '<div class="icon-action del" onclick="removeWithdrawMethod(' + i + ')"><span class="material-icons-round">delete</span></div>' +
+    '</div>').join('');
+}
+function slugifyMethod(name){
+  return name.trim().toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_\u0980-\u09FF]/g,'').slice(0,20) || ('m'+Date.now().toString(36));
+}
+async function addWithdrawMethod(){
+  const name = document.getElementById('new-wd-name').value.trim();
+  const logo = document.getElementById('new-wd-logo').value.trim();
+  if(!name){ toast('⚠️ মেথডের নাম দিন।'); return; }
+  const methods = A.withdrawSettings.methods || [];
+  methods.push({ key: slugifyMethod(name), name, logo });
+  A.withdrawSettings.methods = methods;
+  try{
+    await fbSet('settings','withdraw', { methods, minWithdraw: A.withdrawSettings.minWithdraw||100 });
+    document.getElementById('new-wd-name').value='';
+    document.getElementById('new-wd-logo').value='';
+    const box = document.getElementById('wd-new-box');
+    box.classList.remove('has-img');
+    const img = box.querySelector('img'); if(img) img.remove();
+    const icon = box.querySelector('.upl-icon'); if(icon) icon.style.display='';
+    const txt = box.querySelector('.upl-txt'); if(txt) txt.style.display='';
+    renderWithdrawMethodsManager();
+    toast('✅ মেথড যুক্ত হয়েছে!');
+  }catch(e){ toast('⚠️ সমস্যা হয়েছে।'); }
+}
+async function removeWithdrawMethod(idx){
+  const methods = A.withdrawSettings.methods || [];
+  const removed = methods[idx];
+  openConfirm('"' + (removed?removed.name:'এই মেথড') + '" মুছে ফেলতে চান?', async ()=>{
+    methods.splice(idx,1);
+    A.withdrawSettings.methods = methods;
+    try{
+      await fbSet('settings','withdraw', { methods, minWithdraw: A.withdrawSettings.minWithdraw||100 });
+      renderWithdrawMethodsManager();
+      toast('✅ মেথড মুছে ফেলা হয়েছে।');
+    }catch(e){ toast('⚠️ সমস্যা হয়েছে।'); }
+  });
 }
 async function saveWithdrawSettings(){
-  const data = {
-    minWithdraw: Math.max(1, parseFloat(document.getElementById('set-min-withdraw').value)||100),
-    bkashLogo: document.getElementById('wd-bkash-url').value.trim(),
-    nagadLogo: document.getElementById('wd-nagad-url').value.trim(),
-    rocketLogo: document.getElementById('wd-rocket-url').value.trim(),
-  };
+  const minWithdraw = Math.max(1, parseFloat(document.getElementById('set-min-withdraw').value)||100);
+  A.withdrawSettings.minWithdraw = minWithdraw;
   try{
-    await fbSet('settings','withdraw', data);
-    A.withdrawSettings = data;
+    await fbSet('settings','withdraw', { minWithdraw, methods: A.withdrawSettings.methods||DEFAULT_WD_METHODS });
     toast('✅ উইথড্র সেটিংস সেভ হয়েছে!');
   }catch(e){ toast('⚠️ সমস্যা হয়েছে।'); }
 }
