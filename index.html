@@ -462,6 +462,47 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
       <div class="mgr-card" id="withdrawals-list"></div>
     </div>
 
+    <!-- CLOUDINARY -->
+    <div class="page" id="page-cloudinary">
+      <div class="page-head">
+        <div class="page-title" style="color:var(--accent2);">🌤️ Cloudinary API Setup<small>গ্যালারি থেকে সরাসরি Cloudinary-তে ভিডিও/থাম্বনেইল আপলোড</small></div>
+      </div>
+
+      <div class="mgr-card" style="padding:14px 16px;border-color:rgba(64,158,255,0.35);background:linear-gradient(160deg,rgba(64,158,255,0.08),var(--bg-card));">
+        <div style="font-size:12.5px;color:var(--text);line-height:1.7;">
+          এখানে Cloudinary অ্যাকাউন্টের <b>Cloud Name</b> ও <b>Unsigned Upload Preset</b> বসিয়ে Save করলে গ্যালারি থেকে সরাসরি ভিডিও/থাম্বনেইল আপলোড চালু হয়ে যাবে।
+        </div>
+        <ol style="margin:10px 0 0 18px;padding:0;font-size:12px;color:var(--text-muted);line-height:1.9;">
+          <li>Cloudinary Dashboard-এ লগইন করুন — উপরে Cloud Name দেখতে পাবেন</li>
+          <li>Settings ⚙️ → Upload → Add upload preset</li>
+          <li>Signing Mode অবশ্যই <b style="color:var(--gold3);">Unsigned</b> সিলেক্ট করে Save করুন</li>
+        </ol>
+      </div>
+
+      <div class="mgr-card" id="cloudinary-status-box" style="display:none;padding:12px 16px;border-color:rgba(35,180,122,0.4);background:rgba(35,180,122,0.08);">
+        <div style="font-size:12.5px;color:var(--green);font-weight:700;display:flex;align-items:center;gap:8px;"><span class="material-icons-round" style="font-size:17px;">check_circle</span><span id="cloudinary-status-text"></span></div>
+      </div>
+
+      <div class="mgr-card">
+        <div class="form-section">
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">cloud</span>Cloud Name*</div>
+            <input class="form-input" id="cl-cloud-name" placeholder="যেমন: paqs4n2j" />
+          </div>
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">upload</span>Unsigned Upload Preset*</div>
+            <input class="form-input" id="cl-upload-preset" placeholder="যেমন: movie_lover" />
+          </div>
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">folder</span>Folder (ঐচ্ছিক)</div>
+            <input class="form-input" id="cl-folder" placeholder="movielover_videos" />
+          </div>
+          <button class="save-btn" style="background:linear-gradient(135deg,#0891b2,#06b6d4);" onclick="saveCloudinarySettings()"><span class="material-icons-round">save</span>CLOUDINARY সংরক্ষণ করুন</button>
+          <button class="cancel-btn" onclick="testCloudinaryConnection()"><span class="material-icons-round" style="font-size:16px;vertical-align:-3px;">wifi_tethering</span> সংযোগ পরীক্ষা করুন</button>
+        </div>
+      </div>
+    </div>
+
     <!-- BROADCAST -->
     <div class="page" id="page-broadcast">
       <div class="page-head">
@@ -610,6 +651,54 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
 
       <div class="mgr-card">
         <div class="form-section">
+          <div class="form-label" style="margin-bottom:12px;"><span class="material-icons-round">smart_display</span>ডেইলি অ্যাড টাস্ক<span style="font-weight:400;color:var(--text-muted);font-size:11px;display:block;margin-top:3px;">প্রতিদিন কয়েকটা অ্যাড দেখে ইনকাম — টাস্ক পেজে আলাদা কার্ড হিসেবে দেখাবে</span></div>
+          <div class="form-group">
+            <div class="toggle-row">
+              <div class="toggle-label"><span class="material-icons-round" style="color:var(--green);font-size:18px;">toggle_on</span>চালু রাখুন</div>
+              <label class="switch"><input type="checkbox" id="dat-enabled"/><span class="slider-tg"></span></label>
+            </div>
+          </div>
+          <div class="form-row2">
+            <div class="form-group">
+              <div class="form-label"><span class="material-icons-round">tag</span>দিনে কতটা অ্যাড</div>
+              <input class="form-input" type="number" id="dat-ads-count" placeholder="5" />
+            </div>
+            <div class="form-group">
+              <div class="form-label"><span class="material-icons-round">payments</span>প্রতি অ্যাডে (৳)</div>
+              <input class="form-input" type="number" step="0.01" id="dat-reward" placeholder="0.50" />
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">redeem</span>সব শেষ করলে বোনাস (৳, ঐচ্ছিক)</div>
+            <input class="form-input" type="number" step="0.01" id="dat-bonus" placeholder="৫.০০ (০ দিলে বোনাস নেই)" />
+          </div>
+          <button class="save-btn" onclick="saveDailyAdTaskSettings()"><span class="material-icons-round">save</span>সেভ করুন</button>
+        </div>
+      </div>
+
+      <div class="mgr-card">
+        <div class="form-section">
+          <div class="form-label" style="margin-bottom:12px;"><span class="material-icons-round">campaign</span>রেফারেল ব্যানার (টাস্ক পেজের উপরের LIVE ব্যানার)</div>
+          <div class="form-row2">
+            <div class="form-group">
+              <div class="form-label"><span class="material-icons-round">stars</span>প্রতি রেফারে কয়েন</div>
+              <input class="form-input" type="number" id="ref-amount" placeholder="20" />
+            </div>
+            <div class="form-group">
+              <div class="form-label"><span class="material-icons-round">group</span>কতজন বন্ধু আনলে</div>
+              <input class="form-input" type="number" id="ref-count" placeholder="10" />
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">redeem</span>বোনাস কয়েন</div>
+            <input class="form-input" type="number" id="ref-bonus" placeholder="100" />
+          </div>
+          <button class="save-btn" onclick="saveReferralBannerSettings()"><span class="material-icons-round">save</span>সেভ করুন</button>
+        </div>
+      </div>
+
+      <div class="mgr-card">
+        <div class="form-section">
           <div class="form-label" style="margin-bottom:12px;"><span class="material-icons-round">lock_reset</span>এডমিন পাসওয়ার্ড পরিবর্তন</div>
           <div class="form-group"><input class="form-input" type="password" id="set-new-pass" placeholder="নতুন পাসওয়ার্ড" /></div>
           <button class="save-btn" onclick="changeAdminPassword()"><span class="material-icons-round">key</span>পাসওয়ার্ড পরিবর্তন করুন</button>
@@ -626,6 +715,7 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
     <div class="nav-item" data-page="channels" onclick="showAdminPage('channels')"><span class="material-icons-round">send</span>চ্যানেল</div>
     <div class="nav-item" data-page="tasks" onclick="showAdminPage('tasks')"><span class="material-icons-round">payments</span>টাস্ক</div>
     <div class="nav-item" data-page="withdrawals" onclick="showAdminPage('withdrawals')"><span class="material-icons-round">account_balance_wallet</span>উইথড্র</div>
+    <div class="nav-item" data-page="cloudinary" onclick="showAdminPage('cloudinary')"><span class="material-icons-round">cloud</span>CLOUDINARY</div>
     <div class="nav-item" data-page="broadcast" onclick="showAdminPage('broadcast')"><span class="material-icons-round">campaign</span>ব্রডকাস্ট</div>
     <div class="nav-item" data-page="settings" onclick="showAdminPage('settings')"><span class="material-icons-round">settings</span>সেটিংস</div>
   </nav>
@@ -831,6 +921,7 @@ const A = {
   editingTaskId: null,
   withdrawals: [],
   withdrawSettings: {},
+  cloudinary: {},
 };
 
 let partCounter = 0;
@@ -881,7 +972,7 @@ async function enterApp(){
   A_isEntered = true;
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').classList.add('visible');
-  await Promise.all([loadCategories(), loadChannels(), loadTutorial(), loadSettingsForm(), loadAdNetworkSettingsForm(), loadWithdrawSettingsForm(), loadTelegramSettings(), loadAllUsers(), loadTasks()]);
+  await Promise.all([loadCategories(), loadChannels(), loadTutorial(), loadSettingsForm(), loadAdNetworkSettingsForm(), loadWithdrawSettingsForm(), loadTelegramSettings(), loadAllUsers(), loadTasks(), loadCloudinarySettings(), loadDailyAdTaskSettings(), loadReferralBannerSettings()]);
   subscribeVideosAdmin();
   subscribeWithdrawals();
 }
@@ -967,7 +1058,38 @@ function fmtDate(ts){
   }catch(e){ return new Date(ts).toISOString().slice(0,16).replace('T',' '); }
 }
 
-/* ---------- file upload (Firebase Storage — ভিডিও ফাইলের জন্য) ---------- */
+/* ---------- image/video upload (Cloudinary — optional, auto-preferred when configured) ----------
+   If the admin has connected Cloudinary (see the "Cloudinary API Setup"
+   page), every thumbnail AND video upload goes through it instead of
+   ImgBB/Firebase Storage. If it isn't configured, nothing changes — the
+   original ImgBB/Storage path runs exactly as before. */
+function uploadToCloudinary(file, resourceType, onProgressEl){
+  return new Promise((resolve, reject)=>{
+    const cfg = A.cloudinary;
+    if(!cfg || !cfg.cloudName || !cfg.uploadPreset){
+      reject(new Error('Cloudinary কনফিগার করা নেই')); return;
+    }
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('upload_preset', cfg.uploadPreset);
+    if(cfg.folder) fd.append('folder', cfg.folder);
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `https://api.cloudinary.com/v1_1/${cfg.cloudName}/${resourceType}/upload`, true);
+    xhr.upload.onprogress = e=>{ if(onProgressEl && e.lengthComputable) onProgressEl.style.width = Math.round((e.loaded/e.total)*90)+'%'; };
+    xhr.onload = ()=>{
+      try{
+        const res = JSON.parse(xhr.responseText||'{}');
+        if(res.secure_url){ if(onProgressEl){onProgressEl.style.width='100%'; setTimeout(()=>onProgressEl.style.width='0%',600);} resolve(res.secure_url); }
+        else reject(new Error((res.error&&res.error.message) || 'আপলোড ব্যর্থ'));
+      }catch(e){ reject(e); }
+    };
+    xhr.onerror = ()=>reject(new Error('নেটওয়ার্ক সমস্যা'));
+    xhr.send(fd);
+  });
+}
+function cloudinaryReady(){ return !!(A.cloudinary && A.cloudinary.cloudName && A.cloudinary.uploadPreset); }
+
+/* ---------- file upload (Firebase Storage — ভিডিও ফাইলের জন্য, Cloudinary না থাকলে) ---------- */
 function uploadToStorage(file, folder, onProgressEl){
   return new Promise(async (resolve,reject)=>{
     try{
@@ -1028,13 +1150,28 @@ function handleThumbUpload(input, ctx){
   const prog = map.prog ? document.getElementById(map.prog) : null;
   const localUrl = URL.createObjectURL(file);
   setThumbPreview(box, localUrl);
-  toast('ছবি ImgBB-তে আপলোড হচ্ছে...');
-  uploadToImgBB(file, prog).then(url=>{
+  const applyUrl = (url)=>{
     if(ctx==='v'){ A.pendingThumbUrl = url; document.getElementById('v-thumb-url').value = url; }
     else if(ctx==='bc'){ A.pendingBcThumbUrl = url; document.getElementById('bc-thumb-url').value = url; }
     else if(ctx==='tut'){ A.pendingTutThumbUrl = url; }
     else if(map.url){ document.getElementById(map.url).value = url; }
     setThumbPreview(box, url);
+  };
+  if(cloudinaryReady()){
+    toast('ছবি Cloudinary-তে আপলোড হচ্ছে...');
+    uploadToCloudinary(file, 'image', prog).then(url=>{
+      applyUrl(url);
+      toast('✅ ছবি Cloudinary-তে আপলোড সম্পন্ন!');
+    }).catch(err=>{
+      console.error('Cloudinary upload error:', err);
+      toast('⚠️ Cloudinary আপলোড ব্যর্থ — ImgBB দিয়ে চেষ্টা করা হচ্ছে...');
+      uploadToImgBB(file, prog).then(applyUrl).catch(e2=>toast('⚠️ আপলোড ব্যর্থ হয়েছে। ' + (e2&&e2.message?e2.message:'')));
+    });
+    return;
+  }
+  toast('ছবি ImgBB-তে আপলোড হচ্ছে...');
+  uploadToImgBB(file, prog).then(url=>{
+    applyUrl(url);
     toast('✅ ছবি ImgBB-তে আপলোড সম্পন্ন!');
   }).catch(err=>{
     console.error('ImgBB upload error:', err);
@@ -1060,12 +1197,28 @@ function handleVideoUpload(input, ctx){
   if(!file) return;
   const statusId = ctx==='v' ? 'v-video-status' : 'tut-video-status';
   const statusEl = document.getElementById(statusId);
-  statusEl.textContent = 'আপলোড হচ্ছে... 0%';
-  toast('ভিডিও আপলোড হচ্ছে, এতে কিছুটা সময় লাগতে পারে...');
-  uploadToStorage(file,'videos', null).then(url=>{
+  const applyUrl = (url)=>{
     if(ctx==='v'){ A.pendingVideoUrl = url; document.getElementById('v-url').value = url; }
     else { A.pendingTutVideoUrl = url; document.getElementById('tut-video-url').value = url; }
     statusEl.textContent = '✅ ভিডিও আপলোড সম্পন্ন হয়েছে';
+  };
+  if(cloudinaryReady()){
+    statusEl.textContent = 'Cloudinary-তে আপলোড হচ্ছে...';
+    toast('ভিডিও Cloudinary-তে আপলোড হচ্ছে, এতে কিছুটা সময় লাগতে পারে...');
+    uploadToCloudinary(file, 'video', null).then(url=>{
+      applyUrl(url);
+      toast('✅ ভিডিও আপলোড সম্পন্ন!');
+    }).catch(err=>{
+      console.error('Cloudinary video upload error:', err);
+      statusEl.textContent = '⚠️ Cloudinary ব্যর্থ — Firebase দিয়ে চেষ্টা করা হচ্ছে...';
+      uploadToStorage(file,'videos', null).then(applyUrl).catch(()=>{ statusEl.textContent='⚠️ আপলোড ব্যর্থ হয়েছে, লিংক ব্যবহার করুন'; toast('⚠️ ভিডিও আপলোড ব্যর্থ হয়েছে।'); });
+    });
+    return;
+  }
+  statusEl.textContent = 'আপলোড হচ্ছে... 0%';
+  toast('ভিডিও আপলোড হচ্ছে, এতে কিছুটা সময় লাগতে পারে...');
+  uploadToStorage(file,'videos', null).then(url=>{
+    applyUrl(url);
     toast('✅ ভিডিও আপলোড সম্পন্ন!');
   }).catch(()=>{ statusEl.textContent = '⚠️ আপলোড ব্যর্থ হয়েছে, লিংক ব্যবহার করুন'; toast('⚠️ ভিডিও আপলোড ব্যর্থ হয়েছে।'); });
 }
@@ -1116,11 +1269,24 @@ function handlePartVideoUpload(input){
   const block = input.closest('.part-block');
   const statusEl = block.querySelector('.part-video-status');
   const urlInput = block.querySelector('.part-url-input');
+  const applyUrl = (url)=>{ urlInput.value = url; statusEl.textContent = '✅ ভিডিও আপলোড সম্পন্ন হয়েছে'; };
+  if(cloudinaryReady()){
+    statusEl.textContent = 'Cloudinary-তে আপলোড হচ্ছে...';
+    toast('ভিডিও Cloudinary-তে আপলোড হচ্ছে, এতে কিছুটা সময় লাগতে পারে...');
+    uploadToCloudinary(file, 'video', null).then(url=>{
+      applyUrl(url);
+      toast('✅ ভিডিও আপলোড সম্পন্ন!');
+    }).catch(err=>{
+      console.error('Cloudinary video upload error:', err);
+      statusEl.textContent = '⚠️ Cloudinary ব্যর্থ — Firebase দিয়ে চেষ্টা করা হচ্ছে...';
+      uploadToStorage(file,'videos', null).then(applyUrl).catch(()=>{ statusEl.textContent='⚠️ আপলোড ব্যর্থ হয়েছে, লিংক ব্যবহার করুন'; toast('⚠️ ভিডিও আপলোড ব্যর্থ হয়েছে।'); });
+    });
+    return;
+  }
   statusEl.textContent = 'আপলোড হচ্ছে...';
   toast('ভিডিও আপলোড হচ্ছে, এতে কিছুটা সময় লাগতে পারে...');
   uploadToStorage(file,'videos', null).then(url=>{
-    urlInput.value = url;
-    statusEl.textContent = '✅ ভিডিও আপলোড সম্পন্ন হয়েছে';
+    applyUrl(url);
     toast('✅ ভিডিও আপলোড সম্পন্ন!');
   }).catch(()=>{ statusEl.textContent='⚠️ আপলোড ব্যর্থ হয়েছে, লিংক ব্যবহার করুন'; toast('⚠️ ভিডিও আপলোড ব্যর্থ হয়েছে।'); });
 }
@@ -1770,6 +1936,95 @@ async function saveWithdrawSettings(){
     await fbSet('settings','withdraw', { minWithdraw, methods: A.withdrawSettings.methods||DEFAULT_WD_METHODS });
     toast('✅ উইথড্র সেটিংস সেভ হয়েছে!');
   }catch(e){ toast('⚠️ সমস্যা হয়েছে।'); }
+}
+
+/* ============ CLOUDINARY API SETUP ============ */
+async function loadCloudinarySettings(){
+  const c = await fbGetDoc('settings','cloudinary');
+  A.cloudinary = c || {};
+  document.getElementById('cl-cloud-name').value = A.cloudinary.cloudName || '';
+  document.getElementById('cl-upload-preset').value = A.cloudinary.uploadPreset || '';
+  document.getElementById('cl-folder').value = A.cloudinary.folder || '';
+  renderCloudinaryStatus();
+}
+function renderCloudinaryStatus(){
+  const box = document.getElementById('cloudinary-status-box');
+  const txt = document.getElementById('cloudinary-status-text');
+  if(cloudinaryReady()){
+    box.style.display='block';
+    txt.textContent = `Cloudinary কনফিগার করা আছে — Cloud: ${A.cloudinary.cloudName}, Preset: ${A.cloudinary.uploadPreset}`;
+  } else {
+    box.style.display='none';
+  }
+}
+async function saveCloudinarySettings(){
+  const cloudName = document.getElementById('cl-cloud-name').value.trim();
+  const uploadPreset = document.getElementById('cl-upload-preset').value.trim();
+  const folder = document.getElementById('cl-folder').value.trim();
+  if(!cloudName || !uploadPreset){ toast('⚠️ Cloud Name ও Upload Preset দুটোই দিন।'); return; }
+  try{
+    await fbSet('settings','cloudinary', { cloudName, uploadPreset, folder });
+    A.cloudinary = { cloudName, uploadPreset, folder };
+    renderCloudinaryStatus();
+    toast('✅ Cloudinary সংরক্ষণ হয়েছে! এখন থেকে সব আপলোড Cloudinary দিয়ে হবে।');
+  }catch(e){ toast('⚠️ সমস্যা হয়েছে।'); }
+}
+async function testCloudinaryConnection(){
+  const cloudName = document.getElementById('cl-cloud-name').value.trim();
+  const uploadPreset = document.getElementById('cl-upload-preset').value.trim();
+  if(!cloudName || !uploadPreset){ toast('⚠️ আগে Cloud Name ও Upload Preset দিন।'); return; }
+  toast('সংযোগ পরীক্ষা করা হচ্ছে...');
+  try{
+    const canvas = document.createElement('canvas');
+    canvas.width = 2; canvas.height = 2;
+    const blob = await new Promise(res=>canvas.toBlob(res, 'image/png'));
+    const testFile = new File([blob], 'connection_test.png', { type:'image/png' });
+    const oldCfg = A.cloudinary;
+    A.cloudinary = { cloudName, uploadPreset };
+    await uploadToCloudinary(testFile, 'image', null);
+    A.cloudinary = oldCfg;
+    toast('✅ সংযোগ সফল! Cloudinary ঠিকমতো কাজ করছে।');
+  }catch(e){
+    toast('⚠️ সংযোগ ব্যর্থ — Cloud Name/Preset চেক করুন। ' + (e && e.message ? e.message : ''));
+  }
+}
+
+/* ============ DAILY AD TASK SETTINGS ============ */
+async function loadDailyAdTaskSettings(){
+  const s = await fbGetDoc('settings','dailyAdTask');
+  A.dailyAdTask = s || { enabled:false, adsCount:5, rewardPerAd:0.5, bonusOnComplete:0 };
+  document.getElementById('dat-enabled').checked = !!A.dailyAdTask.enabled;
+  document.getElementById('dat-ads-count').value = A.dailyAdTask.adsCount||5;
+  document.getElementById('dat-reward').value = A.dailyAdTask.rewardPerAd||0.5;
+  document.getElementById('dat-bonus').value = A.dailyAdTask.bonusOnComplete||0;
+}
+async function saveDailyAdTaskSettings(){
+  const data = {
+    enabled: document.getElementById('dat-enabled').checked,
+    adsCount: Math.max(1, parseInt(document.getElementById('dat-ads-count').value)||5),
+    rewardPerAd: Math.max(0, parseFloat(document.getElementById('dat-reward').value)||0),
+    bonusOnComplete: Math.max(0, parseFloat(document.getElementById('dat-bonus').value)||0),
+  };
+  try{ await fbSet('settings','dailyAdTask', data); A.dailyAdTask = data; toast('✅ ডেইলি অ্যাড টাস্ক সেটিংস সেভ হয়েছে!'); }
+  catch(e){ toast('⚠️ সমস্যা হয়েছে।'); }
+}
+
+/* ============ REFERRAL BANNER SETTINGS ============ */
+async function loadReferralBannerSettings(){
+  const s = await fbGetDoc('settings','referral');
+  A.referralBanner = s || { amount:20, count:10, bonusAmount:100 };
+  document.getElementById('ref-amount').value = A.referralBanner.amount||20;
+  document.getElementById('ref-count').value = A.referralBanner.count||10;
+  document.getElementById('ref-bonus').value = A.referralBanner.bonusAmount||100;
+}
+async function saveReferralBannerSettings(){
+  const data = {
+    amount: Math.max(0, parseFloat(document.getElementById('ref-amount').value)||0),
+    count: Math.max(1, parseInt(document.getElementById('ref-count').value)||10),
+    bonusAmount: Math.max(0, parseFloat(document.getElementById('ref-bonus').value)||0),
+  };
+  try{ await fbSet('settings','referral', data); A.referralBanner = data; toast('✅ রেফারেল ব্যানার সেভ হয়েছে!'); }
+  catch(e){ toast('⚠️ সমস্যা হয়েছে।'); }
 }
 
 /* ============ TELEGRAM BOT / BROADCAST ============ */
