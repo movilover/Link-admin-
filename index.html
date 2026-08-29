@@ -445,6 +445,31 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
       <div class="page-head">
         <div class="page-title">উইথড্র রিকুয়েস্ট<small id="withdraw-count-sub">লোড হচ্ছে...</small></div>
       </div>
+
+      <div class="page-head" style="padding-top:6px;padding-bottom:0;">
+        <div class="page-title" style="font-size:14px;"><span class="material-icons-round" style="font-size:16px;vertical-align:-3px;color:var(--gold3);">insights</span> আয় রিপোর্ট (সব ইউজার মিলিয়ে)</div>
+      </div>
+      <div class="users-summary-row">
+        <div class="users-summary-card">
+          <div class="users-summary-val" id="income-today-val">৳0</div>
+          <div class="users-summary-lbl">আজকের ইনকাম</div>
+        </div>
+        <div class="users-summary-card">
+          <div class="users-summary-val gold" id="income-total-val">৳0</div>
+          <div class="users-summary-lbl">সর্বমোট ইনকাম</div>
+        </div>
+      </div>
+      <div class="users-summary-row" style="margin-top:0;">
+        <div class="users-summary-card">
+          <div class="users-summary-val" id="income-balance-val">৳0</div>
+          <div class="users-summary-lbl">ইউজারদের মোট ব্যালেন্স</div>
+        </div>
+        <div class="users-summary-card">
+          <div class="users-summary-val" id="income-withdrawn-val">৳0</div>
+          <div class="users-summary-lbl">মোট উইথড্র হয়েছে</div>
+        </div>
+      </div>
+
       <div class="users-summary-row">
         <div class="users-summary-card">
           <div class="users-summary-val" id="wd-pending-val">0</div>
@@ -645,7 +670,8 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
             <input type="file" accept="image/*" id="wd-new-file" style="display:none;" onchange="handleThumbUpload(this,'wd_new')" />
             <input class="form-input" id="new-wd-logo" placeholder="https://... (অথবা সরাসরি লিংক)" style="margin-top:8px;" />
           </div>
-          <button class="save-btn" onclick="addWithdrawMethod()"><span class="material-icons-round">add_circle</span>মেথড যুক্ত করুন</button>
+          <button class="save-btn" onclick="addWithdrawMethod()"><span class="material-icons-round">add_circle</span><span id="wd-add-btn-label">মেথড যুক্ত করুন</span></button>
+          <button class="cancel-btn" id="wd-cancel-edit-btn" style="display:none;" onclick="cancelEditWithdrawMethod()">এডিট বাতিল করুন</button>
         </div>
       </div>
 
@@ -922,6 +948,7 @@ const A = {
   withdrawals: [],
   withdrawSettings: {},
   cloudinary: {},
+  editingMethodIdx: null,
 };
 
 let partCounter = 0;
@@ -975,6 +1002,7 @@ async function enterApp(){
   await Promise.all([loadCategories(), loadChannels(), loadTutorial(), loadSettingsForm(), loadAdNetworkSettingsForm(), loadWithdrawSettingsForm(), loadTelegramSettings(), loadAllUsers(), loadTasks(), loadCloudinarySettings(), loadDailyAdTaskSettings(), loadReferralBannerSettings()]);
   subscribeVideosAdmin();
   subscribeWithdrawals();
+  setTimeout(loadIncomeReport, 800);
 }
 
 /* ---------- firestore helpers ---------- */
@@ -997,7 +1025,7 @@ function showAdminPage(name){
   if(name==='users') loadAllUsers();
   if(name==='broadcast') refreshBroadcastStats();
   if(name==='tasks') loadTasks();
-  if(name==='withdrawals') renderWithdrawalsList();
+  if(name==='withdrawals'){ renderWithdrawalsList(); loadIncomeReport(); }
 }
 
 /* ============ USERS ============ */
@@ -1602,6 +1630,11 @@ async function saveVideo(){
       toast('✅ নতুন ভিডিও যুক্ত হয়েছে! ইউজার সাইটে এটির জন্য এখনই একটি আলাদা শেয়ার লিংক তৈরি হয়ে যাবে।');
     }
     closeFormModal();
+    if(isNew){
+      try{
+        await fbAdd('notifications', { title: '🎬 নতুন ভিডিও যুক্ত হয়েছে!', body: title, type:'new_video' });
+      }catch(e){}
+    }
     if(isNew && A.telegram.autoNotify && A.telegram.botToken){
       const caption = '🎬 নতুন ভিডিও যুক্ত হয়েছে!\n\n' + title + (description?('\n\n'+description):'');
       runBroadcast(caption, thumbnail, true);
@@ -1816,6 +1849,49 @@ async function loadWithdrawalsFallback(){
   A.withdrawals.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
   renderWithdrawalsList();
 }
+
+/* ============ SITE-WIDE INCOME REPORT =====================
+   Same math as the user site's own wallet stats, just summed across every
+   user instead of one: total income (all task/daily-ad earnings, ever),
+   today's income (only today's slice), total user balance (income minus
+   non-rejected withdrawals), and total actually paid out. */
+async function loadIncomeReport(){
+  const [completions, dailyAds] = await Promise.all([
+    fbGet('task_completions'),
+    fbGet('daily_ad_tasks')
+  ]);
+  const dayStart = new Date(); dayStart.setHours(0,0,0,0);
+  const dayStartMs = dayStart.getTime();
+  const todayKeyStr = (()=>{ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); })();
+
+  let totalIncome = 0, todayIncome = 0;
+  completions.forEach(c=>{
+    totalIncome += (c.totalEarned||0);
+    if((c.completedAt||0) >= dayStartMs){
+      if(c.type==='daily'){
+        const t = A.tasks.find(x=>x.id===c.taskId);
+        todayIncome += t ? (t.reward||0) : 0;
+      } else {
+        todayIncome += (c.totalEarned||0);
+      }
+    }
+  });
+  dailyAds.forEach(d=>{
+    totalIncome += (d.earned||0);
+    if(d.date === todayKeyStr) todayIncome += (d.earned||0);
+  });
+
+  const nonRejected = A.withdrawals.filter(w=>w.status!=='rejected');
+  const totalWithdrawn = nonRejected.reduce((s,w)=>s+(w.amount||0),0);
+  const totalUserBalance = Math.max(0, totalIncome - totalWithdrawn);
+
+  const set = (id,val)=>{ const el=document.getElementById(id); if(el) el.textContent = val; };
+  set('income-today-val', '৳' + fmtNum(todayIncome));
+  set('income-total-val', '৳' + fmtNum(totalIncome));
+  set('income-balance-val', '৳' + fmtNum(totalUserBalance));
+  set('income-withdrawn-val', '৳' + fmtNum(totalWithdrawn));
+}
+
 function renderWithdrawalsList(){
   const wrap = document.getElementById('withdrawals-list');
   const sub = document.getElementById('withdraw-count-sub');
@@ -1856,7 +1932,18 @@ function renderWithdrawalsList(){
 async function setWithdrawStatus(id, status){
   const label = status==='approved' ? 'অনুমোদন' : 'বাতিল';
   openConfirm('এই রিকুয়েস্টটি ' + label + ' করতে চান?', async ()=>{
-    try{ await fbUpdate('withdrawals', id, { status, updatedAt: Date.now() }); toast('✅ ' + label + ' করা হয়েছে।'); }
+    try{
+      const w = A.withdrawals.find(x=>x.id===id);
+      await fbUpdate('withdrawals', id, { status, updatedAt: Date.now() });
+      if(w && w.userId){
+        const title = status==='approved' ? '✅ উইথড্র অনুমোদিত হয়েছে' : '❌ উইথড্র রিকুয়েস্ট বাতিল হয়েছে';
+        const body = status==='approved'
+          ? `আপনার ৳ ${(w.amount||0).toFixed(2)} উইথড্র রিকুয়েস্ট অনুমোদিত হয়েছে।`
+          : `আপনার ৳ ${(w.amount||0).toFixed(2)} উইথড্র রিকুয়েস্ট বাতিল হয়েছে — টাকাটা আবার আপনার ব্যালেন্সে ফেরত এসেছে।`;
+        await fbAdd('notifications', { userId: w.userId, type: status==='approved'?'withdraw_approved':'withdraw_rejected', title, body });
+      }
+      toast('✅ ' + label + ' করা হয়েছে।');
+    }
     catch(e){ toast('⚠️ সমস্যা হয়েছে।'); }
   });
 }
@@ -1890,8 +1977,39 @@ function renderWithdrawMethodsManager(){
     '<div class="cat-row">' +
       '<div class="cat-emoji-box">' + (m.logo?('<img src="'+escHtml(m.logo)+'" style="width:100%;height:100%;object-fit:contain;border-radius:11px;" onerror="this.parentElement.textContent=\'💳\'"/>'):'💳') + '</div>' +
       '<div class="cat-info"><div class="cat-name">' + escHtml(m.name) + '</div><div class="cat-key">key: ' + escHtml(m.key) + '</div></div>' +
-      '<div class="icon-action del" onclick="removeWithdrawMethod(' + i + ')"><span class="material-icons-round">delete</span></div>' +
+      '<div class="icon-action edit" onclick="editWithdrawMethod(' + i + ')" title="এডিট করুন"><span class="material-icons-round">edit</span></div>' +
+      '<div class="icon-action del" onclick="removeWithdrawMethod(' + i + ')" title="মুছে ফেলুন"><span class="material-icons-round">delete</span></div>' +
     '</div>').join('');
+}
+function editWithdrawMethod(idx){
+  const m = (A.withdrawSettings.methods||[])[idx];
+  if(!m) return;
+  A.editingMethodIdx = idx;
+  document.getElementById('new-wd-name').value = m.name || '';
+  document.getElementById('new-wd-logo').value = m.logo || '';
+  const box = document.getElementById('wd-new-box');
+  if(m.logo) setThumbPreview(box, m.logo);
+  else {
+    box.classList.remove('has-img');
+    const img = box.querySelector('img'); if(img) img.remove();
+    const icon = box.querySelector('.upl-icon'); if(icon) icon.style.display='';
+    const txt = box.querySelector('.upl-txt'); if(txt) txt.style.display='';
+  }
+  document.getElementById('wd-add-btn-label').textContent = `"${m.name}" আপডেট করুন`;
+  document.getElementById('wd-cancel-edit-btn').style.display = '';
+  document.getElementById('new-wd-name').scrollIntoView({behavior:'smooth', block:'center'});
+}
+function cancelEditWithdrawMethod(){
+  A.editingMethodIdx = null;
+  document.getElementById('new-wd-name').value='';
+  document.getElementById('new-wd-logo').value='';
+  const box = document.getElementById('wd-new-box');
+  box.classList.remove('has-img');
+  const img = box.querySelector('img'); if(img) img.remove();
+  const icon = box.querySelector('.upl-icon'); if(icon) icon.style.display='';
+  const txt = box.querySelector('.upl-txt'); if(txt) txt.style.display='';
+  document.getElementById('wd-add-btn-label').textContent = 'মেথড যুক্ত করুন';
+  document.getElementById('wd-cancel-edit-btn').style.display = 'none';
 }
 function slugifyMethod(name){
   return name.trim().toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_\u0980-\u09FF]/g,'').slice(0,20) || ('m'+Date.now().toString(36));
@@ -1901,19 +2019,19 @@ async function addWithdrawMethod(){
   const logo = document.getElementById('new-wd-logo').value.trim();
   if(!name){ toast('⚠️ মেথডের নাম দিন।'); return; }
   const methods = A.withdrawSettings.methods || [];
-  methods.push({ key: slugifyMethod(name), name, logo });
+  if(A.editingMethodIdx!=null && methods[A.editingMethodIdx]){
+    methods[A.editingMethodIdx].name = name;
+    methods[A.editingMethodIdx].logo = logo;
+  } else {
+    methods.push({ key: slugifyMethod(name), name, logo });
+  }
   A.withdrawSettings.methods = methods;
+  const wasEditing = A.editingMethodIdx!=null;
   try{
     await fbSet('settings','withdraw', { methods, minWithdraw: A.withdrawSettings.minWithdraw||100 });
-    document.getElementById('new-wd-name').value='';
-    document.getElementById('new-wd-logo').value='';
-    const box = document.getElementById('wd-new-box');
-    box.classList.remove('has-img');
-    const img = box.querySelector('img'); if(img) img.remove();
-    const icon = box.querySelector('.upl-icon'); if(icon) icon.style.display='';
-    const txt = box.querySelector('.upl-txt'); if(txt) txt.style.display='';
+    cancelEditWithdrawMethod();
     renderWithdrawMethodsManager();
-    toast('✅ মেথড যুক্ত হয়েছে!');
+    toast(wasEditing ? '✅ মেথড আপডেট হয়েছে!' : '✅ মেথড যুক্ত হয়েছে!');
   }catch(e){ toast('⚠️ সমস্যা হয়েছে।'); }
 }
 async function removeWithdrawMethod(idx){
