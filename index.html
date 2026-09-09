@@ -725,6 +725,48 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
 
       <div class="mgr-card">
         <div class="form-section">
+          <div class="form-label" style="margin-bottom:12px;"><span class="material-icons-round">campaign</span>ঘোষণা ব্যানার (হেডারের নিচে)<span style="font-weight:400;color:var(--text-muted);font-size:11px;display:block;margin-top:3px;">সাইটে ঢুকলেই স্লাইড-ডাউন হয়ে দেখাবে, সাউন্ডসহ — যেমন "নতুন চ্যানেলে যোগ দিন"</span></div>
+
+          <div class="form-group">
+            <div class="toggle-row">
+              <div class="toggle-label"><span class="material-icons-round" style="color:var(--green);font-size:18px;">visibility</span>ব্যানার চালু রাখুন</div>
+              <label class="switch"><input type="checkbox" id="ann-enabled"/><span class="slider-tg"></span></label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">image</span>আইকন / লোগো (ঐচ্ছিক)</div>
+            <div class="thumb-upload-box" style="aspect-ratio:auto;padding:12px;flex-direction:row;gap:10px;" id="ann-icon-box" onclick="document.getElementById('ann-icon-file').click()">
+              <span class="upl-icon material-icons-round" style="font-size:20px;">add_photo_alternate</span>
+              <span class="upl-txt">আইকন আপলোড করুন (Cloudinary কনফিগার থাকলে সেটাই ব্যবহার হবে)</span>
+            </div>
+            <input type="file" accept="image/*" id="ann-icon-file" style="display:none;" onchange="handleThumbUpload(this,'ann')" />
+            <input class="form-input" id="ann-icon-url" placeholder="https://... (অথবা সরাসরি লিংক)" style="margin-top:8px;" />
+          </div>
+
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">notes</span>মেসেজ টেক্সট</div>
+            <textarea class="form-textarea" id="ann-text" placeholder="আমাদের আগের টেলিগ্রাম চ্যানেলটি বন্ধ হয়ে গেছে, নতুন অফিসিয়াল চ্যানেলে যোগ দিন!"></textarea>
+          </div>
+
+          <div class="form-row2">
+            <div class="form-group">
+              <div class="form-label"><span class="material-icons-round">smart_button</span>বাটনের টেক্সট</div>
+              <input class="form-input" id="ann-btn-text" placeholder="যোগ দিন" />
+            </div>
+            <div class="form-group">
+              <div class="form-label"><span class="material-icons-round">link</span>বাটনের লিংক</div>
+              <input class="form-input" id="ann-btn-url" placeholder="https://t.me/..." />
+            </div>
+          </div>
+
+          <button class="save-btn" onclick="saveAnnouncementSettings()"><span class="material-icons-round">save</span>সেভ ও সবাইকে আবার দেখান</button>
+          <div class="form-hint">Save করলেই যারা আগে ব্যানার বন্ধ করে দিয়েছিল তাদের কাছেও এই নতুন ভার্সনটা আবার দেখাবে (একটা ভার্সন নাম্বার অটো বাড়ে)।</div>
+        </div>
+      </div>
+
+      <div class="mgr-card">
+        <div class="form-section">
           <div class="form-label" style="margin-bottom:12px;"><span class="material-icons-round">lock_reset</span>এডমিন পাসওয়ার্ড পরিবর্তন</div>
           <div class="form-group"><input class="form-input" type="password" id="set-new-pass" placeholder="নতুন পাসওয়ার্ড" /></div>
           <button class="save-btn" onclick="changeAdminPassword()"><span class="material-icons-round">key</span>পাসওয়ার্ড পরিবর্তন করুন</button>
@@ -999,7 +1041,7 @@ async function enterApp(){
   A_isEntered = true;
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').classList.add('visible');
-  await Promise.all([loadCategories(), loadChannels(), loadTutorial(), loadSettingsForm(), loadAdNetworkSettingsForm(), loadWithdrawSettingsForm(), loadTelegramSettings(), loadAllUsers(), loadTasks(), loadCloudinarySettings(), loadDailyAdTaskSettings(), loadReferralBannerSettings()]);
+  await Promise.all([loadCategories(), loadChannels(), loadTutorial(), loadSettingsForm(), loadAdNetworkSettingsForm(), loadWithdrawSettingsForm(), loadTelegramSettings(), loadAllUsers(), loadTasks(), loadCloudinarySettings(), loadDailyAdTaskSettings(), loadReferralBannerSettings(), loadAnnouncementSettings()]);
   subscribeVideosAdmin();
   subscribeWithdrawals();
   setTimeout(loadIncomeReport, 800);
@@ -1169,6 +1211,7 @@ const THUMB_CTX_MAP = {
   tut: { box:'tut-thumb-box', prog:'tut-thumb-progress', url:null },
   t:   { box:'t-icon-box',    prog:null,                 url:'t-icon-url' },
   wd_new:    { box:'wd-new-box',    prog:null, url:'new-wd-logo' },
+  ann:       { box:'ann-icon-box',  prog:null, url:'ann-icon-url' },
 };
 function handleThumbUpload(input, ctx){
   const file = input.files[0];
@@ -2145,6 +2188,36 @@ async function saveReferralBannerSettings(){
   catch(e){ toast('⚠️ সমস্যা হয়েছে।'); }
 }
 
+/* ============ ANNOUNCEMENT BANNER SETTINGS ============ */
+async function loadAnnouncementSettings(){
+  const s = await fbGetDoc('settings','announcement');
+  A.announcement = s || { enabled:false, icon:'', text:'', buttonText:'', buttonUrl:'', version:0 };
+  document.getElementById('ann-enabled').checked = !!A.announcement.enabled;
+  document.getElementById('ann-icon-url').value = A.announcement.icon || '';
+  if(A.announcement.icon) setThumbPreview(document.getElementById('ann-icon-box'), A.announcement.icon);
+  document.getElementById('ann-text').value = A.announcement.text || '';
+  document.getElementById('ann-btn-text').value = A.announcement.buttonText || '';
+  document.getElementById('ann-btn-url').value = A.announcement.buttonUrl || '';
+}
+async function saveAnnouncementSettings(){
+  const text = document.getElementById('ann-text').value.trim();
+  const enabled = document.getElementById('ann-enabled').checked;
+  if(enabled && !text){ toast('⚠️ ব্যানার চালু রাখতে হলে মেসেজ টেক্সট দিন।'); return; }
+  const data = {
+    enabled,
+    icon: document.getElementById('ann-icon-url').value.trim(),
+    text,
+    buttonText: document.getElementById('ann-btn-text').value.trim(),
+    buttonUrl: document.getElementById('ann-btn-url').value.trim(),
+    version: ((A.announcement && A.announcement.version) || 0) + 1,
+  };
+  try{
+    await fbSet('settings','announcement', data);
+    A.announcement = data;
+    toast('✅ ব্যানার সেভ হয়েছে — যারা আগে বন্ধ করেছিল তারাও এখন আবার দেখবে!');
+  }catch(e){ toast('⚠️ সমস্যা হয়েছে।'); }
+}
+
 /* ============ TELEGRAM BOT / BROADCAST ============ */
 async function loadTelegramSettings(){
   const cfg = await fbGetDoc('settings','telegram');
@@ -2219,14 +2292,21 @@ async function runBroadcast(text, photoUrl, silent){
   const progTxt = document.getElementById('bc-progress-txt');
   if(progWrap){ progWrap.style.display='block'; progFill.style.width='0%'; }
 
-  let sent=0, failed=0;
-  for(let i=0;i<targets.length;i++){
-    const ok = await tgSendOne(targets[i].tgUserId, text, photoUrl);
-    if(ok) sent++; else failed++;
-    const pct = Math.round(((i+1)/targets.length)*100);
+  // Sent in parallel batches instead of one message at a time — Telegram
+  // allows roughly 30 messages/sec, so a batch of 25 sent concurrently
+  // then a short pause keeps us safely under that limit while finishing
+  // in a fraction of the time the old one-by-one loop took.
+  const BATCH_SIZE = 25;
+  let sent=0, failed=0, done=0;
+  for(let i=0;i<targets.length;i+=BATCH_SIZE){
+    const batch = targets.slice(i, i+BATCH_SIZE);
+    const results = await Promise.all(batch.map(t=>tgSendOne(t.tgUserId, text, photoUrl)));
+    results.forEach(ok=>{ if(ok) sent++; else failed++; });
+    done += batch.length;
+    const pct = Math.round((done/targets.length)*100);
     if(progFill){ progFill.style.width = pct+'%'; }
-    if(progTxt){ progTxt.textContent = (i+1) + ' / ' + targets.length + ' পাঠানো হয়েছে (সফল: ' + sent + ', ব্যর্থ: ' + failed + ')'; }
-    await new Promise(r=>setTimeout(r,45));
+    if(progTxt){ progTxt.textContent = done + ' / ' + targets.length + ' পাঠানো হয়েছে (সফল: ' + sent + ', ব্যর্থ: ' + failed + ')'; }
+    if(i+BATCH_SIZE < targets.length){ await new Promise(r=>setTimeout(r,1000)); }
   }
   toast('✅ ব্রডকাস্ট শেষ! সফল: ' + sent + ', ব্যর্থ: ' + failed);
   return {sent,failed};
