@@ -56,28 +56,28 @@
 
 <style>
 :root {
-  --bg-deep: #0f0a0d;
-  --bg-card: #1a1214;
-  --bg-card2: #241a1ec0;
-  --accent: #b8203a;
+  --bg-deep: #08060f;
+  --bg-card: #141020;
+  --bg-card2: #1c1630c0;
+  --accent: #a855f7;
   --accent2: #e8425e;
-  --gold: #d9a53f;
-  --gold2: #c8902e;
-  --gold3: #f0c874;
-  --purple: #8a2f42;
-  --purple2: #b8546b;
-  --pink: #c9435f;
+  --gold: #f2b830;
+  --gold2: #c98a0d;
+  --gold3: #ffd98a;
+  --purple: #5b21b6;
+  --purple2: #b79cff;
+  --pink: #a855f7;
   --green: #23b47a;
   --red: #e84855;
-  --text: #f7f0e8;
-  --text-muted: #a08f86;
-  --border: rgba(217,165,63,0.18);
-  --glow: rgba(184,32,58,0.45);
+  --text: #f6f2ff;
+  --text-muted: #9d95b3;
+  --border: rgba(167,139,250,0.18);
+  --glow: rgba(168,85,247,0.45);
   --nav-h: 66px;
   --header-h: 60px;
   --card-radius: 18px;
   --btn-radius: 14px;
-  --grad-btn: linear-gradient(135deg, var(--purple) 0%, var(--pink) 100%);
+  --grad-btn: linear-gradient(135deg, #5b21b6 0%, #7c3aed 50%, #c026d3 100%);
 }
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 html,body { height:100%; overflow:hidden; background:var(--bg-deep); color:var(--text); font-family:'Hind Siliguri',sans-serif; }
@@ -86,8 +86,8 @@ html,body { height:100%; overflow:hidden; background:var(--bg-deep); color:var(-
 ::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
 
 /* ============ LOGIN ============ */
-#login-screen { position:fixed; inset:0; z-index:9999; background:radial-gradient(ellipse at 50% 20%, #241318 0%, var(--bg-deep) 70%); display:flex; align-items:center; justify-content:center; padding:24px; }
-.login-box { width:100%; max-width:340px; background:linear-gradient(180deg,#1f1517,#100a0c); border:1px solid var(--border); border-radius:22px; padding:30px 24px; text-align:center; }
+#login-screen { position:fixed; inset:0; z-index:9999; background:radial-gradient(ellipse at 50% 20%, #2b1a45 0%, var(--bg-deep) 70%); display:flex; align-items:center; justify-content:center; padding:24px; }
+.login-box { width:100%; max-width:340px; background:linear-gradient(180deg,#191325,#0b0812); border:1px solid var(--border); border-radius:22px; padding:30px 24px; text-align:center; }
 .login-logo { font-family:'Cinzel Decorative',serif; font-size:26px; font-weight:900; margin-bottom:4px; }
 .login-logo span { color:var(--accent); text-shadow:0 0 20px var(--glow); }
 .login-sub { font-size:12px; color:var(--text-muted); margin-bottom:22px; letter-spacing:1px; }
@@ -100,7 +100,7 @@ html,body { height:100%; overflow:hidden; background:var(--bg-deep); color:var(-
 /* ============ APP SHELL ============ */
 #app { height:100%; display:flex; flex-direction:column; opacity:0; transition:opacity 0.4s; }
 #app.visible { opacity:1; }
-header { height:var(--header-h); flex-shrink:0; background:linear-gradient(135deg,#130d0f 0%,#1c1316 100%); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 16px; }
+header { height:var(--header-h); flex-shrink:0; background:linear-gradient(135deg,#0e0a17 0%,#171122 100%); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 16px; }
 .header-logo { font-family:'Cinzel Decorative',serif; font-size:19px; font-weight:900; }
 .header-logo span { color:var(--accent); }
 .header-logo small { display:block; font-family:'Rajdhani',sans-serif; font-size:10px; color:var(--gold3); letter-spacing:2px; font-weight:700; }
@@ -114,36 +114,36 @@ header { height:var(--header-h); flex-shrink:0; background:linear-gradient(135de
 .page-head { padding:16px 16px 6px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
 .page-title { font-family:'Rajdhani',sans-serif; font-size:19px; font-weight:700; }
 .page-title small { display:block; font-family:'Hind Siliguri',sans-serif; font-size:11px; color:var(--text-muted); font-weight:400; margin-top:2px; }
-.add-fab { display:flex; align-items:center; gap:6px; padding:10px 16px; border-radius:14px; border:none; background:var(--grad-btn); color:#fff; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:13.5px; cursor:pointer; box-shadow:0 6px 18px rgba(138,47,66,0.35); flex-shrink:0; }
+.add-fab { display:flex; align-items:center; gap:6px; padding:10px 16px; border-radius:14px; border:none; background:var(--grad-btn); color:#fff; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:13.5px; cursor:pointer; box-shadow:0 6px 18px rgba(91,33,182,0.35); flex-shrink:0; }
 
-nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d090b 0%,#120c0f 100%); border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-around; overflow-x:auto; }
+nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0710 0%,#0f0a18 100%); border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-around; overflow-x:auto; }
 .nav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; cursor:pointer; padding:6px 2px; color:var(--text-muted); font-size:9px; font-weight:600; min-width:52px; }
 .nav-item .material-icons-round { font-size:20px; }
 .nav-item.active { color:var(--accent2); }
 .nav-item.active .material-icons-round { filter:drop-shadow(0 0 8px var(--glow)); }
 
 /* ============ CARDS / LISTS ============ */
-.mgr-card { margin:10px 16px; background:linear-gradient(180deg,var(--bg-card),#130d0f); border:1px solid var(--border); border-radius:16px; overflow:hidden; box-shadow:0 6px 20px rgba(0,0,0,0.35); }
+.mgr-card { margin:10px 16px; background:linear-gradient(180deg,var(--bg-card),#0e0a17); border:1px solid var(--border); border-radius:16px; overflow:hidden; box-shadow:0 6px 20px rgba(0,0,0,0.35); }
 .vid-row { display:flex; gap:12px; padding:12px; }
-.vid-thumb { width:96px; height:72px; border-radius:12px; object-fit:cover; background:linear-gradient(135deg,#291b1f,#160f11); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:22px; overflow:hidden; position:relative; border:1px solid var(--border); }
+.vid-thumb { width:96px; height:72px; border-radius:12px; object-fit:cover; background:linear-gradient(135deg,#241b33,#100b1a); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:22px; overflow:hidden; position:relative; border:1px solid var(--border); }
 .vid-thumb img { width:100%; height:100%; object-fit:cover; }
 .vid-body { flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; gap:3px; }
 .vid-title { font-size:13.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .vid-meta-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-.vid-chip { font-size:10px; padding:2px 8px; border-radius:8px; background:rgba(184,84,107,0.15); color:var(--purple2); font-weight:700; }
-.vid-chip.gold { background:rgba(217,165,63,0.15); color:var(--gold3); }
-.vid-chip.pin { background:rgba(217,165,63,0.2); color:var(--gold3); }
+.vid-chip { font-size:10px; padding:2px 8px; border-radius:8px; background:rgba(168,85,247,0.15); color:var(--purple2); font-weight:700; }
+.vid-chip.gold { background:rgba(242,184,48,0.15); color:var(--gold3); }
+.vid-chip.pin { background:rgba(242,184,48,0.2); color:var(--gold3); }
 .vid-stat-sm { font-size:10.5px; color:var(--text-muted); display:flex; align-items:center; gap:3px; }
 .vid-actions { display:flex; gap:6px; align-items:flex-start; flex-shrink:0; }
 .icon-action { width:32px; height:32px; border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer; border:1px solid var(--border); background:rgba(255,255,255,0.03); color:var(--text-muted); }
-.icon-action.edit { color:var(--purple2); border-color:rgba(184,84,107,0.3); }
+.icon-action.edit { color:var(--purple2); border-color:rgba(168,85,247,0.3); }
 .icon-action.del { color:var(--accent2); border-color:rgba(184,32,58,0.3); }
-.icon-action.pin-on { color:var(--gold3); border-color:rgba(217,165,63,0.4); background:rgba(217,165,63,0.12); }
+.icon-action.pin-on { color:var(--gold3); border-color:rgba(242,184,48,0.4); background:rgba(242,184,48,0.12); }
 .icon-action .material-icons-round { font-size:16px; }
 
 .cat-row, .chan-row { display:flex; align-items:center; gap:12px; padding:13px 14px; border-bottom:1px solid var(--border); }
 .cat-row:last-child, .chan-row:last-child { border-bottom:none; }
-.cat-emoji-box { width:38px; height:38px; border-radius:11px; background:rgba(184,84,107,0.12); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+.cat-emoji-box { width:38px; height:38px; border-radius:11px; background:rgba(168,85,247,0.12); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
 .cat-info { flex:1; min-width:0; }
 .cat-name { font-size:13.5px; font-weight:700; }
 .cat-key { font-size:10.5px; color:var(--text-muted); font-family:monospace; }
@@ -155,7 +155,7 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
 .pin-list-row { display:flex; align-items:center; gap:10px; padding:10px 14px; border-bottom:1px solid var(--border); }
 .pin-list-row:last-child { border-bottom:none; }
 .pin-rank-badge { width:26px; height:26px; border-radius:8px; background:var(--grad-btn); color:#fff; font-family:'Rajdhani',sans-serif; font-weight:800; font-size:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.pin-list-thumb { width:44px; height:32px; border-radius:7px; object-fit:cover; background:#241a1e; flex-shrink:0; overflow:hidden; }
+.pin-list-thumb { width:44px; height:32px; border-radius:7px; object-fit:cover; background:#1d1730; flex-shrink:0; overflow:hidden; }
 .pin-list-thumb img { width:100%; height:100%; object-fit:cover; }
 .pin-list-title { flex:1; min-width:0; font-size:12.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .pin-order-btns { display:flex; gap:4px; flex-shrink:0; }
@@ -205,7 +205,7 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
 .part-block-title { font-size:12.5px; font-weight:700; color:var(--purple2); display:flex; align-items:center; gap:6px; }
 .part-block-title .material-icons-round { font-size:15px; }
 .part-remove { cursor:pointer; color:var(--accent2); font-size:19px; width:26px; height:26px; border-radius:8px; display:flex; align-items:center; justify-content:center; background:rgba(184,32,58,0.1); }
-.add-part-btn { width:100%; padding:12px; border-radius:12px; border:1.5px dashed var(--border); background:rgba(184,84,107,0.06); color:var(--purple2); font-family:'Hind Siliguri',sans-serif; font-size:13px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; }
+.add-part-btn { width:100%; padding:12px; border-radius:12px; border:1.5px dashed var(--border); background:rgba(168,85,247,0.06); color:var(--purple2); font-family:'Hind Siliguri',sans-serif; font-size:13px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; }
 
 /* ============ DIRECT LINK AD SLOTS (per-video, per-step) ============ */
 .direct-slot-row { border:1px solid var(--border); border-radius:12px; padding:10px 12px; margin-bottom:8px; background:rgba(255,255,255,0.02); }
@@ -214,9 +214,9 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
 .direct-slot-url { margin-top:8px; }
 
 /* ============ MODAL ============ */
-#form-modal { display:none; position:fixed; inset:0; z-index:800; background:rgba(8,4,6,0.94); backdrop-filter:blur(8px); }
+#form-modal { display:none; position:fixed; inset:0; z-index:800; background:rgba(5,3,10,0.94); backdrop-filter:blur(8px); }
 #form-modal.open { display:flex; flex-direction:column; animation:fadeIn 0.2s; }
-#task-form-modal { display:none; position:fixed; inset:0; z-index:800; background:rgba(8,4,6,0.94); backdrop-filter:blur(8px); }
+#task-form-modal { display:none; position:fixed; inset:0; z-index:800; background:rgba(5,3,10,0.94); backdrop-filter:blur(8px); }
 #task-form-modal.open { display:flex; flex-direction:column; animation:fadeIn 0.2s; }
 @keyframes fadeIn { from{opacity:0} to{opacity:1} }
 .modal-header { height:56px; flex-shrink:0; display:flex; align-items:center; justify-content:space-between; padding:0 16px; border-bottom:1px solid var(--border); background:var(--bg-deep); }
@@ -227,7 +227,7 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
 /* ============ CONFIRM ============ */
 #confirm-modal { display:none; position:fixed; inset:0; z-index:850; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; padding:24px; }
 #confirm-modal.open { display:flex; animation:fadeIn 0.15s; }
-.confirm-box { width:100%; max-width:300px; background:linear-gradient(180deg,#1f1517,#100a0c); border:1px solid var(--border); border-radius:20px; padding:22px; text-align:center; }
+.confirm-box { width:100%; max-width:300px; background:linear-gradient(180deg,#191325,#0b0812); border:1px solid var(--border); border-radius:20px; padding:22px; text-align:center; }
 .confirm-icon { font-size:38px; margin-bottom:10px; }
 .confirm-text { font-size:13.5px; color:var(--text-muted); margin-bottom:16px; line-height:1.5; }
 .confirm-actions { display:flex; gap:8px; }
@@ -237,13 +237,13 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
 
 /* ============ TUTORIAL / SETTINGS PREVIEW ============ */
 .tut-preview-card { margin:10px 16px; border-radius:16px; overflow:hidden; background:var(--bg-card); border:1px solid var(--border); }
-.tut-preview-thumb { width:100%; aspect-ratio:16/9; background:linear-gradient(135deg,#291b20,#140d0f); position:relative; overflow:hidden; }
+.tut-preview-thumb { width:100%; aspect-ratio:16/9; background:linear-gradient(135deg,#241b33,#0e0a17); position:relative; overflow:hidden; }
 .tut-preview-thumb img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
 .tut-preview-label { padding:12px 14px; font-size:13.5px; font-weight:700; }
 
 /* ============ USERS PAGE ============ */
 .users-summary-row { display:flex; gap:10px; margin:10px 16px; }
-.users-summary-card { flex:1; background:linear-gradient(180deg,var(--bg-card),#130d0f); border:1px solid var(--border); border-radius:14px; padding:14px; text-align:center; }
+.users-summary-card { flex:1; background:linear-gradient(180deg,var(--bg-card),#0e0a17); border:1px solid var(--border); border-radius:14px; padding:14px; text-align:center; }
 .users-summary-val { font-family:'Rajdhani',sans-serif; font-size:22px; font-weight:800; color:var(--purple2); }
 .users-summary-val.gold { color:var(--gold3); }
 .users-summary-val.red { color:var(--accent2); }
@@ -259,7 +259,7 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
 .user-sub-row { display:flex; gap:8px; margin-top:4px; flex-wrap:wrap; }
 .user-chip { font-size:10px; padding:2px 8px; border-radius:8px; font-weight:700; display:flex; align-items:center; gap:3px; }
 .user-chip .material-icons-round { font-size:11px; }
-.user-chip.ads { background:rgba(184,84,107,0.15); color:var(--purple2); }
+.user-chip.ads { background:rgba(168,85,247,0.15); color:var(--purple2); }
 .user-chip.unlocks { background:rgba(35,180,122,0.15); color:var(--green); }
 .user-chip.active { background:rgba(35,180,122,0.18); color:var(--green); }
 .user-chip.tg { background:rgba(64,158,255,0.16); color:#63b3ff; }
@@ -267,7 +267,7 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
 
 /* ============ BROADCAST PAGE ============ */
 .bc-stats-row { display:flex; gap:10px; margin:10px 16px; }
-.bc-stat-card { flex:1; background:linear-gradient(180deg,var(--bg-card),#130d0f); border:1px solid var(--border); border-radius:14px; padding:12px; text-align:center; }
+.bc-stat-card { flex:1; background:linear-gradient(180deg,var(--bg-card),#0e0a17); border:1px solid var(--border); border-radius:14px; padding:12px; text-align:center; }
 .bc-stat-val { font-family:'Rajdhani',sans-serif; font-size:20px; font-weight:800; color:#63b3ff; }
 .bc-stat-lbl { font-size:10px; color:var(--text-muted); margin-top:2px; }
 .bc-progress-wrap { margin:0 16px 10px; }
@@ -285,6 +285,77 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
 
 #toast { position:fixed; bottom:calc(var(--nav-h) + 14px); left:50%; transform:translateX(-50%) translateY(20px); background:var(--bg-card2); border:1px solid var(--border); padding:10px 20px; border-radius:30px; font-size:13px; opacity:0; transition:all 0.3s; z-index:999; pointer-events:none; white-space:nowrap; max-width:90vw; text-align:center; backdrop-filter:blur(6px); }
 #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* =====================================================================
+   PREMIUM THEME v2 — নতুন কালার ও প্রিমিয়াম বাটন (শুধু ডিজাইন, লজিক অপরিবর্তিত)
+   ===================================================================== */
+@keyframes pm-sheen { 0%{background-position:170% 0,0 0} 55%,100%{background-position:-70% 0,0 0} }
+:root {
+  --pm-violet: linear-gradient(135deg,#5b21b6 0%,#7c3aed 48%,#c026d3 100%);
+  --pm-gold:   linear-gradient(135deg,#ffe29a 0%,#f2b830 46%,#c98a0d 100%);
+  --pm-rose:   linear-gradient(135deg,#fb7185 0%,#e11d48 52%,#9f1239 100%);
+  --pm-emerald:linear-gradient(135deg,#34d399 0%,#10b981 50%,#047857 100%);
+}
+/* সব প্রাইমারি বাটনে হালকা ঝলক (shine) + গভীরতা */
+.save-btn, .pin-rank-badge, .login-btn, .add-fab {
+  background-repeat:no-repeat;
+  background-size:250% 100%,100% 100%;
+  background-position:170% 0,0 0;
+  animation:pm-sheen 5.5s ease-in-out infinite;
+  border:1px solid rgba(255,255,255,.16);
+  transition:transform .15s ease, box-shadow .2s ease, filter .2s ease;
+  -webkit-font-smoothing:antialiased;
+}
+.save-btn, .pin-rank-badge {
+  background-image:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.30) 50%,transparent 62%), var(--pm-violet);
+  color:#fff; text-shadow:0 1px 2px rgba(20,5,40,.45);
+  box-shadow:0 10px 24px rgba(124,58,237,.38), inset 0 1px 0 rgba(255,255,255,.30), inset 0 -2px 0 rgba(0,0,0,.20);
+}
+.login-btn, .add-fab {
+  background-image:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.30) 50%,transparent 62%), var(--pm-gold);
+  color:#2a1c05; text-shadow:0 1px 0 rgba(255,255,255,.35);
+  border-color:rgba(255,236,170,.55);
+  box-shadow:0 10px 26px rgba(242,184,48,.34), inset 0 1px 0 rgba(255,255,255,.55), inset 0 -2px 0 rgba(120,70,0,.28);
+}
+
+.pin-rank-badge { animation:none; border:none; box-shadow:0 4px 10px rgba(124,58,237,.35); }
+.save-btn { letter-spacing:1.2px; }
+.save-btn.imgbb-save { background-image:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.30) 50%,transparent 62%), var(--pm-gold); color:#2a1c05; text-shadow:0 1px 0 rgba(255,255,255,.35); border-color:rgba(255,236,170,.55); box-shadow:0 10px 26px rgba(242,184,48,.34), inset 0 1px 0 rgba(255,255,255,.55), inset 0 -2px 0 rgba(120,70,0,.28); }
+.save-btn:disabled { animation:none; filter:grayscale(.4); }
+.login-btn:active, .save-btn:active, .add-fab:active { transform:translateY(1px) scale(.98); box-shadow:0 4px 12px rgba(124,58,237,.3), inset 0 2px 4px rgba(0,0,0,.25); }
+.login-btn:hover, .save-btn:hover, .add-fab:hover { filter:brightness(1.07); }
+
+/* সেকেন্ডারি / ডেঞ্জার বাটন */
+.cancel-btn { background:rgba(255,255,255,.04); border:1px solid rgba(167,139,250,.28); color:var(--text); transition:all .2s; }
+.cancel-btn:active { transform:scale(.98); background:rgba(167,139,250,.12); }
+.del-btn-inline { background:linear-gradient(180deg,rgba(232,72,85,.16),rgba(232,72,85,.07)); border:1px solid rgba(232,72,85,.45); box-shadow:inset 0 1px 0 rgba(255,255,255,.06); }
+.add-part-btn { background:rgba(242,184,48,.06); border-color:rgba(242,184,48,.35); color:var(--gold3); }
+.icon-action, .pin-order-btn { transition:all .15s; }
+.icon-action:active, .pin-order-btn:active { transform:scale(.9); }
+.icon-action.edit { color:#c4b0ff; border-color:rgba(168,85,247,.4); background:rgba(168,85,247,.08); }
+.icon-action.pin-on { box-shadow:0 0 12px rgba(242,184,48,.25); }
+
+/* হেডার / নেভিগেশন / কার্ড */
+header { background:linear-gradient(135deg,#0c0814 0%,#171024 100%); border-bottom:1px solid rgba(242,184,48,.28); box-shadow:0 4px 22px rgba(124,58,237,.12); }
+.header-logo span { background:linear-gradient(90deg,#ffe29a,#f2b830); -webkit-background-clip:text; background-clip:text; color:transparent; }
+nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px solid rgba(242,184,48,.22); box-shadow:0 -6px 24px rgba(0,0,0,.35); }
+.nav-item { transition:color .2s; }
+.nav-item.active { color:var(--gold3); }
+.nav-item.active .material-icons-round { filter:drop-shadow(0 0 8px rgba(242,184,48,.55)); transform:translateY(-1px); }
+.mgr-card { background:linear-gradient(180deg,#171127,#100b1a); border:1px solid rgba(167,139,250,.16); box-shadow:0 8px 24px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.04); }
+.login-box { background:linear-gradient(180deg,#1a1428,#0d0914); border:1px solid rgba(242,184,48,.28); box-shadow:0 20px 50px rgba(0,0,0,.55), 0 0 40px rgba(124,58,237,.14); }
+.login-logo span { color:var(--gold); text-shadow:0 0 22px rgba(242,184,48,.45); }
+.form-input:focus, .form-textarea:focus, .form-select:focus, .login-input:focus { border-color:rgba(242,184,48,.6); box-shadow:0 0 0 3px rgba(242,184,48,.12); }
+.switch input:checked + .slider-tg { box-shadow:0 0 12px rgba(168,85,247,.5); }
+
+/* IMGBB পেজ */
+.info-card { padding:14px 16px; border-color:rgba(242,184,48,.32) !important; background:linear-gradient(160deg,rgba(242,184,48,.09),#141020) !important; }
+.key-field { position:relative; }
+.key-field .form-input { padding-right:48px; font-family:monospace; letter-spacing:.5px; }
+.key-eye { position:absolute; right:6px; top:50%; transform:translateY(-50%); width:36px; height:36px; border-radius:10px; border:none; background:transparent; color:var(--text-muted); cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.key-eye:active { background:rgba(255,255,255,.08); }
+
+@media (prefers-reduced-motion: reduce){ * { animation:none !important; } }
 </style>
 </head>
 <body>
@@ -487,43 +558,55 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
       <div class="mgr-card" id="withdrawals-list"></div>
     </div>
 
-    <!-- CLOUDINARY -->
-    <div class="page" id="page-cloudinary">
+    <!-- IMGBB -->
+    <div class="page" id="page-imgbb">
       <div class="page-head">
-        <div class="page-title" style="color:var(--accent2);">🌤️ Cloudinary API Setup<small>গ্যালারি থেকে সরাসরি Cloudinary-তে ভিডিও/থাম্বনেইল আপলোড</small></div>
+        <div class="page-title" style="color:var(--gold3);">🖼️ ImgBB API Setup<small>ছবি/থাম্বনেইল সরাসরি ImgBB-তে আপলোডের জন্য টোকেন (API Key) বসান</small></div>
       </div>
 
-      <div class="mgr-card" style="padding:14px 16px;border-color:rgba(64,158,255,0.35);background:linear-gradient(160deg,rgba(64,158,255,0.08),var(--bg-card));">
+      <div class="mgr-card info-card">
         <div style="font-size:12.5px;color:var(--text);line-height:1.7;">
-          এখানে Cloudinary অ্যাকাউন্টের <b>Cloud Name</b> ও <b>Unsigned Upload Preset</b> বসিয়ে Save করলে গ্যালারি থেকে সরাসরি ভিডিও/থাম্বনেইল আপলোড চালু হয়ে যাবে।
+          এখানে ImgBB-র <b>API Key (টোকেন)</b> বসিয়ে Save করলে থাম্বনেইল, ব্যানার, আইকন ও লোগো — সব ছবি সরাসরি <b>imgbb.com</b>-এ আপলোড হবে।
         </div>
         <ol style="margin:10px 0 0 18px;padding:0;font-size:12px;color:var(--text-muted);line-height:1.9;">
-          <li>Cloudinary Dashboard-এ লগইন করুন — উপরে Cloud Name দেখতে পাবেন</li>
-          <li>Settings ⚙️ → Upload → Add upload preset</li>
-          <li>Signing Mode অবশ্যই <b style="color:var(--gold3);">Unsigned</b> সিলেক্ট করে Save করুন</li>
+          <li><a href="https://imgbb.com/upload" target="_blank" rel="noopener" style="color:var(--gold3);font-weight:700;">imgbb.com</a>-এ লগইন/সাইনআপ করুন</li>
+          <li><a href="https://api.imgbb.com/" target="_blank" rel="noopener" style="color:var(--gold3);font-weight:700;">api.imgbb.com</a> পেজে গিয়ে <b style="color:var(--gold3);">Get API key</b> চাপুন</li>
+          <li>কপি করা Key নিচের ঘরে বসিয়ে <b style="color:var(--gold3);">সংরক্ষণ</b> করুন</li>
         </ol>
       </div>
 
-      <div class="mgr-card" id="cloudinary-status-box" style="display:none;padding:12px 16px;border-color:rgba(35,180,122,0.4);background:rgba(35,180,122,0.08);">
-        <div style="font-size:12.5px;color:var(--green);font-weight:700;display:flex;align-items:center;gap:8px;"><span class="material-icons-round" style="font-size:17px;">check_circle</span><span id="cloudinary-status-text"></span></div>
+      <div class="mgr-card" id="imgbb-status-box" style="display:none;padding:12px 16px;border-color:rgba(35,180,122,0.4);background:rgba(35,180,122,0.08);">
+        <div style="font-size:12.5px;color:var(--green);font-weight:700;display:flex;align-items:center;gap:8px;"><span class="material-icons-round" style="font-size:17px;">check_circle</span><span id="imgbb-status-text"></span></div>
       </div>
 
       <div class="mgr-card">
         <div class="form-section">
           <div class="form-group">
-            <div class="form-label"><span class="material-icons-round">cloud</span>Cloud Name*</div>
-            <input class="form-input" id="cl-cloud-name" placeholder="যেমন: paqs4n2j" />
+            <div class="form-label"><span class="material-icons-round">vpn_key</span>ImgBB API Key (টোকেন)*</div>
+            <div class="key-field">
+              <input class="form-input" id="imgbb-api-key" type="password" autocomplete="off" spellcheck="false" placeholder="যেমন: a14906d3055e23b9..." />
+              <button type="button" class="key-eye" onclick="toggleImgbbKeyVisibility()" aria-label="Key দেখান/লুকান"><span class="material-icons-round" id="imgbb-eye-icon">visibility</span></button>
+            </div>
+            <div class="form-hint">এই Key শুধু আপনার অ্যাডমিন সেটিংসে (Firestore → settings/imgbb) সংরক্ষিত হবে।</div>
           </div>
           <div class="form-group">
-            <div class="form-label"><span class="material-icons-round">upload</span>Unsigned Upload Preset*</div>
-            <input class="form-input" id="cl-upload-preset" placeholder="যেমন: movie_lover" />
+            <div class="form-label"><span class="material-icons-round">timer</span>ছবি অটো-ডিলিট (ঐচ্ছিক)</div>
+            <select class="form-select" id="imgbb-expiration">
+              <option value="0">কখনো না (স্থায়ী)</option>
+              <option value="86400">১ দিন পর</option>
+              <option value="604800">৭ দিন পর</option>
+              <option value="2592000">৩০ দিন পর</option>
+            </select>
+            <div class="form-hint">সাধারণত "স্থায়ী" রাখাই ভালো — নাহলে নির্দিষ্ট সময় পর থাম্বনেইল মুছে যাবে।</div>
           </div>
-          <div class="form-group">
-            <div class="form-label"><span class="material-icons-round">folder</span>Folder (ঐচ্ছিক)</div>
-            <input class="form-input" id="cl-folder" placeholder="movielover_videos" />
-          </div>
-          <button class="save-btn" style="background:linear-gradient(135deg,#0891b2,#06b6d4);" onclick="saveCloudinarySettings()"><span class="material-icons-round">save</span>CLOUDINARY সংরক্ষণ করুন</button>
-          <button class="cancel-btn" onclick="testCloudinaryConnection()"><span class="material-icons-round" style="font-size:16px;vertical-align:-3px;">wifi_tethering</span> সংযোগ পরীক্ষা করুন</button>
+          <button class="save-btn imgbb-save" onclick="saveImgbbSettings()"><span class="material-icons-round">save</span>IMGBB সংরক্ষণ করুন</button>
+          <button class="cancel-btn" onclick="testImgbbConnection()"><span class="material-icons-round" style="font-size:16px;vertical-align:-3px;">wifi_tethering</span> সংযোগ পরীক্ষা করুন</button>
+        </div>
+      </div>
+
+      <div class="mgr-card" style="padding:12px 16px;">
+        <div style="font-size:11.5px;color:var(--text-muted);line-height:1.7;">
+          <b style="color:var(--gold3);">ℹ️ জেনে রাখুন:</b> ImgBB শুধু <b>ছবি</b> হোস্ট করে। ভিডিও ফাইল আগের মতোই Firebase Storage দিয়ে আপলোড হবে, অথবা ভিডিওর লিংক সরাসরি বসাতে পারবেন।
         </div>
       </div>
     </div>
@@ -738,7 +821,7 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
             <div class="form-label"><span class="material-icons-round">image</span>আইকন / লোগো (ঐচ্ছিক)</div>
             <div class="thumb-upload-box" style="aspect-ratio:auto;padding:12px;flex-direction:row;gap:10px;" id="ann-icon-box" onclick="document.getElementById('ann-icon-file').click()">
               <span class="upl-icon material-icons-round" style="font-size:20px;">add_photo_alternate</span>
-              <span class="upl-txt">আইকন আপলোড করুন (Cloudinary কনফিগার থাকলে সেটাই ব্যবহার হবে)</span>
+              <span class="upl-txt">আইকন আপলোড করুন (ImgBB-তে আপলোড হবে)</span>
             </div>
             <input type="file" accept="image/*" id="ann-icon-file" style="display:none;" onchange="handleThumbUpload(this,'ann')" />
             <input class="form-input" id="ann-icon-url" placeholder="https://... (অথবা সরাসরি লিংক)" style="margin-top:8px;" />
@@ -783,7 +866,7 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
     <div class="nav-item" data-page="channels" onclick="showAdminPage('channels')"><span class="material-icons-round">send</span>চ্যানেল</div>
     <div class="nav-item" data-page="tasks" onclick="showAdminPage('tasks')"><span class="material-icons-round">payments</span>টাস্ক</div>
     <div class="nav-item" data-page="withdrawals" onclick="showAdminPage('withdrawals')"><span class="material-icons-round">account_balance_wallet</span>উইথড্র</div>
-    <div class="nav-item" data-page="cloudinary" onclick="showAdminPage('cloudinary')"><span class="material-icons-round">cloud</span>CLOUDINARY</div>
+    <div class="nav-item" data-page="imgbb" onclick="showAdminPage('imgbb')"><span class="material-icons-round">add_photo_alternate</span>IMGBB</div>
     <div class="nav-item" data-page="broadcast" onclick="showAdminPage('broadcast')"><span class="material-icons-round">campaign</span>ব্রডকাস্ট</div>
     <div class="nav-item" data-page="settings" onclick="showAdminPage('settings')"><span class="material-icons-round">settings</span>সেটিংস</div>
   </nav>
@@ -966,8 +1049,12 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0d0
 <div id="toast"></div>
 
 <script>
-/* ============ ImgBB (থাম্বনেইল আপলোডের জন্য) ============ */
-const IMGBB_API_KEY = 'a14906d3055e23b95b4568eacf472af5';
+/* ============ ImgBB (ছবি/থাম্বনেইল আপলোড) ============
+   টোকেন (API Key) এখন অ্যাডমিন প্যানেলের "IMGBB" পেজ থেকে বসানো হয় ও
+   Firestore (settings/imgbb)-এ সেভ থাকে। নিচের IMGBB_LEGACY_KEY শুধু পুরনো
+   ডিফল্ট — অ্যাডমিন প্যানেলে নিজের টোকেন সেভ করলে সেটাই ব্যবহার হবে।
+   চাইলে এই লাইনটা মুছে ফেলতে পারেন (তখন টোকেন বসানো বাধ্যতামূলক)। */
+const IMGBB_LEGACY_KEY = 'a14906d3055e23b95b4568eacf472af5';
 const IMGBB_ENDPOINT = 'https://api.imgbb.com/1/upload';
 
 const A = {
@@ -989,7 +1076,7 @@ const A = {
   editingTaskId: null,
   withdrawals: [],
   withdrawSettings: {},
-  cloudinary: {},
+  imgbb: {},
   editingMethodIdx: null,
 };
 
@@ -1041,7 +1128,7 @@ async function enterApp(){
   A_isEntered = true;
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').classList.add('visible');
-  await Promise.all([loadCategories(), loadChannels(), loadTutorial(), loadSettingsForm(), loadAdNetworkSettingsForm(), loadWithdrawSettingsForm(), loadTelegramSettings(), loadAllUsers(), loadTasks(), loadCloudinarySettings(), loadDailyAdTaskSettings(), loadReferralBannerSettings(), loadAnnouncementSettings()]);
+  await Promise.all([loadCategories(), loadChannels(), loadTutorial(), loadSettingsForm(), loadAdNetworkSettingsForm(), loadWithdrawSettingsForm(), loadTelegramSettings(), loadAllUsers(), loadTasks(), loadImgbbSettings(), loadDailyAdTaskSettings(), loadReferralBannerSettings(), loadAnnouncementSettings()]);
   subscribeVideosAdmin();
   subscribeWithdrawals();
   setTimeout(loadIncomeReport, 800);
@@ -1128,38 +1215,7 @@ function fmtDate(ts){
   }catch(e){ return new Date(ts).toISOString().slice(0,16).replace('T',' '); }
 }
 
-/* ---------- image/video upload (Cloudinary — optional, auto-preferred when configured) ----------
-   If the admin has connected Cloudinary (see the "Cloudinary API Setup"
-   page), every thumbnail AND video upload goes through it instead of
-   ImgBB/Firebase Storage. If it isn't configured, nothing changes — the
-   original ImgBB/Storage path runs exactly as before. */
-function uploadToCloudinary(file, resourceType, onProgressEl){
-  return new Promise((resolve, reject)=>{
-    const cfg = A.cloudinary;
-    if(!cfg || !cfg.cloudName || !cfg.uploadPreset){
-      reject(new Error('Cloudinary কনফিগার করা নেই')); return;
-    }
-    const fd = new FormData();
-    fd.append('file', file);
-    fd.append('upload_preset', cfg.uploadPreset);
-    if(cfg.folder) fd.append('folder', cfg.folder);
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', `https://api.cloudinary.com/v1_1/${cfg.cloudName}/${resourceType}/upload`, true);
-    xhr.upload.onprogress = e=>{ if(onProgressEl && e.lengthComputable) onProgressEl.style.width = Math.round((e.loaded/e.total)*90)+'%'; };
-    xhr.onload = ()=>{
-      try{
-        const res = JSON.parse(xhr.responseText||'{}');
-        if(res.secure_url){ if(onProgressEl){onProgressEl.style.width='100%'; setTimeout(()=>onProgressEl.style.width='0%',600);} resolve(res.secure_url); }
-        else reject(new Error((res.error&&res.error.message) || 'আপলোড ব্যর্থ'));
-      }catch(e){ reject(e); }
-    };
-    xhr.onerror = ()=>reject(new Error('নেটওয়ার্ক সমস্যা'));
-    xhr.send(fd);
-  });
-}
-function cloudinaryReady(){ return !!(A.cloudinary && A.cloudinary.cloudName && A.cloudinary.uploadPreset); }
-
-/* ---------- file upload (Firebase Storage — ভিডিও ফাইলের জন্য, Cloudinary না থাকলে) ---------- */
+/* ---------- file upload (Firebase Storage — ভিডিও ফাইলের জন্য) ---------- */
 function uploadToStorage(file, folder, onProgressEl){
   return new Promise(async (resolve,reject)=>{
     try{
@@ -1175,13 +1231,20 @@ function uploadToStorage(file, folder, onProgressEl){
   });
 }
 
-/* ---------- image upload (ImgBB — থাম্বনেইলের জন্য) ---------- */
-function uploadToImgBB(file, onProgressEl){
+/* ---------- image upload (ImgBB — অ্যাডমিন প্যানেলের টোকেন দিয়ে) ---------- */
+function imgbbKey(){ return (A.imgbb && A.imgbb.apiKey) ? A.imgbb.apiKey : IMGBB_LEGACY_KEY; }
+function imgbbReady(){ return !!imgbbKey(); }
+function uploadToImgBB(file, onProgressEl, overrideKey, overrideExpiration){
   return new Promise((resolve, reject)=>{
+    const key = overrideKey || imgbbKey();
+    if(!key){ reject(new Error('আগে IMGBB পেজে গিয়ে API Key (টোকেন) সেভ করুন')); return; }
+    const exp = overrideExpiration !== undefined ? overrideExpiration : ((A.imgbb && parseInt(A.imgbb.expiration)) || 0);
     const fd = new FormData();
     fd.append('image', file);
+    let url = IMGBB_ENDPOINT + '?key=' + encodeURIComponent(key);
+    if(exp >= 60) url += '&expiration=' + exp;
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', IMGBB_ENDPOINT + '?key=' + IMGBB_API_KEY, true);
+    xhr.open('POST', url, true);
     xhr.upload.onprogress = function(e){
       if(onProgressEl && e.lengthComputable){
         const pct = Math.round((e.loaded/e.total)*90);
@@ -1195,7 +1258,8 @@ function uploadToImgBB(file, onProgressEl){
           if(onProgressEl){ onProgressEl.style.width='100%'; setTimeout(()=>{onProgressEl.style.width='0%';},600); }
           resolve(res.data.url || res.data.display_url);
         } else {
-          const msg = (res && res.error && res.error.message) || 'ImgBB আপলোড ব্যর্থ হয়েছে';
+          let msg = (res && res.error && res.error.message) || 'ImgBB আপলোড ব্যর্থ হয়েছে';
+          if(res && res.status_code === 400 && /key/i.test(msg)) msg = 'API Key সঠিক নয় — আবার চেক করুন';
           reject(new Error(msg));
         }
       }catch(err){ reject(err); }
@@ -1228,18 +1292,6 @@ function handleThumbUpload(input, ctx){
     else if(map.url){ document.getElementById(map.url).value = url; }
     setThumbPreview(box, url);
   };
-  if(cloudinaryReady()){
-    toast('ছবি Cloudinary-তে আপলোড হচ্ছে...');
-    uploadToCloudinary(file, 'image', prog).then(url=>{
-      applyUrl(url);
-      toast('✅ ছবি Cloudinary-তে আপলোড সম্পন্ন!');
-    }).catch(err=>{
-      console.error('Cloudinary upload error:', err);
-      toast('⚠️ Cloudinary আপলোড ব্যর্থ — ImgBB দিয়ে চেষ্টা করা হচ্ছে...');
-      uploadToImgBB(file, prog).then(applyUrl).catch(e2=>toast('⚠️ আপলোড ব্যর্থ হয়েছে। ' + (e2&&e2.message?e2.message:'')));
-    });
-    return;
-  }
   toast('ছবি ImgBB-তে আপলোড হচ্ছে...');
   uploadToImgBB(file, prog).then(url=>{
     applyUrl(url);
@@ -1273,19 +1325,6 @@ function handleVideoUpload(input, ctx){
     else { A.pendingTutVideoUrl = url; document.getElementById('tut-video-url').value = url; }
     statusEl.textContent = '✅ ভিডিও আপলোড সম্পন্ন হয়েছে';
   };
-  if(cloudinaryReady()){
-    statusEl.textContent = 'Cloudinary-তে আপলোড হচ্ছে...';
-    toast('ভিডিও Cloudinary-তে আপলোড হচ্ছে, এতে কিছুটা সময় লাগতে পারে...');
-    uploadToCloudinary(file, 'video', null).then(url=>{
-      applyUrl(url);
-      toast('✅ ভিডিও আপলোড সম্পন্ন!');
-    }).catch(err=>{
-      console.error('Cloudinary video upload error:', err);
-      statusEl.textContent = '⚠️ Cloudinary ব্যর্থ — Firebase দিয়ে চেষ্টা করা হচ্ছে...';
-      uploadToStorage(file,'videos', null).then(applyUrl).catch(()=>{ statusEl.textContent='⚠️ আপলোড ব্যর্থ হয়েছে, লিংক ব্যবহার করুন'; toast('⚠️ ভিডিও আপলোড ব্যর্থ হয়েছে।'); });
-    });
-    return;
-  }
   statusEl.textContent = 'আপলোড হচ্ছে... 0%';
   toast('ভিডিও আপলোড হচ্ছে, এতে কিছুটা সময় লাগতে পারে...');
   uploadToStorage(file,'videos', null).then(url=>{
@@ -1341,19 +1380,6 @@ function handlePartVideoUpload(input){
   const statusEl = block.querySelector('.part-video-status');
   const urlInput = block.querySelector('.part-url-input');
   const applyUrl = (url)=>{ urlInput.value = url; statusEl.textContent = '✅ ভিডিও আপলোড সম্পন্ন হয়েছে'; };
-  if(cloudinaryReady()){
-    statusEl.textContent = 'Cloudinary-তে আপলোড হচ্ছে...';
-    toast('ভিডিও Cloudinary-তে আপলোড হচ্ছে, এতে কিছুটা সময় লাগতে পারে...');
-    uploadToCloudinary(file, 'video', null).then(url=>{
-      applyUrl(url);
-      toast('✅ ভিডিও আপলোড সম্পন্ন!');
-    }).catch(err=>{
-      console.error('Cloudinary video upload error:', err);
-      statusEl.textContent = '⚠️ Cloudinary ব্যর্থ — Firebase দিয়ে চেষ্টা করা হচ্ছে...';
-      uploadToStorage(file,'videos', null).then(applyUrl).catch(()=>{ statusEl.textContent='⚠️ আপলোড ব্যর্থ হয়েছে, লিংক ব্যবহার করুন'; toast('⚠️ ভিডিও আপলোড ব্যর্থ হয়েছে।'); });
-    });
-    return;
-  }
   statusEl.textContent = 'আপলোড হচ্ছে...';
   toast('ভিডিও আপলোড হচ্ছে, এতে কিছুটা সময় লাগতে পারে...');
   uploadToStorage(file,'videos', null).then(url=>{
@@ -2099,54 +2125,60 @@ async function saveWithdrawSettings(){
   }catch(e){ toast('⚠️ সমস্যা হয়েছে।'); }
 }
 
-/* ============ CLOUDINARY API SETUP ============ */
-async function loadCloudinarySettings(){
-  const c = await fbGetDoc('settings','cloudinary');
-  A.cloudinary = c || {};
-  document.getElementById('cl-cloud-name').value = A.cloudinary.cloudName || '';
-  document.getElementById('cl-upload-preset').value = A.cloudinary.uploadPreset || '';
-  document.getElementById('cl-folder').value = A.cloudinary.folder || '';
-  renderCloudinaryStatus();
+/* ============ IMGBB API SETUP ============ */
+async function loadImgbbSettings(){
+  const c = await fbGetDoc('settings','imgbb');
+  A.imgbb = c || {};
+  document.getElementById('imgbb-api-key').value = A.imgbb.apiKey || '';
+  document.getElementById('imgbb-expiration').value = String(A.imgbb.expiration || 0);
+  renderImgbbStatus();
 }
-function renderCloudinaryStatus(){
-  const box = document.getElementById('cloudinary-status-box');
-  const txt = document.getElementById('cloudinary-status-text');
-  if(cloudinaryReady()){
-    box.style.display='block';
-    txt.textContent = `Cloudinary কনফিগার করা আছে — Cloud: ${A.cloudinary.cloudName}, Preset: ${A.cloudinary.uploadPreset}`;
+function maskKey(k){ k = String(k||''); return k.length > 10 ? k.slice(0,4) + '••••••' + k.slice(-4) : '••••••'; }
+function renderImgbbStatus(){
+  const box = document.getElementById('imgbb-status-box');
+  const txt = document.getElementById('imgbb-status-text');
+  box.style.display = 'block';
+  if(A.imgbb && A.imgbb.apiKey){
+    box.style.borderColor = 'rgba(35,180,122,0.4)'; box.style.background = 'rgba(35,180,122,0.08)';
+    txt.textContent = 'ImgBB সংযুক্ত আছে — Key: ' + maskKey(A.imgbb.apiKey);
   } else {
-    box.style.display='none';
+    box.style.borderColor = 'rgba(240,180,41,0.4)'; box.style.background = 'rgba(240,180,41,0.08)';
+    txt.textContent = 'নিজের টোকেন সেভ করা নেই — এখন ডিফল্ট Key ব্যবহার হচ্ছে। নিজের Key বসিয়ে সংরক্ষণ করুন।';
   }
 }
-async function saveCloudinarySettings(){
-  const cloudName = document.getElementById('cl-cloud-name').value.trim();
-  const uploadPreset = document.getElementById('cl-upload-preset').value.trim();
-  const folder = document.getElementById('cl-folder').value.trim();
-  if(!cloudName || !uploadPreset){ toast('⚠️ Cloud Name ও Upload Preset দুটোই দিন।'); return; }
+function toggleImgbbKeyVisibility(){
+  const i = document.getElementById('imgbb-api-key');
+  const ic = document.getElementById('imgbb-eye-icon');
+  const show = i.type === 'password';
+  i.type = show ? 'text' : 'password';
+  ic.textContent = show ? 'visibility_off' : 'visibility';
+}
+async function saveImgbbSettings(){
+  const apiKey = document.getElementById('imgbb-api-key').value.trim();
+  const expiration = parseInt(document.getElementById('imgbb-expiration').value) || 0;
+  if(!apiKey){ toast('⚠️ ImgBB API Key (টোকেন) দিন।'); return; }
+  if(!/^[a-zA-Z0-9]{20,64}$/.test(apiKey)){ toast('⚠️ Key-টি সঠিক মনে হচ্ছে না — শুধু অক্ষর ও সংখ্যা থাকবে, কোনো স্পেস নয়।'); return; }
   try{
-    await fbSet('settings','cloudinary', { cloudName, uploadPreset, folder });
-    A.cloudinary = { cloudName, uploadPreset, folder };
-    renderCloudinaryStatus();
-    toast('✅ Cloudinary সংরক্ষণ হয়েছে! এখন থেকে সব আপলোড Cloudinary দিয়ে হবে।');
+    await fbSet('settings','imgbb', { apiKey, expiration });
+    A.imgbb = { apiKey, expiration };
+    renderImgbbStatus();
+    toast('✅ ImgBB টোকেন সংরক্ষণ হয়েছে! এখন থেকে সব ছবি ImgBB-তে আপলোড হবে।');
   }catch(e){ toast('⚠️ সমস্যা হয়েছে।'); }
 }
-async function testCloudinaryConnection(){
-  const cloudName = document.getElementById('cl-cloud-name').value.trim();
-  const uploadPreset = document.getElementById('cl-upload-preset').value.trim();
-  if(!cloudName || !uploadPreset){ toast('⚠️ আগে Cloud Name ও Upload Preset দিন।'); return; }
+async function testImgbbConnection(){
+  const apiKey = document.getElementById('imgbb-api-key').value.trim();
+  if(!apiKey){ toast('⚠️ আগে API Key দিন।'); return; }
   toast('সংযোগ পরীক্ষা করা হচ্ছে...');
   try{
     const canvas = document.createElement('canvas');
     canvas.width = 2; canvas.height = 2;
     const blob = await new Promise(res=>canvas.toBlob(res, 'image/png'));
     const testFile = new File([blob], 'connection_test.png', { type:'image/png' });
-    const oldCfg = A.cloudinary;
-    A.cloudinary = { cloudName, uploadPreset };
-    await uploadToCloudinary(testFile, 'image', null);
-    A.cloudinary = oldCfg;
-    toast('✅ সংযোগ সফল! Cloudinary ঠিকমতো কাজ করছে।');
+    // টেস্ট ছবি ৬০ সেকেন্ড পর নিজে থেকেই মুছে যায়
+    await uploadToImgBB(testFile, null, apiKey, 60);
+    toast('✅ সংযোগ সফল! ImgBB ঠিকমতো কাজ করছে।');
   }catch(e){
-    toast('⚠️ সংযোগ ব্যর্থ — Cloud Name/Preset চেক করুন। ' + (e && e.message ? e.message : ''));
+    toast('⚠️ সংযোগ ব্যর্থ — ' + (e && e.message ? e.message : 'Key চেক করুন'));
   }
 }
 
