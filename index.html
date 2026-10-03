@@ -356,6 +356,16 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
 .key-eye:active { background:rgba(255,255,255,.08); }
 
 @media (prefers-reduced-motion: reduce){ * { animation:none !important; } }
+
+/* ===== Telegram post composer ===== */
+.bc-btn-row { display:grid; grid-template-columns:1fr 1.4fr 30px; gap:6px; margin-bottom:8px; align-items:center; }
+.bc-btn-row .form-input { padding:10px 11px; font-size:12.5px; }
+.bc-btn-x { width:30px; height:30px; border-radius:9px; background:rgba(232,72,85,.12); color:var(--accent2); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+.bc-btn-x .material-icons-round { font-size:16px; }
+.bc-check { display:flex; align-items:center; gap:8px; font-size:12.5px; margin-bottom:8px; }
+.bc-check input { width:17px; height:17px; accent-color:#a855f7; }
+#bg-job { position:fixed; top:68px; left:50%; transform:translateX(-50%); z-index:960; background:linear-gradient(135deg,#5b21b6,#c026d3); color:#fff; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:13px; padding:9px 18px; border-radius:30px; box-shadow:0 10px 26px rgba(124,58,237,.4); display:none; max-width:92vw; text-align:center; }
+#bg-job.show { display:block; }
 </style>
 </head>
 <body>
@@ -695,12 +705,14 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
             </div>
             <input type="file" accept="image/*" id="bc-thumb-file" style="display:none;" onchange="handleThumbUpload(this,'bc')" />
             <div class="form-hint">অথবা ছবির সরাসরি লিংক:</div>
-            <input class="form-input" id="bc-thumb-url" placeholder="https://..." style="margin-top:8px;" oninput="A.pendingBcThumbUrl=this.value.trim()" />
+            <input class="form-input" id="bc-thumb-url" placeholder="https://..." style="margin-top:8px;" oninput="A.pendingBcThumbUrl=this.value.trim();A.bcThumbFile=null" />
           </div>
           <div class="form-group">
             <div class="form-label"><span class="material-icons-round">message</span>বার্তা লিখুন</div>
             <textarea class="form-textarea" id="bc-message" placeholder="এখানে আপনার বার্তা লিখুন..." style="min-height:110px;"></textarea>
           </div>
+          <div id="bc-mount"></div>
+          <div class="form-hint" style="margin-bottom:10px;">বার্তায় HTML চলবে। ছবি না দিলে শুধু টেক্সট ও বাটন যাবে।</div>
           <button class="save-btn" id="bc-send-btn" onclick="sendManualBroadcast()"><span class="material-icons-round">send</span>সবার কাছে পাঠান</button>
           <div class="bc-progress-wrap" id="bc-progress-wrap" style="display:none;margin-top:14px;">
             <div class="bc-progress-bar"><div class="bc-progress-fill" id="bc-progress-fill"></div></div>
@@ -730,6 +742,11 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
             <div class="form-label"><span class="material-icons-round">key</span>বট টোকেন (Bot Token)</div>
             <input class="form-input" type="password" id="set-bot-token" placeholder="123456789:AA...................." />
             <div class="form-hint">@BotFather থেকে পাওয়া আপনার বটের টোকেন এখানে বসান। এই টোকেন দিয়ে বট সরাসরি ব্রাউজার থেকেই ইউজারদের মেসেজ/ছবি পাঠাবে।</div>
+          </div>
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">campaign</span>ব্রডকাস্ট চ্যানেল/গ্রুপ ID (ঐচ্ছিক)</div>
+            <input class="form-input" id="set-bc-chat" placeholder="-100123456789 অথবা @channelusername" />
+            <div class="form-hint">একাধিক হলে কমা দিয়ে লিখুন। ভিডিও পোস্টের টার্গেট হিসেবে এটাই বসে থাকবে; বটকে ওই চ্যানেল/গ্রুপে অ্যাডমিন করতে হবে।</div>
           </div>
           <div class="form-group">
             <div class="toggle-row">
@@ -942,6 +959,7 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
         <input type="file" accept="image/*" id="v-thumb-file" style="display:none;" onchange="handleThumbUpload(this,'v')" />
         <div class="form-hint">অথবা থাম্বনেইলের সরাসরি লিংক:</div>
         <input class="form-input" id="v-thumb-url" placeholder="https://..." style="margin-top:8px;" oninput="onThumbUrlInput()" />
+        <button type="button" class="cancel-btn" style="margin-top:8px;" onclick="captureThumbFromLastVideo()"><span class="material-icons-round" style="font-size:16px;vertical-align:-3px;">movie_filter</span> আপলোড করা ভিডিওর প্রথম ফ্রেম থেকে থাম্বনেইল নিন</button>
       </div>
 
       <div class="form-group">
@@ -1001,6 +1019,22 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
           <label class="switch"><input type="checkbox" id="v-pinned"/><span class="slider-tg"></span></label>
         </div>
         <div class="form-hint">পিন করলে এই ভিডিওটি ইউজার সাইটের হোম পেজের সবচেয়ে উপরে একটি আলাদা সারিতে দেখাবে (সাধারণ তালিকাতেও থাকবে, লুকাবে না)। কোন ভিডিও আগে/পরে দেখাবে তা "ভিডিও" পেজের "পিন করা ভিডিও" তালিকা থেকে ↑ ↓ দিয়ে সাজানো যাবে।</div>
+      </div>
+
+      <div class="form-group">
+        <div class="toggle-row">
+          <div class="toggle-label"><span class="material-icons-round" style="color:#63b3ff;font-size:18px;">send</span>সেভ করলে টেলিগ্রামে পোস্ট করুন</div>
+          <label class="switch"><input type="checkbox" id="v-bc-enabled" onchange="bcToggleVideoWrap()"/><span class="slider-tg"></span></label>
+        </div>
+        <div id="v-bc-wrap" style="display:none;margin-top:12px;">
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">notes</span>ক্যাপশন (HTML চলবে: &lt;b&gt; &lt;i&gt; &lt;a href&gt; &lt;tg-spoiler&gt;)</div>
+            <textarea class="form-textarea" id="v-bc-caption" placeholder="খালি রাখলে টাইটেল ও বিবরণ থেকে নিজে বানাবে"></textarea>
+            <div class="form-hint">ক্যাপশন ও বাটনের লিংকে <b>{VIDEO_LINK}</b> লিখলে সেখানে এই ভিডিওর নিজস্ব শেয়ার লিংক বসে যাবে।</div>
+          </div>
+          <div id="v-bc-mount"></div>
+          <div class="form-hint" style="color:var(--gold3);">সেভ চাপার পর পোস্ট ব্যাকগ্রাউন্ডে যাবে, আপনাকে অপেক্ষা করতে হবে না। তবে পাঠানো শেষ না হওয়া পর্যন্ত এই ট্যাব বন্ধ করবেন না।</div>
+        </div>
       </div>
 
       <button class="save-btn" id="v-save-btn" onclick="saveVideo()"><span class="material-icons-round">save</span>সেভ করুন</button>
@@ -1097,6 +1131,7 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
   </div>
 </div>
 
+<div id="bg-job"></div>
 <div id="toast"></div>
 
 <script>
@@ -1338,6 +1373,8 @@ function handleThumbUpload(input, ctx){
   const box = document.getElementById(map.box);
   const prog = map.prog ? document.getElementById(map.prog) : null;
   const localUrl = URL.createObjectURL(file);
+  if(ctx==='v') A.vThumbFile = file;
+  if(ctx==='bc') A.bcThumbFile = file;
   setThumbPreview(box, localUrl);
   const applyUrl = (url)=>{
     if(ctx==='v'){ A.pendingThumbUrl = url; document.getElementById('v-thumb-url').value = url; }
@@ -1364,6 +1401,7 @@ function setThumbPreview(box, url){
   const txt = box.querySelector('.upl-txt'); if(txt) txt.style.display='none';
 }
 function onThumbUrlInput(){
+  A.vThumbFile = null;
   const url = document.getElementById('v-thumb-url').value.trim();
   A.pendingThumbUrl = url;
   if(url){ setThumbPreview(document.getElementById('v-thumb-box'), url); }
@@ -1473,6 +1511,7 @@ function tgUploadVideo(file, onProgress){
   });
 }
 function handlePartVideoUpload(input){
+  if(input.files[0]){ A.lastVideoFile = input.files[0]; autoThumbFromVideo(input.files[0]); }
   if(!videoBotReady()){ toast('ℹ️ ভিডিও বট সেট করা নেই — পুরনো পদ্ধতিতে আপলোড হচ্ছে।'); handlePartVideoUploadLegacy(input); return; }
   const file = input.files[0];
   if(!file) return;
@@ -1829,6 +1868,15 @@ function openVideoForm(id){
   }
   renderCategorySelect();
   if(id){ const v=A.videos.find(x=>x.id===id); if(v) document.getElementById('v-category').value = v.category||'all'; }
+  A.vThumbFile = null; A.lastVideoFile = null;
+  {
+    const T = A.telegram || {};
+    const defBtns = T.bcDefaultButtons || [{text:'▶️ ভিডিওটি দেখুন', url:'{VIDEO_LINK}'},{text:'ℹ️ কিভাবে ভিডিও দেখবেন', url:''}];
+    bcInitComposer('v', { buttons:defBtns, toUsers:true });
+    document.getElementById('v-bc-enabled').checked = !id && !!T.autoNotify;
+    document.getElementById('v-bc-caption').value = '';
+    bcToggleVideoWrap();
+  }
   document.getElementById('form-modal').classList.add('open');
 }
 function closeFormModal(){ document.getElementById('form-modal').classList.remove('open'); }
@@ -1839,6 +1887,12 @@ async function saveVideo(){
   const parts = partBlocks.map(b=>({url:b.querySelector('.part-url-input').value.trim(), tgFileId:b.dataset.fileid||'', tgMessageId:b.dataset.msgid||''})).filter(p=>p.url||p.tgFileId);
   if(!title){ toast('⚠️ ভিডিওর টাইটেল দিন।'); return; }
   if(!parts.length){ toast('⚠️ অন্তত একটি ভিডিও পার্ট (আপলোড বা লিংক) দিন।'); return; }
+  let bcJob = null;
+  if(document.getElementById('v-bc-enabled').checked){
+    if(!bcToken()){ toast('⚠️ টেলিগ্রামে পোস্ট করতে আগে সেটিংসে বট টোকেন বসান।'); return; }
+    bcJob = collectVideoBcJob(title);
+    if(!bcJob) return;
+  }
 
   const directLinks = {};
   let missingSlot = null;
@@ -1857,6 +1911,7 @@ async function saveVideo(){
   const btn = document.getElementById('v-save-btn');
   btn.disabled = true; btn.innerHTML = '<span class="material-icons-round">hourglass_top</span>সেভ হচ্ছে...';
   const isNew = !A.editingVideoId;
+  let newVideoId = null; const editingId = A.editingVideoId;
   const thumbnail = document.getElementById('v-thumb-url').value.trim();
   const description = document.getElementById('v-desc').value.trim();
   const wantPinned = document.getElementById('v-pinned').checked;
@@ -1889,7 +1944,7 @@ async function saveVideo(){
     } else {
       data.likes = 0;
       data.videoNo = nextVideoNo();
-      await fbAdd('videos', data);
+      newVideoId = (await fbAdd('videos', data)).id;
       toast('✅ নতুন ভিডিও যুক্ত হয়েছে! ইউজার সাইটে এটির জন্য এখনই একটি আলাদা শেয়ার লিংক তৈরি হয়ে যাবে।');
     }
     closeFormModal();
@@ -1898,10 +1953,7 @@ async function saveVideo(){
         await fbAdd('notifications', { title: '🎬 নতুন ভিডিও যুক্ত হয়েছে!', body: title, type:'new_video' });
       }catch(e){}
     }
-    if(isNew && A.telegram.autoNotify && A.telegram.botToken){
-      const caption = '🎬 নতুন ভিডিও যুক্ত হয়েছে!\n\n' + title + (description?('\n\n'+description):'');
-      runBroadcast(caption, thumbnail, true);
-    }
+    if(bcJob){ startBcJob(bcJob, newVideoId || editingId); }
   }catch(e){ toast('⚠️ সেভ করতে সমস্যা হয়েছে।'); }
   btn.disabled = false; btn.innerHTML = '<span class="material-icons-round">save</span>সেভ করুন';
 }
@@ -2447,17 +2499,20 @@ async function saveAnnouncementSettings(){
 /* ============ TELEGRAM BOT / BROADCAST ============ */
 async function loadTelegramSettings(){
   const cfg = await fbGetDoc('settings','telegram');
-  A.telegram = { botToken:(cfg&&cfg.botToken)||'', autoNotify: !!(cfg&&cfg.autoNotify) };
+  A.telegram = { botToken:(cfg&&cfg.botToken)||'', autoNotify: !!(cfg&&cfg.autoNotify), broadcastChatId:(cfg&&cfg.broadcastChatId)||'', bcBlur:(cfg&&cfg.bcBlur)||'blur', bcDefaultButtons:(cfg&&cfg.bcDefaultButtons)||null };
+  document.getElementById('set-bc-chat').value = A.telegram.broadcastChatId;
   document.getElementById('set-bot-token').value = A.telegram.botToken;
   document.getElementById('set-auto-notify').checked = A.telegram.autoNotify;
   updateBcTgStatus();
+  bcInitComposer('bc', { buttons:[], toUsers:true });
 }
 async function saveTelegramSettings(){
   const botToken = document.getElementById('set-bot-token').value.trim();
   const autoNotify = document.getElementById('set-auto-notify').checked;
   try{
-    await fbSet('settings','telegram',{botToken,autoNotify});
-    A.telegram = {botToken,autoNotify};
+    const broadcastChatId = document.getElementById('set-bc-chat').value.trim();
+    await fbSet('settings','telegram',{botToken,autoNotify,broadcastChatId});
+    A.telegram = Object.assign({}, A.telegram, {botToken,autoNotify,broadcastChatId});
     updateBcTgStatus();
     toast('✅ টেলিগ্রাম বট সেভ হয়েছে!');
   }catch(e){ toast('⚠️ সমস্যা হয়েছে।'); }
@@ -2480,74 +2535,330 @@ function refreshBroadcastStats(){
   document.getElementById('bc-tg-users').textContent = tgUsers.length;
 }
 
-async function tgSendOne(chatId, text, photoUrl){
-  const token = A.telegram.botToken;
-  if(!token) return false;
+/* =====================================================================
+   TELEGRAM POST ENGINE
+   - blur: canvas Gaussian blur (ctx.filter) with a down/up-scale fallback
+   - spoiler: Telegram's own has_spoiler flag
+   - sendPhoto with caption (HTML) + inline_keyboard
+   - runs fully in the background; the admin never waits on it
+   ===================================================================== */
+const MAIN_BOT_USERNAME = 'movilovervairal_bot';
+const MAIN_APP_SHORT = 'webapp';
+function bcToken(){ return (A.telegram && A.telegram.botToken) || (A.videobot && A.videobot.token) || ''; }
+function videoShareLink(vid){ return 'https://t.me/' + MAIN_BOT_USERNAME + '/' + MAIN_APP_SHORT + (vid ? ('?startapp=v-' + vid) : ''); }
+function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
+
+function bcComposerHtml(p){
+  return '' +
+  '<div class="form-group"><div class="form-label"><span class="material-icons-round">blur_on</span>ছবির ইফেক্ট</div>' +
+    '<select class="form-select" id="'+p+'-bc-blur">' +
+      '<option value="blur">ব্লার (ছবিতেই গসিয়ান ব্লার)</option>' +
+      '<option value="spoiler">টেলিগ্রাম স্পয়লার (has_spoiler)</option>' +
+      '<option value="both">ব্লার + স্পয়লার</option>' +
+      '<option value="none">কোনো ইফেক্ট নয়</option>' +
+    '</select></div>' +
+  '<div class="form-group"><div class="form-label"><span class="material-icons-round">smart_button</span>ইনলাইন বাটন</div>' +
+    '<div id="'+p+'-bc-btns"></div>' +
+    '<button type="button" class="add-part-btn" onclick="bcAddBtnRow(\''+p+'\')"><span class="material-icons-round" style="font-size:17px;">add_circle</span>নতুন বাটন যোগ করুন</button>' +
+    '<button type="button" class="cancel-btn" onclick="bcSaveDefaults(\''+p+'\')">এই সেটআপ ডিফল্ট হিসেবে রাখুন</button>' +
+    '<div class="form-hint">প্রতিটি বাটন আলাদা লাইনে যায়। লেবেল ও লিংক (https://...) দুটোই লাগবে; দুটো ঘরই খালি হলে সেই সারি বাদ।</div></div>' +
+  '<div class="form-group"><div class="form-label"><span class="material-icons-round">groups</span>কোথায় পাঠাবেন</div>' +
+    '<label class="bc-check"><input type="checkbox" id="'+p+'-bc-to-chat" checked/>চ্যানেল / গ্রুপ</label>' +
+    '<input class="form-input" id="'+p+'-bc-chat" placeholder="-100123456789 (কমা দিয়ে একাধিক)" style="margin-bottom:10px;"/>' +
+    '<label class="bc-check"><input type="checkbox" id="'+p+'-bc-to-users"/>সব বট-ইউজারের কাছে (যারা টেলিগ্রাম দিয়ে ঢুকেছে)</label></div>';
+}
+function bcMountAll(){
+  const v = document.getElementById('v-bc-mount'); if(v) v.innerHTML = bcComposerHtml('v');
+  const b = document.getElementById('bc-mount'); if(b) b.innerHTML = bcComposerHtml('bc');
+}
+function bcToggleVideoWrap(){
+  const on = document.getElementById('v-bc-enabled').checked;
+  document.getElementById('v-bc-wrap').style.display = on ? '' : 'none';
+}
+function bcAddBtnRow(p, text, url){
+  const wrap = document.getElementById(p+'-bc-btns'); if(!wrap) return;
+  const row = document.createElement('div');
+  row.className = 'bc-btn-row';
+  row.innerHTML = '<input class="form-input bc-t" placeholder="বাটনের লেখা" value="'+escHtml(text||'')+'"/>' +
+                  '<input class="form-input bc-u" placeholder="https://..." value="'+escHtml(url||'')+'"/>' +
+                  '<div class="bc-btn-x" onclick="this.parentElement.remove()"><span class="material-icons-round">close</span></div>';
+  wrap.appendChild(row);
+}
+function bcInitComposer(p, o){
+  if(!document.getElementById(p+'-bc-btns')) return;
+  document.getElementById(p+'-bc-btns').innerHTML = '';
+  (o.buttons||[]).forEach(b=>bcAddBtnRow(p, b.text, b.url));
+  document.getElementById(p+'-bc-blur').value = (A.telegram && A.telegram.bcBlur) || 'blur';
+  document.getElementById(p+'-bc-chat').value = (A.telegram && A.telegram.broadcastChatId) || '';
+  document.getElementById(p+'-bc-to-chat').checked = !!(A.telegram && A.telegram.broadcastChatId);
+  document.getElementById(p+'-bc-to-users').checked = !!o.toUsers;
+}
+function bcRawButtons(p){
+  const rows = document.querySelectorAll('#'+p+'-bc-btns .bc-btn-row');
+  return Array.prototype.map.call(rows, r=>({ text:r.querySelector('.bc-t').value.trim(), url:r.querySelector('.bc-u').value.trim() }));
+}
+async function bcSaveDefaults(p){
+  const btns = bcRawButtons(p).filter(b=>b.text||b.url);
+  const bcBlur = document.getElementById(p+'-bc-blur').value;
+  const broadcastChatId = document.getElementById(p+'-bc-chat').value.trim();
   try{
-    if(photoUrl){
-      const res = await fetch('https://api.telegram.org/bot'+token+'/sendPhoto',{
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ chat_id: chatId, photo: photoUrl, caption: text })
-      });
-      const j = await res.json();
-      if(j.ok) return true;
-      const res2 = await fetch('https://api.telegram.org/bot'+token+'/sendMessage',{
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ chat_id: chatId, text })
-      });
-      const j2 = await res2.json();
-      return !!j2.ok;
-    } else {
-      const res = await fetch('https://api.telegram.org/bot'+token+'/sendMessage',{
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ chat_id: chatId, text })
-      });
-      const j = await res.json();
-      return !!j.ok;
-    }
-  }catch(e){ return false; }
+    await fbSet('settings','telegram',{ bcDefaultButtons:btns, bcBlur, broadcastChatId });
+    A.telegram = Object.assign({}, A.telegram, { bcDefaultButtons:btns, bcBlur, broadcastChatId });
+    document.getElementById('set-bc-chat').value = broadcastChatId;
+    toast('✅ ডিফল্ট সেভ হয়েছে।');
+  }catch(e){ toast('⚠️ সেভ করা যায়নি।'); }
+}
+function bcCollect(p){
+  const blurMode = document.getElementById(p+'-bc-blur').value;
+  const toChat = document.getElementById(p+'-bc-to-chat').checked;
+  const toUsers = document.getElementById(p+'-bc-to-users').checked;
+  const chatIds = toChat ? document.getElementById(p+'-bc-chat').value.split(/[\s,]+/).filter(Boolean) : [];
+  const userIds = toUsers ? Array.from(new Set((A.allUsers||[]).filter(u=>u.tgUserId).map(u=>String(u.tgUserId)))) : [];
+  let invalid = 0;
+  const buttons = [];
+  bcRawButtons(p).forEach(b=>{
+    if(!b.text && !b.url) return;
+    const okUrl = /^(https?:\/\/|tg:\/\/)/i.test(b.url) || b.url.indexOf('{VIDEO_LINK}') > -1;
+    if(!b.text || !okUrl){ invalid++; return; }
+    buttons.push({ text:b.text, url:b.url });
+  });
+  return { blurMode, chatIds, userIds, buttons, invalid };
+}
+function collectVideoBcJob(title){
+  const c = bcCollect('v');
+  if(c.invalid){ toast('⚠️ বাটনের লেবেল ও সঠিক লিংক (https://...) দুটোই দিন, নাহলে সারিটি মুছে দিন।'); return null; }
+  if(!c.chatIds.length && !c.userIds.length){
+    toast('⚠️ টেলিগ্রামে কোথায় পাঠাবেন তা বাছাই করুন (চ্যানেল ID বা ইউজার)।'); return null;
+  }
+  if(c.userIds.length && !bcToken()){ toast('⚠️ বট টোকেন নেই।'); return null; }
+  return Object.assign(c, {
+    title,
+    desc: document.getElementById('v-desc').value.trim(),
+    captionRaw: document.getElementById('v-bc-caption').value.trim(),
+    src: { file: A.vThumbFile || null, url: document.getElementById('v-thumb-url').value.trim() },
+  });
+}
+function startBcJob(job, vid){
+  const link = videoShareLink(vid);
+  const fill = s=>String(s||'').split('{VIDEO_LINK}').join(link);
+  const caption = job.captionRaw
+    ? fill(job.captionRaw)
+    : ('🎬 <b>' + escHtml(job.title) + '</b>' + (job.desc ? ('\n\n' + escHtml(job.desc)) : ''));
+  const buttons = job.buttons.map(b=>[{ text:b.text, url: fill(b.url) }]);
+  bcRunJob({ src:job.src, blurMode:job.blurMode, caption, buttons, chatIds:job.chatIds, userIds:job.userIds, label:'ভিডিও পোস্ট' })
+    .catch(e=>{ console.error(e); toast('⚠️ টেলিগ্রাম পোস্টে সমস্যা হয়েছে।'); bgPill(''); });
 }
 
-async function runBroadcast(text, photoUrl, silent){
-  if(!A.telegram.botToken){ if(!silent) toast('⚠️ আগে সেটিংসে গিয়ে বট টোকেন বসান।'); return; }
-  const targets = A.allUsers.filter(u=>u.tgUserId);
-  if(!targets.length){ if(!silent) toast('⚠️ টেলিগ্রাম দিয়ে ঢোকা কোনো ইউজার এখনো পাওয়া যায়নি।'); return; }
+/* ---- first-frame thumbnail from a video file ---- */
+function captureFrameBlob(file){
+  return new Promise((resolve, reject)=>{
+    const url = URL.createObjectURL(file);
+    const v = document.createElement('video');
+    v.muted = true; v.playsInline = true; v.preload = 'auto'; v.src = url;
+    const fail = err=>{ URL.revokeObjectURL(url); reject(err || new Error('frame')); };
+    v.onerror = ()=>fail(new Error('video load'));
+    v.onloadeddata = ()=>{ try{ v.currentTime = Math.min(0.5, (v.duration||1)/2); }catch(e){ fail(e); } };
+    v.onseeked = ()=>{
+      try{
+        const sc = Math.min(1, 1280 / (v.videoWidth||1280));
+        const c = document.createElement('canvas');
+        c.width = Math.round((v.videoWidth||640)*sc); c.height = Math.round((v.videoHeight||360)*sc);
+        c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+        c.toBlob(b=>{ URL.revokeObjectURL(url); b ? resolve(b) : reject(new Error('blob')); }, 'image/jpeg', 0.88);
+      }catch(e){ fail(e); }
+    };
+  });
+}
+async function autoThumbFromVideo(file, force){
+  if(!force && (document.getElementById('v-thumb-url').value.trim() || A.vThumbFile)) return;
+  try{
+    const blob = await captureFrameBlob(file);
+    const img = new File([blob], 'frame.jpg', { type:'image/jpeg' });
+    A.vThumbFile = img;
+    const box = document.getElementById('v-thumb-box');
+    setThumbPreview(box, URL.createObjectURL(img));
+    toast('🖼️ ভিডিও থেকে থাম্বনেইল নেওয়া হচ্ছে...');
+    const url = await uploadToImgBB(img, document.getElementById('v-thumb-progress'));
+    document.getElementById('v-thumb-url').value = url;
+    A.pendingThumbUrl = url;
+    setThumbPreview(box, url);
+    toast('✅ থাম্বনেইল তৈরি হয়েছে।');
+  }catch(e){ console.warn('auto thumb failed', e); }
+}
+function captureThumbFromLastVideo(){
+  if(!A.lastVideoFile){ toast('ℹ️ আগে একটি ভিডিও ফাইল আপলোডের জন্য বাছাই করুন।'); return; }
+  autoThumbFromVideo(A.lastVideoFile, true);
+}
 
+/* ---- Gaussian blur (canvas) ---- */
+function blurImageBlob(blob){
+  return new Promise((resolve, reject)=>{
+    const img = new Image();
+    const u = URL.createObjectURL(blob);
+    img.onload = ()=>{
+      try{
+        const sc = Math.min(1, 1280 / img.width);
+        const w = Math.round(img.width*sc), h = Math.round(img.height*sc);
+        const c = document.createElement('canvas'); c.width = w; c.height = h;
+        const ctx = c.getContext('2d');
+        const r = Math.max(8, Math.round(Math.max(w,h)*0.03));
+        if('filter' in ctx){
+          ctx.filter = 'blur(' + r + 'px)';
+          const pad = r*2;
+          ctx.drawImage(img, -pad, -pad, w+pad*2, h+pad*2);
+          ctx.filter = 'none';
+        } else {
+          const sm = document.createElement('canvas');
+          const f = Math.max(8, Math.round(w/24));
+          sm.width = Math.max(1, Math.round(w/f)); sm.height = Math.max(1, Math.round(h/f));
+          const sctx = sm.getContext('2d');
+          sctx.imageSmoothingQuality = 'high';
+          sctx.drawImage(img, 0, 0, sm.width, sm.height);
+          ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(sm, 0, 0, w, h);
+        }
+        c.toBlob(b=>{ URL.revokeObjectURL(u); b ? resolve(b) : reject(new Error('blob')); }, 'image/jpeg', 0.85);
+      }catch(e){ URL.revokeObjectURL(u); reject(e); }
+    };
+    img.onerror = ()=>{ URL.revokeObjectURL(u); reject(new Error('image load')); };
+    img.src = u;
+  });
+}
+async function bcPreparePhoto(src, mode){
+  const wantBlur = mode==='blur' || mode==='both';
+  let spoiler = mode==='spoiler' || mode==='both';
+  if(!src || (!src.file && !src.url)) return { photo:null, spoiler:false };
+  if(!wantBlur) return { photo: src.file ? { blob:src.file } : { url:src.url }, spoiler };
+  try{
+    const original = src.file || await (await fetch(src.url, { mode:'cors' })).blob();
+    const blurred = await blurImageBlob(original);
+    return { photo:{ blob:blurred }, spoiler };
+  }catch(e){
+    // image host blocked CORS or canvas failed -> fall back to Telegram's own spoiler blur
+    console.warn('canvas blur failed, using has_spoiler', e);
+    return { photo: src.file ? { blob:src.file } : { url:src.url }, spoiler:true, fallback:true };
+  }
+}
+
+/* ---- Telegram sending ---- */
+async function tgApi(method, payload, isForm){
+  const opt = isForm
+    ? { method:'POST', body:payload }
+    : { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) };
+  const r = await fetch('https://api.telegram.org/bot' + bcToken() + '/' + method, opt);
+  return r.json();
+}
+async function bcSendText(chatId, text, markup){
+  const base = { chat_id:chatId, text, disable_web_page_preview:true };
+  if(markup) base.reply_markup = markup;
+  let r = await tgApi('sendMessage', Object.assign({ parse_mode:'HTML' }, base));
+  if(!r.ok && /parse entities/i.test(r.description||'')) r = await tgApi('sendMessage', base);
+  return r;
+}
+async function bcSendOne(chatId, photo, caption, markup, spoiler){
+  try{
+    if(!photo) {
+      const r = await bcSendText(chatId, caption || ' ', markup);
+      return { ok:!!r.ok, err:r.description };
+    }
+    const longCap = (caption||'').length > 1024;
+    const cap = longCap ? '' : (caption||'');
+    const build = (withParse)=>{
+      if(photo.blob){
+        const fd = new FormData();
+        fd.append('chat_id', String(chatId));
+        fd.append('photo', photo.blob, 'thumb.jpg');
+        if(cap){ fd.append('caption', cap); if(withParse) fd.append('parse_mode', 'HTML'); }
+        if(spoiler) fd.append('has_spoiler', 'true');
+        if(markup && !longCap) fd.append('reply_markup', JSON.stringify(markup));
+        return fd;
+      }
+      const o = { chat_id:chatId, photo: photo.fileId || photo.url };
+      if(cap){ o.caption = cap; if(withParse) o.parse_mode = 'HTML'; }
+      if(spoiler) o.has_spoiler = true;
+      if(markup && !longCap) o.reply_markup = markup;
+      return o;
+    };
+    let r = await tgApi('sendPhoto', build(true), !!photo.blob);
+    if(!r.ok && /parse entities/i.test(r.description||'')) r = await tgApi('sendPhoto', build(false), !!photo.blob);
+    if(!r.ok) return { ok:false, err:r.description };
+    if(longCap) await bcSendText(chatId, caption, markup);
+    const sizes = (r.result && r.result.photo) || [];
+    return { ok:true, fileId: sizes.length ? sizes[sizes.length-1].file_id : null };
+  }catch(e){ return { ok:false, err:'network' }; }
+}
+function bgPill(text){
+  const el = document.getElementById('bg-job'); if(!el) return;
+  if(!text){ el.classList.remove('show'); return; }
+  el.textContent = text; el.classList.add('show');
+}
+
+/* ---- background job: never awaited by the save button ---- */
+async function bcRunJob(job){
+  if(!bcToken()){ toast('⚠️ বট টোকেন নেই।'); return; }
+  const label = job.label || 'পোস্ট';
+  bgPill('🖼️ ' + label + ': ছবি প্রস্তুত হচ্ছে...');
+  const prep = await bcPreparePhoto(job.src, job.blurMode);
+  if(prep.fallback) toast('ℹ️ ব্লার করা যায়নি (ছবির সার্ভার অনুমতি দেয়নি) — টেলিগ্রামের স্পয়লার ইফেক্ট দেওয়া হলো।');
+  let photo = prep.photo;
+  const markup = job.buttons && job.buttons.length ? { inline_keyboard: job.buttons } : undefined;
+  const targets = Array.from(new Set((job.chatIds||[]).map(String).concat((job.userIds||[]).map(String))));
+  const total = targets.length;
+  let sent = 0, failed = 0, done = 0, lastErr = '';
   const progWrap = document.getElementById('bc-progress-wrap');
   const progFill = document.getElementById('bc-progress-fill');
   const progTxt = document.getElementById('bc-progress-txt');
-  if(progWrap){ progWrap.style.display='block'; progFill.style.width='0%'; }
-
-  // Sent in parallel batches instead of one message at a time — Telegram
-  // allows roughly 30 messages/sec, so a batch of 25 sent concurrently
-  // then a short pause keeps us safely under that limit while finishing
-  // in a fraction of the time the old one-by-one loop took.
-  const BATCH_SIZE = 25;
-  let sent=0, failed=0, done=0;
-  for(let i=0;i<targets.length;i+=BATCH_SIZE){
-    const batch = targets.slice(i, i+BATCH_SIZE);
-    const results = await Promise.all(batch.map(t=>tgSendOne(t.tgUserId, text, photoUrl)));
-    results.forEach(ok=>{ if(ok) sent++; else failed++; });
-    done += batch.length;
-    const pct = Math.round((done/targets.length)*100);
-    if(progFill){ progFill.style.width = pct+'%'; }
-    if(progTxt){ progTxt.textContent = done + ' / ' + targets.length + ' পাঠানো হয়েছে (সফল: ' + sent + ', ব্যর্থ: ' + failed + ')'; }
-    if(i+BATCH_SIZE < targets.length){ await new Promise(r=>setTimeout(r,1000)); }
+  const update = ()=>{
+    bgPill('📤 ' + label + ': ' + done + '/' + total + ' (সফল ' + sent + ')');
+    if(job.showProgress && progWrap){
+      progWrap.style.display = 'block';
+      progFill.style.width = Math.round(done/Math.max(1,total)*100) + '%';
+      progTxt.textContent = done + ' / ' + total + ' পাঠানো হয়েছে (সফল: ' + sent + ', ব্যর্থ: ' + failed + ')';
+    }
+  };
+  update();
+  let i = 0;
+  // first sends go one by one until Telegram returns a file_id we can reuse for everyone else
+  while(i < total && photo && photo.blob){
+    const r = await bcSendOne(targets[i], photo, job.caption, markup, prep.spoiler);
+    i++; done++;
+    if(r.ok){ sent++; if(r.fileId) photo = { fileId:r.fileId }; } else { failed++; lastErr = r.err || lastErr; }
+    update();
   }
-  toast('✅ ব্রডকাস্ট শেষ! সফল: ' + sent + ', ব্যর্থ: ' + failed);
-  return {sent,failed};
+  const BATCH = 25;
+  for(; i < total; i += BATCH){
+    const batch = targets.slice(i, i+BATCH);
+    const results = await Promise.all(batch.map(t=>bcSendOne(t, photo, job.caption, markup, prep.spoiler)));
+    results.forEach(r=>{ if(r.ok) sent++; else { failed++; lastErr = r.err || lastErr; } });
+    done += batch.length;
+    update();
+    if(i + BATCH < total) await sleep(1000);
+  }
+  bgPill('✅ ' + label + ' শেষ — সফল ' + sent + ', ব্যর্থ ' + failed);
+  setTimeout(()=>bgPill(''), 7000);
+  toast(failed ? ('⚠️ সফল ' + sent + ', ব্যর্থ ' + failed + (lastErr ? (' — ' + lastErr) : '')) : ('✅ সব ' + sent + 'টি পাঠানো হয়েছে!'));
 }
 
 async function sendManualBroadcast(){
   const text = document.getElementById('bc-message').value.trim();
-  const photoUrl = document.getElementById('bc-thumb-url').value.trim() || A.pendingBcThumbUrl || '';
+  const url = document.getElementById('bc-thumb-url').value.trim() || A.pendingBcThumbUrl || '';
   if(!text){ toast('⚠️ একটি বার্তা লিখুন।'); return; }
-  if(!A.telegram.botToken){ toast('⚠️ আগে সেটিংসে গিয়ে বট টোকেন বসান।'); return; }
-  const btn = document.getElementById('bc-send-btn');
-  btn.disabled = true; btn.innerHTML = '<span class="material-icons-round">hourglass_top</span>পাঠানো হচ্ছে...';
-  await runBroadcast(text, photoUrl, false);
-  btn.disabled = false; btn.innerHTML = '<span class="material-icons-round">send</span>সবার কাছে পাঠান';
+  if(!bcToken()){ toast('⚠️ আগে সেটিংসে গিয়ে বট টোকেন বসান।'); return; }
+  const c = bcCollect('bc');
+  if(c.invalid){ toast('⚠️ বাটনের লেবেল ও সঠিক লিংক (https://...) দুটোই দিন।'); return; }
+  if(!c.chatIds.length && !c.userIds.length){ toast('⚠️ কোথায় পাঠাবেন তা বাছাই করুন।'); return; }
+  const fill = s=>String(s||'').split('{VIDEO_LINK}').join(videoShareLink(''));
+  bcRunJob({
+    src: { file: A.bcThumbFile || null, url },
+    blurMode: c.blurMode,
+    caption: text,
+    buttons: c.buttons.map(b=>[{ text:b.text, url:fill(b.url) }]),
+    chatIds: c.chatIds, userIds: c.userIds,
+    label: 'ব্রডকাস্ট', showProgress: true
+  }).catch(e=>{ console.error(e); toast('⚠️ ব্রডকাস্টে সমস্যা হয়েছে।'); bgPill(''); });
+  toast('🚀 ব্যাকগ্রাউন্ডে পাঠানো শুরু হয়েছে — আপনি অন্য কাজ করতে পারেন।');
 }
+bcMountAll();
 
 /* ============ GENERAL SETTINGS ============ */
 async function loadSettingsForm(){
