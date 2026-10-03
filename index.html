@@ -611,6 +611,56 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
       </div>
     </div>
 
+    <!-- VIDEO BOT (Telegram storage + delivery, no server) -->
+    <div class="page" id="page-videobot">
+      <div class="page-head">
+        <div class="page-title" style="color:var(--gold3);">🤖 ভিডিও বট<small>শুধু বটের টোকেন ও প্রাইভেট চ্যানেলের ID বসান</small></div>
+      </div>
+
+      <div class="mgr-card info-card">
+        <div style="font-size:12.5px;line-height:1.8;">
+          <b>কীভাবে কাজ করে:</b><br>
+          ১) এডমিন থেকে ভিডিও আপলোড করলে সেটি বটের মাধ্যমে আপনার প্রাইভেট চ্যানেলে জমা হয়।<br>
+          ২) ইউজার অ্যাড শেষ করে <b>Watch Now</b> চাপলে ভিডিওটি বটের চ্যাটে চলে যায় এবং চ্যাট খুলে যায়।<br>
+          ৩) নির্ধারিত মিনিট পর বটের চ্যাট থেকে ভিডিও মুছে যায়, নিচে "আরও ভিডিও" বাটন থাকে।
+        </div>
+        <ol style="margin:10px 0 0 18px;padding:0;font-size:12px;color:var(--text-muted);line-height:1.9;">
+          <li>@BotFather থেকে একটি <b style="color:var(--gold3);">নতুন বট</b> বানান (শুধু এই কাজের জন্য)</li>
+          <li>একটি <b style="color:var(--gold3);">প্রাইভেট চ্যানেল</b> বানিয়ে বটকে Admin করুন (Post Messages অনুমতি সহ)</li>
+          <li>নিচে টোকেন ও চ্যানেল ID (<code>-100...</code>) বসিয়ে সংরক্ষণ করুন</li>
+        </ol>
+      </div>
+
+      <div class="mgr-card" id="vb-status-box" style="display:none;padding:12px 16px;border-color:rgba(35,180,122,0.4);background:rgba(35,180,122,0.08);">
+        <div style="font-size:12.5px;color:var(--green);font-weight:700;display:flex;align-items:center;gap:8px;"><span class="material-icons-round" style="font-size:17px;">check_circle</span><span id="vb-status-text"></span></div>
+      </div>
+
+      <div class="mgr-card">
+        <div class="form-section">
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">key</span>বট টোকেন*</div>
+            <input class="form-input" type="password" id="vb-token" placeholder="123456789:AA..." autocomplete="off" spellcheck="false" />
+          </div>
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">inventory_2</span>প্রাইভেট চ্যানেল ID*</div>
+            <input class="form-input" id="vb-chat-id" placeholder="-1001234567890" />
+          </div>
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">timer</span>ভিডিও কত মিনিট থাকবে</div>
+            <input class="form-input" type="number" min="1" id="vb-retention" placeholder="15" />
+          </div>
+          <button class="save-btn" onclick="saveVideoBotSettings()"><span class="material-icons-round">save</span>সংরক্ষণ করুন</button>
+          <button class="cancel-btn" onclick="testVideoBot()"><span class="material-icons-round" style="font-size:16px;vertical-align:-3px;">wifi_tethering</span> চ্যানেলে টেস্ট মেসেজ পাঠান</button>
+        </div>
+      </div>
+
+      <div class="mgr-card" style="padding:12px 16px;">
+        <div style="font-size:11.5px;color:var(--text-muted);line-height:1.7;">
+          <b style="color:var(--gold3);">ℹ️ জেনে রাখুন:</b> ব্রাউজার থেকে সর্বোচ্চ <b>৫০MB</b> ভিডিও আপলোড হয়। মেয়াদ শেষের ভিডিও মোছার কাজ ইউজারের অ্যাপ খোলা থাকলে নিজে থেকে হয়, আর এডমিন প্যানেল খোলা থাকলে সেটিও সবার জন্য মুছে দেয়।
+        </div>
+      </div>
+    </div>
+
     <!-- BROADCAST -->
     <div class="page" id="page-broadcast">
       <div class="page-head">
@@ -867,6 +917,7 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
     <div class="nav-item" data-page="tasks" onclick="showAdminPage('tasks')"><span class="material-icons-round">payments</span>টাস্ক</div>
     <div class="nav-item" data-page="withdrawals" onclick="showAdminPage('withdrawals')"><span class="material-icons-round">account_balance_wallet</span>উইথড্র</div>
     <div class="nav-item" data-page="imgbb" onclick="showAdminPage('imgbb')"><span class="material-icons-round">add_photo_alternate</span>IMGBB</div>
+    <div class="nav-item" data-page="videobot" onclick="showAdminPage('videobot')"><span class="material-icons-round">smart_toy</span>ভিডিও বট</div>
     <div class="nav-item" data-page="broadcast" onclick="showAdminPage('broadcast')"><span class="material-icons-round">campaign</span>ব্রডকাস্ট</div>
     <div class="nav-item" data-page="settings" onclick="showAdminPage('settings')"><span class="material-icons-round">settings</span>সেটিংস</div>
   </nav>
@@ -1077,6 +1128,7 @@ const A = {
   withdrawals: [],
   withdrawSettings: {},
   imgbb: {},
+  videobot: {},
   editingMethodIdx: null,
 };
 
@@ -1128,10 +1180,12 @@ async function enterApp(){
   A_isEntered = true;
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').classList.add('visible');
-  await Promise.all([loadCategories(), loadChannels(), loadTutorial(), loadSettingsForm(), loadAdNetworkSettingsForm(), loadWithdrawSettingsForm(), loadTelegramSettings(), loadAllUsers(), loadTasks(), loadImgbbSettings(), loadDailyAdTaskSettings(), loadReferralBannerSettings(), loadAnnouncementSettings()]);
+  await Promise.all([loadCategories(), loadChannels(), loadTutorial(), loadSettingsForm(), loadAdNetworkSettingsForm(), loadWithdrawSettingsForm(), loadTelegramSettings(), loadAllUsers(), loadTasks(), loadImgbbSettings(), loadDailyAdTaskSettings(), loadReferralBannerSettings(), loadAnnouncementSettings(), loadVideoBotSettings()]);
   subscribeVideosAdmin();
   subscribeWithdrawals();
   setTimeout(loadIncomeReport, 800);
+  setTimeout(sweepDeliveries, 3000);
+  setInterval(sweepDeliveries, 60000);
 }
 
 /* ---------- firestore helpers ---------- */
@@ -1353,6 +1407,7 @@ function createPartBlock(data){
     '<input class="form-input part-url-input" placeholder="https://... (এই পার্টের ভিডিও লিংক)" style="margin-top:8px;" value="' + escHtml(data.url||'') + '" oninput="onPartUrlInput(this)" />';
   document.getElementById('v-parts-container').appendChild(wrap);
   if(data.url){ wrap.querySelector('.part-video-status').textContent = '✅ ভিডিও লিংক সেট করা আছে'; }
+  if(data.tgFileId){ wrap.dataset.fileid = data.tgFileId; wrap.dataset.msgid = data.tgMessageId || ''; wrap.querySelector('.part-video-status').textContent = '✅ টেলিগ্রামে সংরক্ষিত আছে (নতুন ফাইল দিলে বদলে যাবে)'; }
   renumberParts();
   return wrap;
 }
@@ -1373,7 +1428,7 @@ function renumberParts(){
   });
 }
 function addPartBlockBtn(){ createPartBlock(); }
-function handlePartVideoUpload(input){
+function handlePartVideoUploadLegacy(input){
   const file = input.files[0];
   if(!file) return;
   const block = input.closest('.part-block');
@@ -1386,6 +1441,141 @@ function handlePartVideoUpload(input){
     applyUrl(url);
     toast('✅ ভিডিও আপলোড সম্পন্ন!');
   }).catch(()=>{ statusEl.textContent='⚠️ আপলোড ব্যর্থ হয়েছে, লিংক ব্যবহার করুন'; toast('⚠️ ভিডিও আপলোড ব্যর্থ হয়েছে।'); });
+}
+
+
+/* ============ TELEGRAM VIDEO UPLOAD (storage channel via delivery bot) ============ */
+function videoBotReady(){ return !!(A.videobot && A.videobot.token && A.videobot.chatId); }
+function tgUploadVideo(file, onProgress){
+  return new Promise((resolve, reject)=>{
+    if(file.size > 50*1024*1024){ reject(new Error('ফাইল ৫০MB এর বেশি — টেলিগ্রাম বট এটি নিতে পারে না')); return; }
+    const fd = new FormData();
+    fd.append('chat_id', A.videobot.chatId);
+    fd.append('supports_streaming', 'true');
+    fd.append('caption', file.name);
+    fd.append('video', file, file.name);
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', 'https://api.telegram.org/bot' + A.videobot.token + '/sendVideo', true);
+    xhr.upload.onprogress = e=>{ if(onProgress && e.lengthComputable) onProgress(Math.round(e.loaded/e.total*100)); };
+    xhr.onload = ()=>{
+      try{
+        const res = JSON.parse(xhr.responseText || '{}');
+        if(res.ok && res.result){
+          const m = res.result;
+          const fileId = (m.video && m.video.file_id) || (m.document && m.document.file_id) || '';
+          if(!fileId){ reject(new Error('file_id পাওয়া যায়নি')); return; }
+          resolve({ fileId, messageId: m.message_id });
+        } else reject(new Error(res.description || 'টেলিগ্রাম আপলোড ব্যর্থ'));
+      }catch(e){ reject(e); }
+    };
+    xhr.onerror = ()=>reject(new Error('নেটওয়ার্ক সমস্যা'));
+    xhr.send(fd);
+  });
+}
+function handlePartVideoUpload(input){
+  if(!videoBotReady()){ toast('ℹ️ ভিডিও বট সেট করা নেই — পুরনো পদ্ধতিতে আপলোড হচ্ছে।'); handlePartVideoUploadLegacy(input); return; }
+  const file = input.files[0];
+  if(!file) return;
+  const block = input.closest('.part-block');
+  const statusEl = block.querySelector('.part-video-status');
+  statusEl.textContent = 'টেলিগ্রামে আপলোড হচ্ছে... 0%';
+  tgUploadVideo(file, p=>{ statusEl.textContent = 'টেলিগ্রামে আপলোড হচ্ছে... ' + p + '%'; }).then(r=>{
+    block.dataset.fileid = r.fileId;
+    block.dataset.msgid = String(r.messageId||'');
+    block.querySelector('.part-url-input').value = '';
+    statusEl.textContent = '✅ টেলিগ্রামে আপলোড সম্পন্ন';
+    toast('✅ ভিডিও টেলিগ্রামে সংরক্ষিত হয়েছে!');
+  }).catch(err=>{
+    statusEl.textContent = '⚠️ আপলোড ব্যর্থ: ' + (err.message||'');
+    toast('⚠️ ' + (err.message||'আপলোড ব্যর্থ'));
+  });
+}
+
+/* ============ VIDEO NUMBERS (unique ID per video) ============ */
+function nextVideoNo(){ return A.videos.reduce((m,v)=>Math.max(m, v.videoNo||0), 0) + 1; }
+let _numbering = false;
+async function ensureVideoNumbers(){
+  if(_numbering) return;
+  const missing = A.videos.filter(v=>!v.videoNo).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+  if(!missing.length) return;
+  _numbering = true;
+  try{
+    let n = A.videos.reduce((m,v)=>Math.max(m, v.videoNo||0), 0);
+    for(const v of missing){ n++; await fbUpdate('videos', v.id, { videoNo: n }); }
+  }catch(e){}
+  _numbering = false;
+}
+
+/* ============ VIDEO BOT SETTINGS ============
+   settings/videobot = { token, chatId, botUsername, retentionMinutes }
+   (Firestore rules: only signed-in users can read it, only admin can write) */
+async function loadVideoBotSettings(){
+  const c = await fbGetDoc('settings','videobot');
+  A.videobot = c || {};
+  document.getElementById('vb-token').value = A.videobot.token || '';
+  document.getElementById('vb-chat-id').value = A.videobot.chatId || '';
+  document.getElementById('vb-retention').value = A.videobot.retentionMinutes || 15;
+  renderVideoBotStatus();
+}
+function renderVideoBotStatus(){
+  const box = document.getElementById('vb-status-box');
+  const txt = document.getElementById('vb-status-text');
+  if(!box) return;
+  box.style.display = 'block';
+  if(videoBotReady()){
+    box.style.borderColor='rgba(35,180,122,0.4)'; box.style.background='rgba(35,180,122,0.08)';
+    txt.textContent = 'বট সংযুক্ত' + (A.videobot.botUsername?(' — @'+A.videobot.botUsername):'');
+  } else {
+    box.style.borderColor='rgba(240,180,41,0.4)'; box.style.background='rgba(240,180,41,0.08)';
+    txt.textContent = 'টোকেন ও চ্যানেল ID দিন।';
+  }
+}
+async function saveVideoBotSettings(){
+  const token = document.getElementById('vb-token').value.trim();
+  const chatId = document.getElementById('vb-chat-id').value.trim();
+  const retentionMinutes = Math.max(1, parseInt(document.getElementById('vb-retention').value)||15);
+  if(!token || !chatId){ toast('⚠️ টোকেন ও চ্যানেল ID দুটোই দিন।'); return; }
+  let botUsername = '';
+  try{
+    const r = await (await fetch('https://api.telegram.org/bot'+token+'/getMe')).json();
+    if(!r.ok){ toast('⚠️ টোকেন সঠিক নয়।'); return; }
+    botUsername = r.result.username || '';
+  }catch(e){ toast('⚠️ টেলিগ্রামে সংযোগ করা যায়নি।'); return; }
+  try{
+    await fbSet('settings','videobot',{ token, chatId, botUsername, retentionMinutes });
+    A.videobot = { token, chatId, botUsername, retentionMinutes };
+    renderVideoBotStatus();
+    toast('✅ ভিডিও বট সংরক্ষিত হয়েছে (@'+botUsername+')');
+  }catch(e){ toast('⚠️ সংরক্ষণে সমস্যা হয়েছে।'); }
+}
+async function testVideoBot(){
+  if(!videoBotReady()){ toast('⚠️ আগে সংরক্ষণ করুন।'); return; }
+  try{
+    const r = await (await fetch('https://api.telegram.org/bot'+A.videobot.token+'/sendMessage', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ chat_id: A.videobot.chatId, text:'✅ Movi Lover বট সংযোগ ঠিক আছে।' })
+    })).json();
+    toast(r.ok ? '✅ টেস্ট মেসেজ চ্যানেলে গেছে!' : ('⚠️ ' + (r.description||'ব্যর্থ')));
+  }catch(e){ toast('⚠️ সংযোগ ব্যর্থ।'); }
+}
+
+/* Expired-delivery sweeper: while the admin panel is open it deletes
+   every user's expired video messages (backup for users whose app is
+   closed). Runs on load and every minute. */
+async function sweepDeliveries(){
+  if(!videoBotReady()) return;
+  try{
+    const all = await fbGet('tg_deliveries');
+    const now = Date.now();
+    for(const d of all.filter(x=>(x.deleteAt||0) <= now)){
+      for(const mid of (d.messageIds||[])){
+        try{ await fetch('https://api.telegram.org/bot'+A.videobot.token+'/deleteMessage', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ chat_id: d.chatId, message_id: mid }) }); }catch(e){}
+      }
+      try{ await fbDelete('tg_deliveries', d.id); }catch(e){}
+    }
+  }catch(e){}
 }
 
 /* ============ DIRECT LINK AD SLOTS (per-video, per-step) ============ */
@@ -1485,6 +1675,7 @@ function subscribeVideosAdmin(){
       A.videos = snap.docs.map(d=>({id:d.id,...d.data()}));
       renderVideosList();
       renderPinnedManagerList();
+      ensureVideoNumbers();
     }, ()=>loadVideosFallback());
   }catch(e){ loadVideosFallback(); }
 }
@@ -1515,6 +1706,8 @@ function renderVideosList(){
       '<div class="vid-body">' +
         '<div class="vid-title">' + escHtml(v.title||'শিরোনামহীন') + '</div>' +
         '<div class="vid-meta-row">' +
+          (v.videoNo?'<span class="vid-chip gold">#' + v.videoNo + '</span>':'') +
+          ((v.parts||[]).some(p=>p.tgFileId)?'<span class="vid-chip" style="background:rgba(64,158,255,0.16);color:#63b3ff;">🤖 টেলিগ্রাম</span>':'') +
           '<span class="vid-chip">' + catLabelAdmin(v.category) + '</span>' +
           '<span class="vid-chip gold">🎬 ' + adsN + ' বিজ্ঞাপন</span>' +
           (partsCount>1?('<span class="vid-chip" style="background:rgba(217,165,63,0.15);color:var(--gold3);">📼 ' + partsCount + ' পার্ট</span>'):'') +
@@ -1643,7 +1836,7 @@ function closeFormModal(){ document.getElementById('form-modal').classList.remov
 async function saveVideo(){
   const title = document.getElementById('v-title').value.trim();
   const partBlocks = Array.prototype.slice.call(document.querySelectorAll('#v-parts-container .part-block'));
-  const parts = partBlocks.map(b=>({url:b.querySelector('.part-url-input').value.trim()})).filter(p=>p.url);
+  const parts = partBlocks.map(b=>({url:b.querySelector('.part-url-input').value.trim(), tgFileId:b.dataset.fileid||'', tgMessageId:b.dataset.msgid||''})).filter(p=>p.url||p.tgFileId);
   if(!title){ toast('⚠️ ভিডিওর টাইটেল দিন।'); return; }
   if(!parts.length){ toast('⚠️ অন্তত একটি ভিডিও পার্ট (আপলোড বা লিংক) দিন।'); return; }
 
@@ -1695,6 +1888,7 @@ async function saveVideo(){
       toast('✅ ভিডিও আপডেট হয়েছে!');
     } else {
       data.likes = 0;
+      data.videoNo = nextVideoNo();
       await fbAdd('videos', data);
       toast('✅ নতুন ভিডিও যুক্ত হয়েছে! ইউজার সাইটে এটির জন্য এখনই একটি আলাদা শেয়ার লিংক তৈরি হয়ে যাবে।');
     }
