@@ -731,6 +731,7 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
         <div class="form-section">
           <div class="form-group"><div class="form-label"><span class="material-icons-round">badge</span>সাইটের নাম</div><input class="form-input" id="set-site-name" placeholder="Movi Lover" /></div>
           <div class="form-group"><div class="form-label"><span class="material-icons-round">support_agent</span>সাপোর্ট / যোগাযোগ লিংক</div><input class="form-input" id="set-admin-contact" placeholder="https://t.me/yourusername" /><div class="form-hint">ইউজার সাইটের প্রোফাইল পেজে "সাপোর্ট / যোগাযোগ" মেনু আইটেম হিসেবে দেখাবে (খালি রাখলে আইটেমটি লুকানো থাকবে)।</div></div>
+          <div class="form-group"><div class="form-label"><span class="material-icons-round">timer</span>আনলক ল্যান্ডিং পেজে অপেক্ষার সময় (সেকেন্ড)</div><input class="form-input" type="number" min="5" max="120" id="set-landing-wait" placeholder="15" /><div class="form-hint">ভিডিও আনলকের প্রতিটি ধাপে ইউজারকে ল্যান্ডিং পেজে এত সেকেন্ড থাকতে হবে। আগের সব ভিডিওতেও এটাই প্রযোজ্য (ডিফল্ট ১৫)।</div></div>
           <button class="save-btn" onclick="saveGeneralSettings()"><span class="material-icons-round">save</span>সেভ করুন</button>
         </div>
       </div>
@@ -997,13 +998,9 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
       <div class="form-hint" style="margin-top:-8px;margin-bottom:14px;">প্রতিটি সংখ্যা মানে ঠিক ততগুলো আলাদা বিজ্ঞাপন-ট্যাপ — প্রতিবার একটি সত্যিকারের বিজ্ঞাপন দেখানো হয়, কোনো ভুয়া ধাপ নেই। এখন প্রয়োজন অনুযায়ী ৩টির বেশি সংখ্যাও বসাতে পারবেন।</div>
 
       <div class="form-group">
-        <div class="form-label"><span class="material-icons-round">link</span>প্রতি স্টেপে ডাইরেক্ট লিংক (ঐচ্ছিক)</div>
-        <div class="form-hint" style="margin-bottom:8px;">যে স্লটে ডাইরেক্ট লিংক চালু করবেন, ইউজার সেই ধাপে নরমাল বিজ্ঞাপনের বদলে আপনার দেওয়া লিংকে যাবে (নতুন ট্যাবে খুলবে, নির্দিষ্ট সময় পর ব্যাক করে ফিরে আসতে হবে)। চালু না করলে সেই স্লটে আগের মতোই নেটওয়ার্ক বিজ্ঞাপন (Monetag/GigaPub) দেখানো হবে।</div>
+        <div class="form-label"><span class="material-icons-round">hub</span>প্রতি ধাপে ডাইরেক্ট লিংক (সর্বোচ্চ ৫টি নেটওয়ার্ক)</div>
+        <div class="form-hint" style="margin-bottom:8px;">যে ধাপে লিংক চালু করবেন, সেই ধাপে ইউজার <b>ল্যান্ডিং পেজে</b> যাবে (সেখানে নির্ধারিত সময় থাকতে হবে, নাহলে আনলক হবে না)। একই ধাপে একাধিক নেটওয়ার্কের লিংক দিলে প্রতিবার একটি এলোমেলোভাবে বাছাই হবে — ফলে ট্রাফিক সব নেটওয়ার্কে ভাগ হয়, একটি অ্যাকাউন্টে চাপ কম পড়ে। চালু না করলে আগের মতো নেটওয়ার্ক-SDK বিজ্ঞাপন দেখানো হবে। সময় (ডিফল্ট ১৫ সেকেন্ড) সেটিংস পেজ থেকে সব ভিডিওর জন্য একসাথে বদলানো যায়।</div>
         <div id="v-direct-slots-wrap"></div>
-        <div class="form-group" style="margin-top:4px;margin-bottom:0;">
-          <div class="form-label"><span class="material-icons-round">timer</span>ডাইরেক্ট লিংকে অপেক্ষার সময় (সেকেন্ড)</div>
-          <input class="form-input" type="number" id="v-direct-wait" min="1" step="1" value="5" placeholder="৫" />
-        </div>
       </div>
 
       <div class="form-group">
@@ -1073,10 +1070,51 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
         <div class="form-hint">টাস্কের নামের ঠিক নিচে ছোট করে দেখাবে।</div>
       </div>
 
-      <div class="form-group">
+      <div class="form-group" style="background:linear-gradient(135deg,rgba(242,184,48,.10),rgba(124,58,237,.08));border:1px solid rgba(242,184,48,.28);border-radius:16px;padding:14px;">
+        <div class="toggle-row">
+          <div class="toggle-label"><span class="material-icons-round" style="color:var(--gold3);font-size:18px;">rocket_launch</span>ল্যান্ডিং পেজ সিস্টেম (কোড ভেরিফিকেশন)</div>
+          <label class="switch"><input type="checkbox" id="t-landing" checked onchange="toggleLandingFields()"/><span class="slider-tg"></span></label>
+        </div>
+        <div class="form-hint">চালু থাকলে ইউজার "শুরু করুন" চাপলে সুন্দর ল্যান্ডিং পেজ খুলবে → বিজ্ঞাপন লিংক খুলবে → কাউন্টডাউন → কোড পাবে → ব্যাক করে কোড সাবমিট করলে ব্যালেন্স যোগ হবে। কাউন্টডাউনের ন্যূনতম সময় সার্ভারেই (Rules) চেক হয়।</div>
+        <div id="t-landing-wrap" style="margin-top:12px;">
+          <div class="form-label" style="margin-bottom:6px;"><span class="material-icons-round">timer</span>কাউন্টডাউন সময়</div>
+          <div style="display:flex;gap:8px;margin-bottom:12px;">
+            <button type="button" class="cancel-btn" style="margin:0;flex:1;" onclick="document.getElementById('t-wait').value=15">১৫ সেকেন্ড</button>
+            <button type="button" class="cancel-btn" style="margin:0;flex:1;" onclick="document.getElementById('t-wait').value=30">৩০ সেকেন্ড</button>
+            <button type="button" class="cancel-btn" style="margin:0;flex:1;" onclick="document.getElementById('t-wait').value=45">৪৫ সেকেন্ড</button>
+          </div>
+          <div class="form-label" style="margin-bottom:6px;"><span class="material-icons-round">hub</span>৫টি নেটওয়ার্কের ডাইরেক্ট লিংক (যেগুলো আছে শুধু সেগুলো দিন)</div>
+          <div class="form-group" style="margin-bottom:8px;">
+            <div class="form-label"><span class="material-icons-round">ads_click</span>Monetag — ডাইরেক্ট লিংক</div>
+            <input class="form-input t-ad-url" data-name="Monetag" id="t-ad-0" placeholder="https://... (Monetag Direct Link)" />
+          </div>
+          <div class="form-group" style="margin-bottom:8px;">
+            <div class="form-label"><span class="material-icons-round">ads_click</span>Adsterra — ডাইরেক্ট লিংক</div>
+            <input class="form-input t-ad-url" data-name="Adsterra" id="t-ad-1" placeholder="https://... (Adsterra Direct Link)" />
+          </div>
+          <div class="form-group" style="margin-bottom:8px;">
+            <div class="form-label"><span class="material-icons-round">ads_click</span>GigaPub — ডাইরেক্ট লিংক</div>
+            <input class="form-input t-ad-url" data-name="GigaPub" id="t-ad-2" placeholder="https://... (GigaPub Direct Link)" />
+          </div>
+          <div class="form-group" style="margin-bottom:8px;">
+            <div class="form-label"><span class="material-icons-round">ads_click</span>HilltopAds — ডাইরেক্ট লিংক</div>
+            <input class="form-input t-ad-url" data-name="HilltopAds" id="t-ad-3" placeholder="https://... (HilltopAds Direct Link)" />
+          </div>
+          <div class="form-group" style="margin-bottom:8px;">
+            <div class="form-label"><span class="material-icons-round">ads_click</span>Clickadu — ডাইরেক্ট লিংক</div>
+            <input class="form-input t-ad-url" data-name="Clickadu" id="t-ad-4" placeholder="https://... (Clickadu Direct Link)" />
+          </div>
+          <div class="form-group" style="margin-top:10px;">
+            <div class="form-label"><span class="material-icons-round">touch_app</span>কয়টি বিজ্ঞাপন খোলা বাধ্যতামূলক</div>
+            <input class="form-input" type="number" min="1" max="5" id="t-req-clicks" value="2" />
+            <div class="form-hint">প্রতিবার এতগুলো নেটওয়ার্ক এলোমেলোভাবে বাছাই হবে — সব নেটওয়ার্ক সমান ট্রাফিক পাবে। বেশি দিলে ইনকাম বাড়ে, কিন্তু ইউজার বিরক্ত হয় (১–২ রাখাই ভালো)।</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group" id="t-link-group">
         <div class="form-label"><span class="material-icons-round">link</span>ডাইরেক্ট লিংক</div>
-        <textarea class="form-input" id="t-link" rows="5" placeholder="প্রতি লাইনে একটি করে ডাইরেক্ট লিংক (৫টি নেটওয়ার্কের লিংক দিন)&#10;https://monetag-link...&#10;https://gigapub-link...&#10;https://adsterra-link..." style="resize:vertical;"></textarea>
-        <div class="form-hint">একাধিক লিংক দিলে ইউজার প্রতিবার র‍্যান্ডমভাবে একটি নেটওয়ার্কের লিংক পাবে — তাতে সব নেটওয়ার্ক থেকে সমানভাবে ইনকাম আসে। শুধু http/https লিংক কাজ করবে।</div>
+        <input class="form-input" id="t-link" placeholder="https://..." />
         <div class="form-hint">ইউজার "শুরু করুন" চাপলে এই লিংকটি নতুন ট্যাবে খুলবে।</div>
       </div>
 
@@ -1087,7 +1125,7 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
         </div>
         <div class="form-group">
           <div class="form-label"><span class="material-icons-round">timer</span>টাইমার (সেকেন্ড)</div>
-          <input class="form-input" type="number" id="t-wait" value="30" placeholder="৩০" />
+          <input class="form-input" type="number" id="t-wait" value="15" placeholder="১৫" />
         </div>
       </div>
 
@@ -1678,43 +1716,50 @@ async function sweepDeliveries(){
 }
 
 /* ============ DIRECT LINK AD SLOTS (per-video, per-step) ============ */
+const LAND_NETS = ['Monetag','Adsterra','GigaPub','HilltopAds','Clickadu'];
 function getCurrentDirectSlotsState(){
-  const rows = document.querySelectorAll('#v-direct-slots-wrap .direct-slot-row');
   const state = [];
-  rows.forEach(r=>{
-    const chk = r.querySelector('.direct-slot-toggle');
-    const url = r.querySelector('.direct-slot-url');
-    state.push({ on: chk ? chk.checked : false, url: url ? url.value.trim() : '' });
+  document.querySelectorAll('#v-direct-slots-wrap .direct-slot-row').forEach(r=>{
+    const urls = {};
+    r.querySelectorAll('.direct-net-url').forEach(i=>{ urls[i.dataset.name] = i.value.trim(); });
+    state.push({ on: r.querySelector('.direct-slot-toggle').checked, urls });
   });
   return state;
 }
-function renderDirectSlots(prefillMap){
+/* video = the video doc being edited (or null). Understands the new per-step
+   network sets (directLinkSets) and the old single-link format (directLinks);
+   an old single link is shown in the first box so nothing is lost on re-save. */
+function renderDirectSlots(video){
   const wrap = document.getElementById('v-direct-slots-wrap');
   if(!wrap) return;
   const n = Math.max(1, parseInt(document.getElementById('v-ads-required').value)||1);
   const existingState = getCurrentDirectSlotsState();
-
-  let rowsHtml = '';
+  const sets = (video && video.directLinkSets) || null;
+  const old = (video && video.directLinks) || null;
+  let html = '';
   for(let i=1;i<=n;i++){
-    let on = false, url = '';
-    if(prefillMap && prefillMap[String(i)]){ on = true; url = prefillMap[String(i)]; }
-    else if(existingState[i-1]){ on = existingState[i-1].on; url = existingState[i-1].url; }
-    rowsHtml +=
-      '<div class="direct-slot-row">' +
-        '<div class="toggle-row">' +
-          '<div class="toggle-label"><span class="material-icons-round" style="color:var(--gold3);font-size:16px;">link</span>স্লট ' + i + ' — ডাইরেক্ট লিংক ব্যবহার করুন</div>' +
-          '<label class="switch"><input type="checkbox" class="direct-slot-toggle" data-slot="' + i + '" ' + (on?'checked':'') + ' onchange="onDirectSlotToggle(this)"/><span class="slider-tg"></span></label>' +
-        '</div>' +
-        '<input class="form-input direct-slot-url" data-slot="' + i + '" placeholder="https://... (এই স্লটের ডাইরেক্ট লিংক)" value="' + escHtml(url) + '" style="' + (on?'':'display:none;') + '" />' +
-      '</div>';
+    let on = false, urls = {}, oldNote = false;
+    if(sets && Array.isArray(sets[String(i)]) && sets[String(i)].length){
+      on = true; sets[String(i)].forEach(l=>{ urls[l.name] = l.url; });
+    } else if(old && old[String(i)]){
+      on = true; urls[LAND_NETS[0]] = old[String(i)]; oldNote = true;
+    } else if(existingState[i-1]){
+      on = existingState[i-1].on; urls = existingState[i-1].urls;
+    }
+    html += '<div class="direct-slot-row">' +
+      '<div class="toggle-row"><div class="toggle-label"><span class="material-icons-round" style="color:var(--gold3);font-size:16px;">rocket_launch</span>ধাপ ' + i + ' — ল্যান্ডিং পেজ + ডাইরেক্ট লিংক</div>' +
+      '<label class="switch"><input type="checkbox" class="direct-slot-toggle" data-slot="' + i + '" ' + (on?'checked':'') + ' onchange="onDirectSlotToggle(this)"/><span class="slider-tg"></span></label></div>' +
+      '<div class="direct-net-wrap" style="' + (on?'':'display:none;') + 'margin-top:8px;">' +
+        (oldNote ? '<div class="form-hint" style="color:var(--gold3);margin-bottom:6px;">ℹ️ আগের সেভ করা লিংকটি প্রথম ঘরে বসানো হয়েছে — কোন নেটওয়ার্কের সেটা ঠিক করে নিতে পারেন।</div>' : '') +
+        LAND_NETS.map(nm=>'<input class="form-input direct-net-url" data-name="' + nm + '" placeholder="' + nm + ' ডাইরেক্ট লিংক (https://...)" value="' + escHtml(urls[nm]||'') + '" style="margin-bottom:6px;" />').join('') +
+      '</div></div>';
   }
-  wrap.innerHTML = rowsHtml;
+  wrap.innerHTML = html;
 }
 function onDirectSlotToggle(chk){
   const row = chk.closest('.direct-slot-row');
-  const urlInput = row.querySelector('.direct-slot-url');
-  urlInput.style.display = chk.checked ? '' : 'none';
-  if(!chk.checked) urlInput.value = '';
+  row.querySelector('.direct-net-wrap').style.display = chk.checked ? '' : 'none';
+  if(!chk.checked) row.querySelectorAll('.direct-net-url').forEach(i=>i.value='');
 }
 
 /* ============ CATEGORIES ============ */
@@ -1799,7 +1844,7 @@ function renderVideosList(){
   wrap.innerHTML = A.videos.map(v=>{
     const partsCount = (v.parts && v.parts.length) ? v.parts.length : 1;
     const adsN = Math.max(1, parseInt(v.adsRequired)||3);
-    const directLinkCount = v.directLinks ? Object.keys(v.directLinks).length : 0;
+    const directLinkCount = Object.keys(v.directLinkSets || v.directLinks || {}).length;
     return '<div class="vid-row" style="border-bottom:1px solid var(--border);">' +
       '<div class="vid-thumb">' + (v.thumbnail?('<img src="'+escHtml(v.thumbnail)+'" onerror="this.style.display=\'none\'"/>'):'🎬') + '</div>' +
       '<div class="vid-body">' +
@@ -1917,7 +1962,7 @@ function openVideoForm(id){
       if(v.thumbnail) setThumbPreview(box, v.thumbnail);
       const partsData = (v.parts && v.parts.length) ? v.parts : (v.url ? [{url:v.url}] : [{}]);
       partsData.forEach(p=>createPartBlock(p));
-      renderDirectSlots(v.directLinks||null);
+      renderDirectSlots(v);
       document.getElementById('v-del-btn').style.display='block';
     }
   } else {
@@ -1954,19 +1999,22 @@ async function saveVideo(){
     if(!bcJob) return;
   }
 
-  const directLinks = {};
-  let missingSlot = null;
+  const directLinks = {}, directLinkSets = {};
+  let missingSlot = null, badSlot = null;
   document.querySelectorAll('#v-direct-slots-wrap .direct-slot-row').forEach(row=>{
     const chk = row.querySelector('.direct-slot-toggle');
-    const urlInput = row.querySelector('.direct-slot-url');
     const slot = chk.dataset.slot;
-    if(chk.checked){
-      const url = urlInput.value.trim();
-      if(url) directLinks[slot] = url; else missingSlot = slot;
-    }
+    if(!chk.checked) return;
+    const list = [];
+    row.querySelectorAll('.direct-net-url').forEach(i=>{ const u = i.value.trim(); if(u) list.push({ name:i.dataset.name, url:u }); });
+    if(!list.length){ missingSlot = slot; return; }
+    if(list.some(l=>!/^https?:\/\//i.test(l.url))){ badSlot = slot; return; }
+    directLinkSets[slot] = list;
+    directLinks[slot] = list[0].url;   // old-format copy so older code paths keep working
   });
-  if(missingSlot){ toast('⚠️ স্লট ' + missingSlot + ' এর জন্য ডাইরেক্ট লিংক দিন, অথবা টগল বন্ধ করুন।'); return; }
-  const directLinkWaitSeconds = Math.max(1, parseInt(document.getElementById('v-direct-wait').value)||5);
+  if(missingSlot){ toast('⚠️ ধাপ ' + missingSlot + ' এ অন্তত একটি নেটওয়ার্কের লিংক দিন, অথবা টগল বন্ধ করুন।'); return; }
+  if(badSlot){ toast('⚠️ ধাপ ' + badSlot + ' এর লিংক https:// দিয়ে শুরু হতে হবে।'); return; }
+  const directLinkWaitSeconds = 15;
 
   const btn = document.getElementById('v-save-btn');
   btn.disabled = true; btn.innerHTML = '<span class="material-icons-round">hourglass_top</span>সেভ হচ্ছে...';
@@ -1991,6 +2039,7 @@ async function saveVideo(){
     category: document.getElementById('v-category').value,
     adsRequired: Math.max(1, parseInt(document.getElementById('v-ads-required').value)||3),
     directLinks,
+    directLinkSets,
     directLinkWaitSeconds,
     views: parseInt(document.getElementById('v-views').value)||0,
     featured: document.getElementById('v-featured').checked,
@@ -2119,6 +2168,7 @@ function renderTasksList(){
           '<span class="vid-chip gold">৳ ' + (t.reward||0).toFixed(2) + '</span>' +
           '<span class="vid-chip">⏱ ' + (t.waitSeconds||15) + 'সে</span>' +
           (t.type==='daily'?'<span class="vid-chip pin">প্রতিদিন</span>':'<span class="vid-chip">একবার</span>') +
+          (t.landing?('<span class="vid-chip" style="background:rgba(124,58,237,.18);color:#c4a2ff;">🚀 ল্যান্ডিং · ' + ((t.adLinks||[]).length) + ' নেটওয়ার্ক</span>'):'') +
           (t.active===false?'<span class="vid-chip" style="background:rgba(179,37,60,0.14);color:var(--accent2);">বন্ধ</span>':'') +
         '</div>' +
       '</div>' +
@@ -2142,10 +2192,14 @@ function openTaskForm(id){
   document.getElementById('t-link').value='';
   document.getElementById('t-icon-url').value='';
   document.getElementById('t-reward').value='';
-  document.getElementById('t-wait').value='30';
+  document.getElementById('t-wait').value='15';
   document.getElementById('t-type').value='once';
   document.getElementById('t-badge').value='';
   document.getElementById('t-active').checked=true;
+  document.getElementById('t-landing').checked=true;
+  document.getElementById('t-wait').value='30';
+  document.getElementById('t-req-clicks').value='2';
+  document.querySelectorAll('.t-ad-url').forEach(i=>i.value='');
 
   if(id){
     const t = A.tasks.find(x=>x.id===id);
@@ -2160,6 +2214,9 @@ function openTaskForm(id){
       document.getElementById('t-type').value = t.type||'once';
       document.getElementById('t-badge').value = t.badge||'';
       document.getElementById('t-active').checked = t.active!==false;
+      document.getElementById('t-landing').checked = t.landing===true;
+      document.getElementById('t-req-clicks').value = t.requiredClicks || 2;
+      (t.adLinks||[]).forEach(l=>{ const el = Array.prototype.find.call(document.querySelectorAll('.t-ad-url'), x=>x.dataset.name===l.name); if(el) el.value = l.url||''; });
       if(t.icon) setThumbPreview(box, t.icon);
       document.getElementById('t-del-btn').style.display='block';
     }
@@ -2167,21 +2224,36 @@ function openTaskForm(id){
     document.getElementById('task-modal-title-text').textContent = 'নতুন টাস্ক যুক্ত করুন';
     document.getElementById('t-del-btn').style.display='none';
   }
+  toggleLandingFields();
   document.getElementById('task-form-modal').classList.add('open');
+}
+function toggleLandingFields(){
+  const on = document.getElementById('t-landing').checked;
+  document.getElementById('t-landing-wrap').style.display = on ? '' : 'none';
+  document.getElementById('t-link-group').style.display = on ? 'none' : '';
 }
 function closeTaskFormModal(){ document.getElementById('task-form-modal').classList.remove('open'); }
 async function saveTask(){
   const title = document.getElementById('t-title').value.trim();
-  const link = document.getElementById('t-link').value.trim();
+  let link = document.getElementById('t-link').value.trim();
+  const landing = document.getElementById('t-landing').checked;
+  const adLinks = [];
+  document.querySelectorAll('.t-ad-url').forEach(i=>{ const u = i.value.trim(); if(u){ adLinks.push({ name:i.dataset.name, url:u }); } });
   const reward = parseFloat(document.getElementById('t-reward').value);
   if(!title){ toast('⚠️ টাস্কের নাম দিন।'); return; }
-  if(!link){ toast('⚠️ ডাইরেক্ট লিংক দিন।'); return; }
+  if(landing){
+    if(!adLinks.length){ toast('⚠️ অন্তত একটি নেটওয়ার্কের ডাইরেক্ট লিংক দিন।'); return; }
+    if(adLinks.some(l=>!/^https?:\/\//i.test(l.url))){ toast('⚠️ লিংক অবশ্যই https:// দিয়ে শুরু হতে হবে।'); return; }
+    link = adLinks[0].url;
+  } else if(!link){ toast('⚠️ ডাইরেক্ট লিংক দিন।'); return; }
   if(!reward || reward<=0){ toast('⚠️ সঠিক রিওয়ার্ড পরিমাণ দিন।'); return; }
   const data = {
     title, link, reward,
     description: document.getElementById('t-desc').value.trim(),
     icon: document.getElementById('t-icon-url').value.trim(),
-    waitSeconds: Math.max(1, parseInt(document.getElementById('t-wait').value)||15),
+    waitSeconds: Math.max(5, Math.min(120, parseInt(document.getElementById('t-wait').value)||30)),
+    landing, adLinks,
+    requiredClicks: Math.max(1, Math.min(5, parseInt(document.getElementById('t-req-clicks').value)||1)),
     type: document.getElementById('t-type').value,
     badge: document.getElementById('t-badge').value.trim(),
     active: document.getElementById('t-active').checked,
@@ -2924,12 +2996,16 @@ bcMountAll();
 async function loadSettingsForm(){
   const site = await fbGetDoc('settings','site');
   if(site){ document.getElementById('set-site-name').value = site.name||''; document.getElementById('set-admin-contact').value = site.adminContactUrl||''; }
+  const ld = await fbGetDoc('settings','landing');
+  document.getElementById('set-landing-wait').value = (ld && ld.unlockWaitSeconds) || 15;
 }
 async function saveGeneralSettings(){
   const name = document.getElementById('set-site-name').value.trim() || 'Movi Lover';
   const adminContactUrl = document.getElementById('set-admin-contact').value.trim();
   try{
+    const unlockWaitSeconds = Math.max(5, Math.min(120, parseInt(document.getElementById('set-landing-wait').value)||15));
     await fbSet('settings','site',{name, adminContactUrl});
+    await fbSet('settings','landing',{ unlockWaitSeconds });
     toast('✅ সেটিংস সেভ হয়েছে!');
   }catch(e){ toast('⚠️ সেভ করতে সমস্যা হয়েছে।'); }
 }
