@@ -649,7 +649,7 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
         <div class="form-section">
           <div class="form-group">
             <div class="form-label"><span class="material-icons-round">key</span>বট টোকেন*</div>
-            <input class="form-input" type="password" id="vb-token" placeholder="123456789:AA..." autocomplete="off" spellcheck="false" />
+            <input class="form-input" type="text" id="vb-token" name="vb-bot-token-field" placeholder="123456789:AA..." autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" style="-webkit-text-security:disc;" />
           </div>
           <div class="form-group">
             <div class="form-label"><span class="material-icons-round">inventory_2</span>প্রাইভেট চ্যানেল ID*</div>
@@ -1512,11 +1512,21 @@ function tgUploadVideo(file, onProgress){
 }
 function handlePartVideoUpload(input){
   if(input.files[0]){ A.lastVideoFile = input.files[0]; autoThumbFromVideo(input.files[0]); }
-  if(!videoBotReady()){ toast('ℹ️ ভিডিও বট সেট করা নেই — পুরনো পদ্ধতিতে আপলোড হচ্ছে।'); handlePartVideoUploadLegacy(input); return; }
   const file = input.files[0];
   if(!file) return;
   const block = input.closest('.part-block');
   const statusEl = block.querySelector('.part-video-status');
+  (async ()=>{
+    if(!videoBotReady()){ statusEl.textContent = 'বট সেটিংস লোড হচ্ছে...'; await loadVideoBotSettings(); }
+    if(!videoBotReady()){
+      statusEl.textContent = '⚠️ ভিডিও বটের টোকেন/চ্যানেল ID পাওয়া যায়নি — "ভিডিও বট" পেজে গিয়ে সংরক্ষণ করুন।';
+      toast('⚠️ ভিডিও বট সেট করা নেই।');
+      return;
+    }
+    runTgUpload(file, block, statusEl);
+  })();
+}
+function runTgUpload(file, block, statusEl){
   statusEl.textContent = 'টেলিগ্রামে আপলোড হচ্ছে... 0%';
   tgUploadVideo(file, p=>{ statusEl.textContent = 'টেলিগ্রামে আপলোড হচ্ছে... ' + p + '%'; }).then(r=>{
     block.dataset.fileid = r.fileId;
@@ -1525,9 +1535,22 @@ function handlePartVideoUpload(input){
     statusEl.textContent = '✅ টেলিগ্রামে আপলোড সম্পন্ন';
     toast('✅ ভিডিও টেলিগ্রামে সংরক্ষিত হয়েছে!');
   }).catch(err=>{
-    statusEl.textContent = '⚠️ আপলোড ব্যর্থ: ' + (err.message||'');
-    toast('⚠️ ' + (err.message||'আপলোড ব্যর্থ'));
+    const msg = tgErrorBn(err.message||'');
+    statusEl.textContent = '⚠️ আপলোড ব্যর্থ: ' + msg;
+    toast('⚠️ ' + msg);
   });
+}
+/* turn Telegram's English error into a plain Bengali reason + fix */
+function tgErrorBn(d){
+  const s = String(d||'');
+  if(/chat not found/i.test(s)) return 'চ্যানেল পাওয়া যায়নি (chat not found) — ID ভুল, অথবা বটকে চ্যানেলে অ্যাডমিন করা হয়নি।';
+  if(/not a member|bot was kicked|bot is not a member/i.test(s)) return 'বট ওই চ্যানেলে নেই — বটকে চ্যানেলে অ্যাডমিন করুন।';
+  if(/not enough rights|have no rights|CHAT_WRITE_FORBIDDEN|administrator rights/i.test(s)) return 'বটের মেসেজ পাঠানোর অনুমতি নেই — অ্যাডমিন অপশনে "Post Messages" চালু করুন।';
+  if(/unauthorized|401/i.test(s)) return 'বট টোকেন ভুল বা বাতিল (Unauthorized) — BotFather থেকে সঠিক টোকেন নিন।';
+  if(/file is too big|too large|entity too large|413/i.test(s)) return 'ফাইল খুব বড় — ব্রাউজার থেকে সর্বোচ্চ ৫০MB।';
+  if(/too many requests|retry after/i.test(s)) return 'টেলিগ্রাম কিছুক্ষণ আটকে রেখেছে (Too Many Requests) — ১ মিনিট পর আবার চেষ্টা করুন।';
+  if(/network|failed to fetch/i.test(s)) return 'নেটওয়ার্ক সমস্যা — ইন্টারনেট/VPN দেখুন।';
+  return s;
 }
 
 /* ============ VIDEO NUMBERS (unique ID per video) ============ */
@@ -1548,8 +1571,20 @@ async function ensureVideoNumbers(){
 /* ============ VIDEO BOT SETTINGS ============
    settings/videobot = { token, chatId, botUsername, retentionMinutes }
    (Firestore rules: only signed-in users can read it, only admin can write) */
+function showVbDiag(kind, text){
+  const box = document.getElementById('vb-status-box'), txt = document.getElementById('vb-status-text');
+  if(!box) return;
+  const col = kind==='ok' ? ['rgba(35,180,122,0.4)','rgba(35,180,122,0.08)','var(--green)'] : kind==='bad' ? ['rgba(232,72,85,0.5)','rgba(232,72,85,0.1)','var(--accent2)'] : ['rgba(240,180,41,0.4)','rgba(240,180,41,0.08)','var(--gold3)'];
+  box.style.display='block'; box.style.borderColor=col[0]; box.style.background=col[1]; txt.style.color=col[2]; txt.style.lineHeight='1.6'; txt.textContent=text;
+}
 async function loadVideoBotSettings(){
-  const c = await fbGetDoc('settings','videobot');
+  let c = null;
+  try{
+    const d = await window._getDoc(window._doc(window._db,'settings','videobot'));
+    c = d.exists() ? d.data() : null;
+  }catch(e){
+    showVbDiag('bad','সেভ করা বট সেটিংস পড়া যায়নি (' + (e && e.code || 'error') + '). লগইন ও Firestore Rules দেখুন।');
+  }
   A.videobot = c || {};
   document.getElementById('vb-token').value = A.videobot.token || '';
   document.getElementById('vb-chat-id').value = A.videobot.chatId || '';
@@ -1566,26 +1601,50 @@ function renderVideoBotStatus(){
     txt.textContent = 'বট সংযুক্ত' + (A.videobot.botUsername?(' — @'+A.videobot.botUsername):'');
   } else {
     box.style.borderColor='rgba(240,180,41,0.4)'; box.style.background='rgba(240,180,41,0.08)';
-    txt.textContent = 'টোকেন ও চ্যানেল ID দিন।';
+    txt.textContent = 'টোকেন ও চ্যানেল ID দিন, তারপর "সংরক্ষণ করুন" চাপুন।';
   }
 }
+function normTgToken(t){ return String(t||'').replace(/^["'\s]+|["'\s]+$/g,'').replace(/^bot(?=\d)/i,'').replace(/\s+/g,''); }
+function normTgChat(c){
+  c = String(c||'').trim().replace(/^https?:\/\/t\.me\//i,'@').replace(/\s+/g,'');
+  if(/^\d{9,}$/.test(c)) return '-100' + c;          // channel id pasted without -100
+  if(/^-\d{9,}$/.test(c) && !/^-100/.test(c) && c.length>=13) return '-100' + c.slice(1);
+  if(/^[A-Za-z][A-Za-z0-9_]{3,}$/.test(c)) return '@' + c;
+  return c;
+}
 async function saveVideoBotSettings(){
-  const token = document.getElementById('vb-token').value.trim();
-  const chatId = document.getElementById('vb-chat-id').value.trim();
+  const token = normTgToken(document.getElementById('vb-token').value);
+  const chatId = normTgChat(document.getElementById('vb-chat-id').value);
+  document.getElementById('vb-token').value = token;
+  document.getElementById('vb-chat-id').value = chatId;
   const retentionMinutes = Math.max(1, parseInt(document.getElementById('vb-retention').value)||15);
   if(!token || !chatId){ toast('⚠️ টোকেন ও চ্যানেল ID দুটোই দিন।'); return; }
-  let botUsername = '';
+  if(!/^\d{6,}:[A-Za-z0-9_-]{30,}$/.test(token)){ showVbDiag('bad','টোকেনের ফরম্যাট ঠিক নয়। সঠিক ফরম্যাট: 123456789:AAxxxxxxxx… (BotFather-এর দেওয়া পুরো টোকেন কপি করুন, আর কিছু নয়)'); return; }
+  let botUsername = '', botId = 0;
+  showVbDiag('wait','যাচাই করা হচ্ছে...');
   try{
     const r = await (await fetch('https://api.telegram.org/bot'+token+'/getMe')).json();
-    if(!r.ok){ toast('⚠️ টোকেন সঠিক নয়।'); return; }
-    botUsername = r.result.username || '';
-  }catch(e){ toast('⚠️ টেলিগ্রামে সংযোগ করা যায়নি।'); return; }
+    if(!r.ok){ showVbDiag('bad','টোকেন টেলিগ্রাম গ্রহণ করেনি (' + (r.description||'Unauthorized') + '). BotFather → /mybots → বট → API Token থেকে নতুন করে কপি করুন। আগে "Revoke" করে থাকলে নতুন টোকেন লাগবে।'); return; }
+    botUsername = r.result.username || ''; botId = r.result.id;
+  }catch(e){ showVbDiag('bad','টেলিগ্রামে পৌঁছানো যায়নি (নেটওয়ার্ক/VPN/অ্যাডব্লকার দেখুন)।'); return; }
+  try{
+    const ch = await (await fetch('https://api.telegram.org/bot'+token+'/getChat?chat_id='+encodeURIComponent(chatId))).json();
+    if(!ch.ok){ showVbDiag('bad','টোকেন ঠিক আছে (@'+botUsername+'), কিন্তু চ্যানেল পাওয়া গেল না: ' + tgErrorBn(ch.description) + ' [দেওয়া ID: ' + chatId + ']'); return; }
+    const mem = await (await fetch('https://api.telegram.org/bot'+token+'/getChatMember?chat_id='+encodeURIComponent(chatId)+'&user_id='+botId)).json();
+    if(!mem.ok || !mem.result || (mem.result.status!=='administrator' && mem.result.status!=='creator')){
+      showVbDiag('bad','চ্যানেল পাওয়া গেছে ("'+(ch.result.title||chatId)+'"), কিন্তু @'+botUsername+' ওখানে অ্যাডমিন নয়। চ্যানেল → Administrators → Add Admin → বটটি দিন → "Post Messages" চালু করুন।'); return;
+    }
+    if(mem.result.status==='administrator' && mem.result.can_post_messages===false){
+      showVbDiag('bad','বট অ্যাডমিন, কিন্তু "Post Messages" অনুমতি বন্ধ। অ্যাডমিন অপশনে সেটি চালু করুন।'); return;
+    }
+    if(ch.result.id && String(ch.result.id)!==chatId && /^@/.test(chatId)){ /* keep @username; works for sendVideo */ }
+  }catch(e){ showVbDiag('bad','চ্যানেল যাচাই করা যায়নি (নেটওয়ার্ক)।'); return; }
   try{
     await fbSet('settings','videobot',{ token, chatId, botUsername, retentionMinutes });
     A.videobot = { token, chatId, botUsername, retentionMinutes };
     renderVideoBotStatus();
-    toast('✅ ভিডিও বট সংরক্ষিত হয়েছে (@'+botUsername+')');
-  }catch(e){ toast('⚠️ সংরক্ষণে সমস্যা হয়েছে।'); }
+    showVbDiag('ok','✅ সব ঠিক আছে — বট @'+botUsername+' চ্যানেলের অ্যাডমিন, সংরক্ষিত হয়েছে। এখন ভিডিও আপলোড করতে পারবেন।');
+  }catch(e){ showVbDiag('bad','Firebase-এ সংরক্ষণ হয়নি: ' + (e && e.code ? e.code : 'অনুমতি/নেটওয়ার্ক') + ' — অ্যাডমিন ইমেইল-পাসওয়ার্ড দিয়ে লগইন আছে কি না এবং Rules Publish হয়েছে কি না দেখুন।'); }
 }
 async function testVideoBot(){
   if(!videoBotReady()){ toast('⚠️ আগে সংরক্ষণ করুন।'); return; }
