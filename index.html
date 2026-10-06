@@ -1075,7 +1075,8 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
 
       <div class="form-group">
         <div class="form-label"><span class="material-icons-round">link</span>ডাইরেক্ট লিংক</div>
-        <input class="form-input" id="t-link" placeholder="https://..." />
+        <textarea class="form-input" id="t-link" rows="5" placeholder="প্রতি লাইনে একটি করে ডাইরেক্ট লিংক (৫টি নেটওয়ার্কের লিংক দিন)&#10;https://monetag-link...&#10;https://gigapub-link...&#10;https://adsterra-link..." style="resize:vertical;"></textarea>
+        <div class="form-hint">একাধিক লিংক দিলে ইউজার প্রতিবার র‍্যান্ডমভাবে একটি নেটওয়ার্কের লিংক পাবে — তাতে সব নেটওয়ার্ক থেকে সমানভাবে ইনকাম আসে। শুধু http/https লিংক কাজ করবে।</div>
         <div class="form-hint">ইউজার "শুরু করুন" চাপলে এই লিংকটি নতুন ট্যাবে খুলবে।</div>
       </div>
 
@@ -1086,7 +1087,7 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
         </div>
         <div class="form-group">
           <div class="form-label"><span class="material-icons-round">timer</span>টাইমার (সেকেন্ড)</div>
-          <input class="form-input" type="number" id="t-wait" value="15" placeholder="১৫" />
+          <input class="form-input" type="number" id="t-wait" value="30" placeholder="৩০" />
         </div>
       </div>
 
@@ -2141,7 +2142,7 @@ function openTaskForm(id){
   document.getElementById('t-link').value='';
   document.getElementById('t-icon-url').value='';
   document.getElementById('t-reward').value='';
-  document.getElementById('t-wait').value='15';
+  document.getElementById('t-wait').value='30';
   document.getElementById('t-type').value='once';
   document.getElementById('t-badge').value='';
   document.getElementById('t-active').checked=true;
