@@ -1075,7 +1075,7 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
           <div class="toggle-label"><span class="material-icons-round" style="color:var(--gold3);font-size:18px;">rocket_launch</span>ল্যান্ডিং পেজ সিস্টেম (কোড ভেরিফিকেশন)</div>
           <label class="switch"><input type="checkbox" id="t-landing" checked onchange="toggleLandingFields()"/><span class="slider-tg"></span></label>
         </div>
-        <div class="form-hint">চালু থাকলে ইউজার "শুরু করুন" চাপলে সুন্দর ল্যান্ডিং পেজ খুলবে → বিজ্ঞাপন লিংক খুলবে → কাউন্টডাউন → কোড পাবে → ব্যাক করে কোড সাবমিট করলে ব্যালেন্স যোগ হবে। কাউন্টডাউনের ন্যূনতম সময় সার্ভারেই (Rules) চেক হয়।</div>
+        <div class="form-hint">চালু থাকলে ইউজার "শুরু করুন" চাপলে ল্যান্ডিং পেজ খুলবে → টাইমারে ক্লিক → কাউন্টডাউন → কোড আসবে → "কোড কপি" চাপলে কোড কপি হবে ও আপনার ডাইরেক্ট লিংক (৫ নেটওয়ার্কের একটি, এলোমেলো) খুলবে → ইউজার অ্যাপে ফিরে কোড সাবমিট করলে ব্যালেন্স যোগ হবে। কাউন্টডাউনের ন্যূনতম সময় সার্ভারেই (Rules) চেক হয়।</div>
         <div id="t-landing-wrap" style="margin-top:12px;">
           <div class="form-label" style="margin-bottom:6px;"><span class="material-icons-round">timer</span>কাউন্টডাউন সময়</div>
           <div style="display:flex;gap:8px;margin-bottom:12px;">
@@ -1103,11 +1103,6 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
           <div class="form-group" style="margin-bottom:8px;">
             <div class="form-label"><span class="material-icons-round">ads_click</span>Clickadu — ডাইরেক্ট লিংক</div>
             <input class="form-input t-ad-url" data-name="Clickadu" id="t-ad-4" placeholder="https://... (Clickadu Direct Link)" />
-          </div>
-          <div class="form-group" style="margin-top:10px;">
-            <div class="form-label"><span class="material-icons-round">touch_app</span>কয়টি বিজ্ঞাপন খোলা বাধ্যতামূলক</div>
-            <input class="form-input" type="number" min="1" max="5" id="t-req-clicks" value="2" />
-            <div class="form-hint">প্রতিবার এতগুলো নেটওয়ার্ক এলোমেলোভাবে বাছাই হবে — সব নেটওয়ার্ক সমান ট্রাফিক পাবে। বেশি দিলে ইনকাম বাড়ে, কিন্তু ইউজার বিরক্ত হয় (১–২ রাখাই ভালো)।</div>
           </div>
         </div>
       </div>
@@ -2197,8 +2192,7 @@ function openTaskForm(id){
   document.getElementById('t-badge').value='';
   document.getElementById('t-active').checked=true;
   document.getElementById('t-landing').checked=true;
-  document.getElementById('t-wait').value='30';
-  document.getElementById('t-req-clicks').value='2';
+  document.getElementById('t-wait').value='15';
   document.querySelectorAll('.t-ad-url').forEach(i=>i.value='');
 
   if(id){
@@ -2215,7 +2209,6 @@ function openTaskForm(id){
       document.getElementById('t-badge').value = t.badge||'';
       document.getElementById('t-active').checked = t.active!==false;
       document.getElementById('t-landing').checked = t.landing===true;
-      document.getElementById('t-req-clicks').value = t.requiredClicks || 2;
       (t.adLinks||[]).forEach(l=>{ const el = Array.prototype.find.call(document.querySelectorAll('.t-ad-url'), x=>x.dataset.name===l.name); if(el) el.value = l.url||''; });
       if(t.icon) setThumbPreview(box, t.icon);
       document.getElementById('t-del-btn').style.display='block';
@@ -2251,9 +2244,9 @@ async function saveTask(){
     title, link, reward,
     description: document.getElementById('t-desc').value.trim(),
     icon: document.getElementById('t-icon-url').value.trim(),
-    waitSeconds: Math.max(5, Math.min(120, parseInt(document.getElementById('t-wait').value)||30)),
+    waitSeconds: Math.max(5, Math.min(120, parseInt(document.getElementById('t-wait').value)||15)),
     landing, adLinks,
-    requiredClicks: Math.max(1, Math.min(5, parseInt(document.getElementById('t-req-clicks').value)||1)),
+    requiredClicks: 1,
     type: document.getElementById('t-type').value,
     badge: document.getElementById('t-badge').value.trim(),
     active: document.getElementById('t-active').checked,
