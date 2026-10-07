@@ -731,7 +731,8 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
         <div class="form-section">
           <div class="form-group"><div class="form-label"><span class="material-icons-round">badge</span>সাইটের নাম</div><input class="form-input" id="set-site-name" placeholder="Movi Lover" /></div>
           <div class="form-group"><div class="form-label"><span class="material-icons-round">support_agent</span>সাপোর্ট / যোগাযোগ লিংক</div><input class="form-input" id="set-admin-contact" placeholder="https://t.me/yourusername" /><div class="form-hint">ইউজার সাইটের প্রোফাইল পেজে "সাপোর্ট / যোগাযোগ" মেনু আইটেম হিসেবে দেখাবে (খালি রাখলে আইটেমটি লুকানো থাকবে)।</div></div>
-          <div class="form-group"><div class="form-label"><span class="material-icons-round">timer</span>আনলক ল্যান্ডিং পেজে অপেক্ষার সময় (সেকেন্ড)</div><input class="form-input" type="number" min="5" max="120" id="set-landing-wait" placeholder="15" /><div class="form-hint">ভিডিও আনলকের প্রতিটি ধাপে ইউজারকে ল্যান্ডিং পেজে এত সেকেন্ড থাকতে হবে। আগের সব ভিডিওতেও এটাই প্রযোজ্য (ডিফল্ট ১৫)।</div></div>
+          <div class="form-group"><div class="form-label"><span class="material-icons-round">timer</span>আনলক ল্যান্ডিং পেজে অপেক্ষার সময় (সেকেন্ড)</div><input class="form-input" type="number" min="5" max="120" id="set-landing-wait" placeholder="7" /><div class="form-hint">ভিডিও আনলকের প্রতিটি ধাপে ইউজারকে ল্যান্ডিং পেজে এত সেকেন্ড থাকতে হবে (ডিফল্ট ৭)। টাস্কের অপেক্ষার সময় প্রতিটি টাস্কে আলাদাভাবে সেট হয়।</div></div>
+          <div class="form-group"><div class="form-label"><span class="material-icons-round">payments</span>প্রতি ভিডিও আনলকে রিওয়ার্ড (৳)</div><input class="form-input" type="number" min="0" step="0.01" id="set-video-reward" placeholder="1" /><div class="form-hint">ইউজার একটি ভিডিওর সব অ্যাড দেখা শেষ করলে ওয়ালেটে এই টাকা জমা হবে (প্রতি ইউজার প্রতি ভিডিওতে একবার)। ০ দিলে রিওয়ার্ড বন্ধ।</div></div>
           <button class="save-btn" onclick="saveGeneralSettings()"><span class="material-icons-round">save</span>সেভ করুন</button>
         </div>
       </div>
@@ -2296,9 +2297,10 @@ async function loadWithdrawalsFallback(){
    today's income (only today's slice), total user balance (income minus
    non-rejected withdrawals), and total actually paid out. */
 async function loadIncomeReport(){
-  const [completions, dailyAds] = await Promise.all([
+  const [completions, dailyAds, vRewards] = await Promise.all([
     fbGet('task_completions'),
-    fbGet('daily_ad_tasks')
+    fbGet('daily_ad_tasks'),
+    fbGet('video_rewards')
   ]);
   const dayStart = new Date(); dayStart.setHours(0,0,0,0);
   const dayStartMs = dayStart.getTime();
@@ -2320,6 +2322,8 @@ async function loadIncomeReport(){
     totalIncome += (d.earned||0);
     if(d.date === todayKeyStr) todayIncome += (d.earned||0);
   });
+
+  vRewards.forEach(r=>{ totalIncome += (r.amount||0); if((r.createdAt||0) >= dayStartMs) todayIncome += (r.amount||0); });
 
   const nonRejected = A.withdrawals.filter(w=>w.status!=='rejected');
   const totalWithdrawn = nonRejected.reduce((s,w)=>s+(w.amount||0),0);
@@ -2990,13 +2994,17 @@ async function loadSettingsForm(){
   const site = await fbGetDoc('settings','site');
   if(site){ document.getElementById('set-site-name').value = site.name||''; document.getElementById('set-admin-contact').value = site.adminContactUrl||''; }
   const ld = await fbGetDoc('settings','landing');
-  document.getElementById('set-landing-wait').value = (ld && ld.unlockWaitSeconds) || 15;
+  document.getElementById('set-landing-wait').value = (ld && ld.unlockWaitSeconds) || 7;
+  const rw = await fbGetDoc('settings','rewards');
+  document.getElementById('set-video-reward').value = (rw && rw.videoReward != null) ? rw.videoReward : 1;
 }
 async function saveGeneralSettings(){
   const name = document.getElementById('set-site-name').value.trim() || 'Movi Lover';
   const adminContactUrl = document.getElementById('set-admin-contact').value.trim();
   try{
-    const unlockWaitSeconds = Math.max(5, Math.min(120, parseInt(document.getElementById('set-landing-wait').value)||15));
+    const unlockWaitSeconds = Math.max(5, Math.min(120, parseInt(document.getElementById('set-landing-wait').value)||7));
+    const videoReward = Math.max(0, parseFloat(document.getElementById('set-video-reward').value));
+    await fbSet('settings','rewards',{ videoReward: isNaN(videoReward) ? 1 : videoReward });
     await fbSet('settings','site',{name, adminContactUrl});
     await fbSet('settings','landing',{ unlockWaitSeconds });
     toast('✅ সেটিংস সেভ হয়েছে!');
