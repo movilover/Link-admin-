@@ -1448,7 +1448,7 @@ function handleVideoUpload(input, ctx){
   const statusId = ctx==='v' ? 'v-video-status' : 'tut-video-status';
   const statusEl = document.getElementById(statusId);
   const applyUrl = (url)=>{
-    if(ctx==='v'){ A.pendingVideoUrl = url; document.getElementById('v-url').value = url; }
+    if(ctx==='v'){ A.pendingVideoUrl = url; const vu=document.getElementById('v-url'); if(vu) vu.value = url; }
     else { A.pendingTutVideoUrl = url; document.getElementById('tut-video-url').value = url; }
     statusEl.textContent = '✅ ভিডিও আপলোড সম্পন্ন হয়েছে';
   };
@@ -1938,7 +1938,6 @@ function openVideoForm(id){
   document.getElementById('v-featured').checked=false;
   document.getElementById('v-pinned').checked=false;
   document.getElementById('v-ads-required').value='3';
-  document.getElementById('v-direct-wait').value='5';
 
   document.getElementById('v-parts-container').innerHTML='';
   partCounter = 0;
@@ -1954,7 +1953,6 @@ function openVideoForm(id){
       document.getElementById('v-featured').checked = !!v.featured;
       document.getElementById('v-pinned').checked = !!v.pinned;
       document.getElementById('v-ads-required').value = String(Math.max(1,parseInt(v.adsRequired)||3));
-      document.getElementById('v-direct-wait').value = String(Math.max(1,parseInt(v.directLinkWaitSeconds)||5));
       if(v.thumbnail) setThumbPreview(box, v.thumbnail);
       const partsData = (v.parts && v.parts.length) ? v.parts : (v.url ? [{url:v.url}] : [{}]);
       partsData.forEach(p=>createPartBlock(p));
