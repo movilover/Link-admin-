@@ -225,6 +225,26 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0
 .modal-body { flex:1; overflow-y:auto; }
 
 /* ============ CONFIRM ============ */
+
+/* ===== reject-with-reason + direct message modals ===== */
+#reject-modal,#dm-modal{display:none;position:fixed;inset:0;z-index:860;background:rgba(0,0,0,.72);align-items:center;justify-content:center;padding:20px}
+#reject-modal.open,#dm-modal.open{display:flex;animation:fadeIn .15s}
+.xbox{width:100%;max-width:360px;max-height:92vh;overflow:auto;background:linear-gradient(180deg,#191325,#0b0812);border:1px solid var(--border);border-radius:20px;padding:20px}
+.xbox h3{font-size:16px;margin:0 0 4px;color:var(--text,#fff)}
+.xbox .xsub{font-size:12.5px;color:var(--text-muted);margin-bottom:12px;line-height:1.5}
+.xchips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px}
+.xchip{padding:6px 11px;border-radius:14px;font-size:12px;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text-muted);cursor:pointer}
+.xchip:active{transform:scale(.96)}
+.xbox .xact{display:flex;gap:8px;margin-top:14px}
+.xbox .xact button{flex:1;padding:11px;border-radius:12px;border:none;font-weight:700;font-size:13.5px;cursor:pointer;font-family:inherit}
+.xbox .xno{background:rgba(255,255,255,.08);color:var(--text-muted)}
+.xbox .xyes{background:linear-gradient(135deg,var(--accent),var(--red));color:#fff}
+.xbox .xyes[disabled]{opacity:.6}
+.xcheck{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-muted);margin-top:10px}
+.user-extra{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0 2px}
+.user-fin{font-size:11.5px;padding:3px 9px;border-radius:10px;background:rgba(242,184,48,.1);color:var(--gold3,#e8c36a);font-weight:600}
+.dm-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:10px;border:1px solid rgba(99,179,255,.4);background:rgba(99,179,255,.1);color:#63b3ff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.dm-btn .material-icons-round{font-size:14px}
 #confirm-modal { display:none; position:fixed; inset:0; z-index:850; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; padding:24px; }
 #confirm-modal.open { display:flex; animation:fadeIn 0.15s; }
 .confirm-box { width:100%; max-width:300px; background:linear-gradient(180deg,#191325,#0b0812); border:1px solid var(--border); border-radius:20px; padding:22px; text-align:center; }
@@ -1166,6 +1186,26 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
   </div>
 </div>
 
+<div id="reject-modal">
+  <div class="xbox">
+    <h3>❌ উইথড্র বাতিল করুন</h3>
+    <div class="xsub" id="rej-info"></div>
+    <textarea class="form-textarea" id="rej-reason" placeholder="কেন বাতিল করছেন তা লিখুন (ইউজার নোটিফিকেশনে এটা দেখবে)"></textarea>
+    <div class="xchips" id="rej-chips"></div>
+    <div class="xsub" style="margin:8px 0 0;">বাতিল করলে টাকাটা সাথে সাথে ইউজারের ব্যালেন্সে ফেরত যাবে।</div>
+    <div class="xact"><button class="xno" onclick="closeRejectModal()">ফিরে যান</button><button class="xyes" id="rej-submit" onclick="submitReject()">বাতিল করুন</button></div>
+  </div>
+</div>
+<div id="dm-modal">
+  <div class="xbox">
+    <h3>📩 ইউজারকে মেসেজ পাঠান</h3>
+    <div class="xsub" id="dm-info"></div>
+    <textarea class="form-textarea" id="dm-text" placeholder="মেসেজ লিখুন..."></textarea>
+    <label class="xcheck"><input type="checkbox" id="dm-notif" checked/> সাইটের নোটিফিকেশনেও দেখান</label>
+    <div class="xact"><button class="xno" onclick="closeDmModal()">বন্ধ করুন</button><button class="xyes" id="dm-submit" style="background:linear-gradient(135deg,#3b82f6,#2563eb)" onclick="sendDm()">পাঠান</button></div>
+  </div>
+</div>
+
 <div id="bg-job"></div>
 <div id="toast"></div>
 
@@ -1293,6 +1333,7 @@ async function loadAllUsers(){
   document.getElementById('users-unlocks-val').textContent = fmtNum(totalUnlocks);
   document.getElementById('users-count-sub').textContent = 'মোট ' + users.length + ' জন ইউজার';
   renderUsersList();
+  loadUserFinance();
 }
 function renderUsersList(){
   const wrap = document.getElementById('users-list');
@@ -1321,6 +1362,7 @@ function renderUsersList(){
         '<div class="user-name-txt">' + nameLine + '</div>' +
         '<div class="user-id-txt">' + escHtml(u.id) + (u.tgUserId?' · tg:'+escHtml(String(u.tgUserId)):'') + '</div>' +
         '<div class="user-reg-txt"><span class="material-icons-round" style="font-size:11px;vertical-align:-2px;">event</span> রেজিস্ট্রেশন: ' + regTxt + '</div>' +
+        userExtraHtml(u) +
         '<div class="user-sub-row">' +
           '<span class="user-chip ads"><span class="material-icons-round">smart_display</span>' + (u.adsWatched||0) + ' অ্যাড দেখেছে</span>' +
           '<span class="user-chip unlocks"><span class="material-icons-round">lock_open</span>' + (u.unlockedCount||0) + ' আনলক</span>' +
@@ -1972,7 +2014,7 @@ function openVideoForm(id){
     const T = A.telegram || {};
     const defBtns = T.bcDefaultButtons || [{text:'▶️ ভিডিওটি দেখুন', url:'{VIDEO_LINK}'},{text:'ℹ️ কিভাবে ভিডিও দেখবেন', url:''}];
     bcInitComposer('v', { buttons:defBtns, toUsers:true });
-    document.getElementById('v-bc-enabled').checked = !id && !!T.autoNotify;
+    document.getElementById('v-bc-enabled').checked = !id && !!bcToken();
     document.getElementById('v-bc-caption').value = '';
     bcToggleVideoWrap();
   }
@@ -2364,6 +2406,7 @@ function renderWithdrawalsList(){
       '<div class="vid-body" style="padding:2px 0;">' +
         '<div class="vid-title">৳ ' + (w.amount||0).toFixed(2) + ' — ' + (methodNames[w.method]||w.method||'') + '</div>' +
         '<div class="vid-meta-row"><span class="vid-chip" ' + chipColor + '>' + (statusLabel[status]||status) + '</span><span class="vid-stat-sm">' + escHtml(w.number||'') + '</span></div>' +
+        (status==='rejected' && w.rejectReason ? '<div class="vid-stat-sm" style="margin-top:3px;color:var(--accent2);">কারণ: ' + escHtml(w.rejectReason) + '</div>' : '') +
         '<div class="vid-stat-sm" style="margin-top:3px;"><span class="material-icons-round" style="font-size:12px;">person</span>' + escHtml(w.userId||'') + '</div>' +
       '</div>' +
       '<div class="vid-actions">' + actionBtns + '</div>' +
@@ -2372,6 +2415,7 @@ function renderWithdrawalsList(){
   wrap.lastElementChild.style.borderBottom='none';
 }
 async function setWithdrawStatus(id, status){
+  if(status==='rejected'){ openRejectModal(id); return; }
   const label = status==='approved' ? 'অনুমোদন' : 'বাতিল';
   openConfirm('এই রিকুয়েস্টটি ' + label + ' করতে চান?', async ()=>{
     try{
@@ -2872,8 +2916,15 @@ async function tgApi(method, payload, isForm){
   const opt = isForm
     ? { method:'POST', body:payload }
     : { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) };
-  const r = await fetch('https://api.telegram.org/bot' + bcToken() + '/' + method, opt);
-  return r.json();
+  let r;
+  for(let k=0;k<4;k++){
+    const res = await fetch('https://api.telegram.org/bot' + bcToken() + '/' + method, opt);
+    r = await res.json();
+    // Telegram flood limit: wait the time it asks for, then retry instead of dropping the message
+    if(r && r.ok === false && r.error_code === 429){ await sleep(((r.parameters && r.parameters.retry_after) || 2) * 1000 + 300); continue; }
+    break;
+  }
+  return r;
 }
 async function bcSendText(chatId, text, markup){
   const base = { chat_id:chatId, text, disable_web_page_preview:true };
@@ -3048,6 +3099,91 @@ async function changeAdminPassword(){
 }
 
 /* ============ CONFIRM MODAL ============ */
+
+/* ============ WITHDRAW REJECT WITH REASON ============ */
+const REJECT_REASONS = ['পেমেন্ট নম্বর ভুল','ব্যালেন্স যাচাই করা যায়নি','নিয়ম ভঙ্গ করা হয়েছে','সন্দেহজনক কার্যকলাপ'];
+function openRejectModal(id){
+  const w = A.withdrawals.find(x=>x.id===id); if(!w) return;
+  A.rejectId = id;
+  document.getElementById('rej-info').textContent = '৳ ' + (w.amount||0).toFixed(2) + ' — ' + (w.number||'');
+  document.getElementById('rej-reason').value = '';
+  document.getElementById('rej-chips').innerHTML = REJECT_REASONS.map(r=>'<span class="xchip" onclick="document.getElementById(\'rej-reason\').value=this.textContent">'+escHtml(r)+'</span>').join('');
+  document.getElementById('rej-submit').disabled = false;
+  document.getElementById('reject-modal').classList.add('open');
+}
+function closeRejectModal(){ document.getElementById('reject-modal').classList.remove('open'); A.rejectId = null; }
+async function submitReject(){
+  const id = A.rejectId; const w = A.withdrawals.find(x=>x.id===id);
+  const reason = document.getElementById('rej-reason').value.trim();
+  if(!w){ closeRejectModal(); return; }
+  if(reason.length < 3){ toast('⚠️ বাতিলের কারণ লিখুন।'); return; }
+  const btn = document.getElementById('rej-submit'); btn.disabled = true;
+  try{
+    await fbUpdate('withdrawals', id, { status:'rejected', rejectReason:reason, updatedAt:Date.now() });
+    if(w.userId){
+      const amt = (w.amount||0).toFixed(2);
+      await fbAdd('notifications', { userId:w.userId, type:'withdraw_rejected', title:'❌ উইথড্র রিকুয়েস্ট বাতিল হয়েছে',
+        body:'আপনার ৳ ' + amt + ' উইথড্র বাতিল হয়েছে। কারণ: ' + reason + ' — টাকাটা আবার আপনার ব্যালেন্সে ফেরত এসেছে।' });
+      const usr = (A.allUsers||[]).find(x=>x.id===w.userId);
+      if(usr && usr.tgUserId && bcToken()){
+        bcSendText(String(usr.tgUserId), '❌ <b>উইথড্র বাতিল হয়েছে</b>\n\nপরিমাণ: ৳ ' + amt + '\nকারণ: ' + escHtml(reason) + '\n\nটাকাটা আপনার ব্যালেন্সে ফেরত এসেছে।').catch(()=>{});
+      }
+    }
+    closeRejectModal();
+    toast('✅ বাতিল করা হয়েছে, টাকা ইউজারের ব্যালেন্সে ফেরত গেছে।');
+  }catch(e){ btn.disabled = false; toast('⚠️ সমস্যা হয়েছে।'); }
+}
+
+/* ============ DIRECT MESSAGE TO ONE USER (bot + site notification) ============ */
+function userDisplayName(u){ return [u.tgFirstName,u.tgLastName].filter(Boolean).join(' ').trim() || u.id; }
+function openDmModal(uid){
+  const u = (A.allUsers||[]).find(x=>x.id===uid); if(!u) return;
+  A.dmUid = uid;
+  document.getElementById('dm-info').textContent = userDisplayName(u) + (u.tgUsername ? ' @'+u.tgUsername : '') + (u.tgUserId ? ' — বটে যাবে' : ' — বট সংযুক্ত নেই, শুধু সাইটের নোটিফিকেশনে যাবে');
+  document.getElementById('dm-text').value = '';
+  document.getElementById('dm-notif').checked = true;
+  document.getElementById('dm-submit').disabled = false;
+  document.getElementById('dm-modal').classList.add('open');
+}
+function closeDmModal(){ document.getElementById('dm-modal').classList.remove('open'); A.dmUid = null; }
+async function sendDm(){
+  const u = (A.allUsers||[]).find(x=>x.id===A.dmUid); if(!u){ closeDmModal(); return; }
+  const text = document.getElementById('dm-text').value.trim();
+  const alsoNotif = document.getElementById('dm-notif').checked || !u.tgUserId;
+  if(!text){ toast('⚠️ মেসেজ লিখুন।'); return; }
+  const btn = document.getElementById('dm-submit'); btn.disabled = true;
+  let botOk = false;
+  try{
+    if(u.tgUserId && bcToken()){
+      const r = await bcSendText(String(u.tgUserId), '📩 <b>অ্যাডমিনের বার্তা</b>\n\n' + escHtml(text));
+      botOk = !!(r && r.ok);
+    }
+    if(alsoNotif || !botOk){
+      await fbAdd('notifications', { userId:u.id, type:'admin_message', title:'📩 অ্যাডমিনের বার্তা', body:text });
+    }
+    closeDmModal();
+    toast(botOk ? '✅ বটে মেসেজ পাঠানো হয়েছে।' : '⚠️ বটে যায়নি (ইউজার বট স্টার্ট করেনি বা ব্লক করেছে) — সাইটের নোটিফিকেশনে পাঠানো হয়েছে।');
+  }catch(e){ btn.disabled = false; toast('⚠️ পাঠানো যায়নি।'); }
+}
+
+/* ============ PER-USER MONEY SUMMARY (admin users list) ============ */
+async function loadUserFinance(){
+  try{
+    const [comps, dailies, vrs, wds] = await Promise.all([fbGet('task_completions'), fbGet('daily_ad_tasks'), fbGet('video_rewards'), fbGet('withdrawals')]);
+    const m = {}; const g = id => (m[id] = m[id] || { income:0, withdrawn:0 });
+    comps.forEach(c=>{ if(c.userId) g(c.userId).income += (c.totalEarned||0); });
+    dailies.forEach(d=>{ if(d.userId) g(d.userId).income += (d.earned||0); });
+    vrs.forEach(r=>{ if(r.userId) g(r.userId).income += (r.amount||0); });
+    wds.forEach(w=>{ if(w.userId && w.status!=='rejected') g(w.userId).withdrawn += (w.amount||0); });
+    A.userFin = m; renderUsersList();
+  }catch(e){ console.warn('user finance', e); }
+}
+function userExtraHtml(u){
+  const f = (A.userFin||{})[u.id];
+  const fin = f ? '<span class="user-fin">ব্যালেন্স ৳' + Math.max(0,f.income-f.withdrawn).toFixed(2) + '</span><span class="user-fin">মোট ইনকাম ৳' + f.income.toFixed(2) + '</span><span class="user-fin">উইথড্র ৳' + f.withdrawn.toFixed(2) + '</span>' : '';
+  return '<div class="user-extra">' + fin + '<button class="dm-btn" onclick="openDmModal(\'' + escHtml(u.id) + '\')"><span class="material-icons-round">send</span>মেসেজ</button></div>';
+}
+
 function openConfirm(text, cb){
   document.getElementById('confirm-text').textContent = text;
   A.confirmCb = cb;
