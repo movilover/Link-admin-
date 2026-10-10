@@ -386,6 +386,34 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
 .bc-check input { width:17px; height:17px; accent-color:#a855f7; }
 #bg-job { position:fixed; top:68px; left:50%; transform:translateX(-50%); z-index:960; background:linear-gradient(135deg,#5b21b6,#c026d3); color:#fff; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:13px; padding:9px 18px; border-radius:30px; box-shadow:0 10px 26px rgba(124,58,237,.4); display:none; max-width:92vw; text-align:center; }
 #bg-job.show { display:block; }
+
+/* =====================================================================
+   PREMIUM THEME v3 — "Royal Cinema" (Violet = প্রাইমারি · Gold = হাইলাইট · Emerald = সফল)
+   ===================================================================== */
+:root {
+  --v3-violet: linear-gradient(180deg,#8b5cf6 0%,#6d28d9 55%,#5b21b6 100%);
+  --v3-gold:   linear-gradient(180deg,#ffe9a8 0%,#f5c542 50%,#d99a14 100%);
+  --v3-ring: 0 0 0 1px rgba(255,255,255,.14) inset;
+}
+.save-btn, .add-fab, .login-btn, .dm-btn, .xbox .xact button { border-radius:14px; font-weight:800; letter-spacing:.4px; position:relative; overflow:hidden; transition:transform .14s ease, box-shadow .25s ease, filter .2s ease; }
+.save-btn, .xbox .xyes {
+  background-image:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.22) 50%,transparent 60%), var(--v3-violet);
+  color:#fff; text-shadow:0 1px 2px rgba(20,5,50,.5); border:1px solid rgba(196,181,253,.45);
+  box-shadow:0 10px 26px rgba(109,40,217,.40), var(--v3-ring), inset 0 -2px 0 rgba(0,0,0,.22);
+}
+.add-fab, .login-btn, .save-btn.imgbb-save {
+  background-image:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.45) 50%,transparent 60%), var(--v3-gold);
+  color:#2b1d03; text-shadow:0 1px 0 rgba(255,255,255,.4); border:1px solid rgba(255,240,180,.7);
+  box-shadow:0 12px 28px rgba(245,197,66,.36), inset 0 1px 0 rgba(255,255,255,.7), inset 0 -2px 0 rgba(130,80,0,.30);
+}
+.save-btn:hover, .add-fab:hover, .login-btn:hover { filter:brightness(1.07) saturate(1.05); }
+.save-btn:active, .add-fab:active, .login-btn:active { transform:translateY(1px) scale(.975); filter:brightness(.94); }
+.save-btn:disabled { filter:grayscale(.5); opacity:.55; box-shadow:none; }
+.cancel-btn { background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)); border:1px solid rgba(167,139,250,.32); color:#e9e4ff; }
+.del-btn-inline { background:linear-gradient(180deg,rgba(239,68,68,.18),rgba(239,68,68,.07)); border:1px solid rgba(239,68,68,.5); color:#fca5a5; }
+.dm-btn { background:linear-gradient(180deg,rgba(99,179,255,.18),rgba(99,179,255,.06)); border:1px solid rgba(99,179,255,.5); color:#9fd0ff; }
+.icon-action { background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02)); }
+.save-btn:focus-visible, .add-fab:focus-visible { outline:2px solid #ffe08a; outline-offset:2px; }
 </style>
 </head>
 <body>
@@ -446,6 +474,20 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
         <div class="users-summary-card">
           <div class="users-summary-val" id="users-unlocks-val">0</div>
           <div class="users-summary-lbl">মোট আনলক</div>
+        </div>
+      </div>
+      <div class="users-summary-row" style="margin-top:0;">
+        <div class="users-summary-card">
+          <div class="users-summary-val gold" id="users-new-today">0</div>
+          <div class="users-summary-lbl">আজকের নতুন ইউজার</div>
+        </div>
+        <div class="users-summary-card">
+          <div class="users-summary-val" id="users-bot-active">0</div>
+          <div class="users-summary-lbl">বট সক্রিয়</div>
+        </div>
+        <div class="users-summary-card">
+          <div class="users-summary-val red" id="users-bot-blocked">0</div>
+          <div class="users-summary-lbl">বট ব্লক/লিভ</div>
         </div>
       </div>
       <div class="user-search-wrap">
@@ -733,6 +775,8 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
           </div>
           <div id="bc-mount"></div>
           <div class="form-hint" style="margin-bottom:10px;">বার্তায় HTML চলবে। ছবি না দিলে শুধু টেক্সট ও বাটন যাবে।</div>
+          <label class="bc-check" style="margin:4px 0 4px;"><input type="checkbox" id="bc-via-server" checked/>⚡ বট সার্ভারের মাধ্যমে সবাইকে ইনস্ট্যান্ট পাঠান (ট্যাব বন্ধ থাকলেও চলবে)</label>
+          <div class="form-hint" style="margin-bottom:12px;">চালু থাকলে মেসেজ কিউতে যাবে এবং চলমান বট (bot.js) সব সক্রিয় বট-ইউজারকে একসাথে পাঠাবে। ব্লার/স্পয়লার ইফেক্ট ও চ্যানেল-টার্গেট শুধু বন্ধ অবস্থায় (ব্রাউজার থেকে) কাজ করে।</div>
           <button class="save-btn" id="bc-send-btn" onclick="sendManualBroadcast()"><span class="material-icons-round">send</span>সবার কাছে পাঠান</button>
           <div class="bc-progress-wrap" id="bc-progress-wrap" style="display:none;margin-top:14px;">
             <div class="bc-progress-bar"><div class="bc-progress-fill" id="bc-progress-fill"></div></div>
@@ -740,6 +784,44 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- REFERRALS -->
+    <div class="page" id="page-referrals">
+      <div class="page-head">
+        <div class="page-title">রেফারেল ট্র্যাকিং<small id="ref-count-sub">লোড হচ্ছে...</small></div>
+      </div>
+
+      <div class="users-summary-row">
+        <div class="users-summary-card"><div class="users-summary-val" id="rf-total-clicks">0</div><div class="users-summary-lbl">মোট ক্লিক</div></div>
+        <div class="users-summary-card"><div class="users-summary-val gold" id="rf-total-joins">0</div><div class="users-summary-lbl">সফল জয়েন</div></div>
+        <div class="users-summary-card"><div class="users-summary-val red" id="rf-total-left">0</div><div class="users-summary-lbl">লিভ</div></div>
+      </div>
+      <div class="users-summary-row" style="margin-top:0;">
+        <div class="users-summary-card"><div class="users-summary-val gold" id="rf-total-earned">৳0</div><div class="users-summary-lbl">মোট প্রদেয় আয়</div></div>
+        <div class="users-summary-card"><div class="users-summary-val" id="rf-today-joins">0</div><div class="users-summary-lbl">আজকের জয়েন</div></div>
+      </div>
+
+      <div class="mgr-card">
+        <div class="form-section">
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">payments</span>প্রতি সফল জয়েনে রেট (৳)</div>
+            <input class="form-input" type="number" min="0" step="0.01" id="rf-rate" placeholder="5" />
+            <div class="form-hint">আয় = (লিভ বাদে সফল জয়েন) × এই রেট। আয় কোথাও সেভ থাকে না, প্রতিবার হিসাব করা হয় — তাই ইউজার নিজে বদলাতে পারে না।</div>
+          </div>
+          <button class="save-btn" onclick="saveReferralRate()"><span class="material-icons-round">save</span>রেট সেভ করুন</button>
+        </div>
+      </div>
+
+      <div class="user-search-wrap">
+        <input class="form-input" id="rf-search" placeholder="টেলিগ্রাম আইডি / ইউজারনেম / নাম দিয়ে খুঁজুন..." oninput="renderReferralSearch()" />
+      </div>
+      <div class="mgr-card" id="rf-search-results" style="margin-top:10px;display:none;"></div>
+
+      <div class="mgr-card" id="rf-detail" style="display:none;"></div>
+
+      <div class="page-head" style="padding-top:6px;"><div class="page-title" style="font-size:14px;">সক্রিয় প্রোমোটার<small>জয়েন সংখ্যা অনুযায়ী সাজানো</small></div></div>
+      <div class="mgr-card" id="rf-dash-list"></div>
     </div>
 
     <!-- SETTINGS -->
@@ -955,6 +1037,7 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
     <div class="nav-item" data-page="channels" onclick="showAdminPage('channels')"><span class="material-icons-round">send</span>চ্যানেল</div>
     <div class="nav-item" data-page="tasks" onclick="showAdminPage('tasks')"><span class="material-icons-round">payments</span>টাস্ক</div>
     <div class="nav-item" data-page="withdrawals" onclick="showAdminPage('withdrawals')"><span class="material-icons-round">account_balance_wallet</span>উইথড্র</div>
+    <div class="nav-item" data-page="referrals" onclick="showAdminPage('referrals')"><span class="material-icons-round">share</span>রেফার</div>
     <div class="nav-item" data-page="imgbb" onclick="showAdminPage('imgbb')"><span class="material-icons-round">add_photo_alternate</span>IMGBB</div>
     <div class="nav-item" data-page="videobot" onclick="showAdminPage('videobot')"><span class="material-icons-round">smart_toy</span>ভিডিও বট</div>
     <div class="nav-item" data-page="broadcast" onclick="showAdminPage('broadcast')"><span class="material-icons-round">campaign</span>ব্রডকাস্ট</div>
@@ -1051,6 +1134,7 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
             <div class="form-hint">ক্যাপশন ও বাটনের লিংকে <b>{VIDEO_LINK}</b> লিখলে সেখানে এই ভিডিওর নিজস্ব শেয়ার লিংক বসে যাবে।</div>
           </div>
           <div id="v-bc-mount"></div>
+          <div class="form-hint" style="color:var(--green);">⚡ বট সার্ভার (bot.js) চালু থাকলে ভিডিও সেভ হওয়ার সাথে সাথে থাম্বনেইল, টাইটেল ও "Watch Now" বাটনসহ সব বট-ইউজারের কাছে নিজে থেকেই চলে যাবে — এখানে কিছু করতে হবে না। বট সার্ভার না চালালে নিচের "সব বট-ইউজার" টিক দিন।</div>
           <div class="form-hint" style="color:var(--gold3);">সেভ চাপার পর পোস্ট ব্যাকগ্রাউন্ডে যাবে, আপনাকে অপেক্ষা করতে হবে না। তবে পাঠানো শেষ না হওয়া পর্যন্ত এই ট্যাব বন্ধ করবেন না।</div>
         </div>
       </div>
@@ -1318,16 +1402,36 @@ function showAdminPage(name){
   if(name==='users') loadAllUsers();
   if(name==='broadcast') refreshBroadcastStats();
   if(name==='tasks') loadTasks();
+  if(name==='referrals') loadReferralPage();
   if(name==='withdrawals'){ renderWithdrawalsList(); loadIncomeReport(); }
 }
 
 /* ============ USERS ============ */
 async function loadAllUsers(){
-  const users = await fbGet('users');
-  users.sort((a,b)=>(b.lastAdAt||b.createdAt||0)-(a.lastAdAt||a.createdAt||0));
+  // সাইটের ইউজার + বটের ইউজার (bot_users) এক তালিকায় মেলানো হচ্ছে
+  const [siteUsers, botUsers] = await Promise.all([fbGet('users'), fbGet('bot_users')]);
+  A.botUsers = botUsers;
+  const byTg = {}; botUsers.forEach(b=>{ byTg[String(b.tgUserId||b.id)] = b; });
+  const seenTg = new Set();
+  const users = siteUsers.map(u=>{
+    if(u.tgUserId){ const b = byTg[String(u.tgUserId)]; if(b){ u._bot = b; seenTg.add(String(u.tgUserId)); } }
+    return u;
+  });
+  botUsers.forEach(b=>{
+    const tg = String(b.tgUserId||b.id);
+    if(seenTg.has(tg)) return;
+    users.push({ id:'tg'+tg, tgUserId:tg, tgUsername:b.username||'', tgFirstName:b.firstName||'', tgLastName:b.lastName||'',
+                 createdAt:b.startedAt||0, lastSeenAt:b.lastSeenAt||0, adsWatched:0, unlockedCount:0, _bot:b, _botOnly:true });
+  });
+  users.sort((a,b)=>(b.lastAdAt||b.lastSeenAt||b.createdAt||0)-(a.lastAdAt||a.lastSeenAt||a.createdAt||0));
   A.allUsers = users;
   const totalAds = users.reduce((sum,u)=>sum+(u.adsWatched||0),0);
   const totalUnlocks = users.reduce((sum,u)=>sum+(u.unlockedCount||0),0);
+  const dayStartMs = (()=>{ const d=new Date(); d.setHours(0,0,0,0); return d.getTime(); })();
+  const setT = (id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
+  setT('users-new-today', users.filter(u=>(u.createdAt||0)>=dayStartMs).length);
+  setT('users-bot-active', users.filter(u=>u._bot && u._bot.active!==false).length);
+  setT('users-bot-blocked', users.filter(u=>u._bot && u._bot.active===false).length);
   document.getElementById('users-total-val').textContent = users.length;
   document.getElementById('users-ads-val').textContent = fmtNum(totalAds);
   document.getElementById('users-unlocks-val').textContent = fmtNum(totalUnlocks);
@@ -1362,16 +1466,39 @@ function renderUsersList(){
         '<div class="user-name-txt">' + nameLine + '</div>' +
         '<div class="user-id-txt">' + escHtml(u.id) + (u.tgUserId?' · tg:'+escHtml(String(u.tgUserId)):'') + '</div>' +
         '<div class="user-reg-txt"><span class="material-icons-round" style="font-size:11px;vertical-align:-2px;">event</span> রেজিস্ট্রেশন: ' + regTxt + '</div>' +
-        userExtraHtml(u) +
+        userExtraHtml(u) + botInfoHtml(u) +
         '<div class="user-sub-row">' +
           '<span class="user-chip ads"><span class="material-icons-round">smart_display</span>' + (u.adsWatched||0) + ' অ্যাড দেখেছে</span>' +
           '<span class="user-chip unlocks"><span class="material-icons-round">lock_open</span>' + (u.unlockedCount||0) + ' আনলক</span>' +
           '<span class="user-chip active"><span class="material-icons-round">check_circle</span>সচল</span>' +
-          (u.tgUserId?'<span class="user-chip tg"><span class="material-icons-round">send</span>বট সংযুক্ত</span>':'<span class="user-chip notg"><span class="material-icons-round">block</span>বট নেই</span>') +
+          botChipHtml(u) +
+          (u._botOnly?'<span class="user-chip notg"><span class="material-icons-round">language</span>সাইটে আসেনি</span>':'') +
         '</div>' +
       '</div>' +
     '</div>';
   }).join('');
+}
+function botChipHtml(u){
+  if(u._bot){
+    return u._bot.active===false
+      ? '<span class="user-chip notg" style="color:var(--accent2);"><span class="material-icons-round">block</span>বট ব্লক/লিভ</span>'
+      : '<span class="user-chip tg"><span class="material-icons-round">send</span>বট সক্রিয়</span>';
+  }
+  return u.tgUserId
+    ? '<span class="user-chip tg"><span class="material-icons-round">send</span>টেলিগ্রাম আইডি আছে</span>'
+    : '<span class="user-chip notg"><span class="material-icons-round">block</span>বট নেই</span>';
+}
+/* বটের তথ্য: ইউজারনেম, রেফারার, রেফারেল সংখ্যা, আয়, শেষ অ্যাক্টিভিটি */
+function botInfoHtml(u){
+  const b = u._bot;
+  if(!b) return '';
+  const refBy = b.referredBy ? (typeof refLabel==='function' ? refLabel(String(b.referredBy)) : b.referredBy) : '';
+  return '<div class="user-extra">' +
+    (refBy ? '<span class="user-fin">রেফার করেছে: ' + escHtml(refBy) + '</span>' : '') +
+    '<span class="user-fin">রেফারেল: ' + (b.validReferrals||0) + '/' + (b.totalReferrals||0) + '</span>' +
+    '<span class="user-fin">রেফার আয়: ৳' + (b.totalEarnings||0).toFixed(2) + '</span>' +
+    (b.lastSeenAt ? '<span class="user-fin">শেষ সক্রিয়: ' + fmtDate(b.lastSeenAt) + '</span>' : '') +
+  '</div>';
 }
 function fmtDate(ts){
   if(!ts) return '—';
@@ -2013,7 +2140,7 @@ function openVideoForm(id){
   {
     const T = A.telegram || {};
     const defBtns = T.bcDefaultButtons || [{text:'▶️ ভিডিওটি দেখুন', url:'{VIDEO_LINK}'},{text:'ℹ️ কিভাবে ভিডিও দেখবেন', url:''}];
-    bcInitComposer('v', { buttons:defBtns, toUsers:true });
+    bcInitComposer('v', { buttons:defBtns, toUsers:false }); // ইউজারদের কাছে বট সার্ভার নিজেই ইনস্ট্যান্ট পাঠায়
     document.getElementById('v-bc-enabled').checked = !id && !!bcToken();
     document.getElementById('v-bc-caption').value = '';
     bcToggleVideoWrap();
@@ -2082,6 +2209,8 @@ async function saveVideo(){
     pinned: wantPinned,
     pinOrder: wantPinned ? pinOrder : 0,
   };
+  // ব্রাউজার নিজেই ইউজারদের পাঠালে বট সার্ভার যেন আবার না পাঠায় (ডুপ্লিকেট এড়াতে)
+  if(bcJob && bcJob.userIds && bcJob.userIds.length) data.skipBotBroadcast = true;
   try{
     if(A.editingVideoId){
       await fbUpdate('videos', A.editingVideoId, data);
@@ -3040,6 +3169,8 @@ async function sendManualBroadcast(){
   const text = document.getElementById('bc-message').value.trim();
   const url = document.getElementById('bc-thumb-url').value.trim() || A.pendingBcThumbUrl || '';
   if(!text){ toast('⚠️ একটি বার্তা লিখুন।'); return; }
+  const viaSrv = document.getElementById('bc-via-server');
+  if(viaSrv && viaSrv.checked){ return enqueueServerBroadcast(text, url); }
   if(!bcToken()){ toast('⚠️ আগে সেটিংসে গিয়ে বট টোকেন বসান।'); return; }
   const c = bcCollect('bc');
   if(c.invalid){ toast('⚠️ বাটনের লেবেল ও সঠিক লিংক (https://...) দুটোই দিন।'); return; }
@@ -3054,6 +3185,37 @@ async function sendManualBroadcast(){
     label: 'ব্রডকাস্ট', showProgress: true
   }).catch(e=>{ console.error(e); toast('⚠️ ব্রডকাস্টে সমস্যা হয়েছে।'); bgPill(''); });
   toast('🚀 ব্যাকগ্রাউন্ডে পাঠানো শুরু হয়েছে — আপনি অন্য কাজ করতে পারেন।');
+}
+/* সার্ভার ব্রডকাস্ট: কিউতে ঢোকে, bot.js সবাইকে একসাথে পাঠায়, প্রগ্রেস এখানে লাইভ দেখায় */
+async function enqueueServerBroadcast(text, imageUrl){
+  const c = bcCollect('bc');
+  if(c.invalid){ toast('⚠️ বাটনের লেবেল ও সঠিক লিংক (https://...) দুটোই দিন।'); return; }
+  const link = videoShareLink('');
+  const buttons = c.buttons.map(b=>({ text:b.text, url:String(b.url||'').split('{VIDEO_LINK}').join(link) }));
+  try{
+    const ref = await fbAdd('broadcast_jobs', { text, imageUrl: imageUrl||'', buttons, status:'queued', target:'all' });
+    toast('🚀 কিউতে গেছে — বট এখনই সবাইকে পাঠাচ্ছে।');
+    const progWrap = document.getElementById('bc-progress-wrap');
+    const progFill = document.getElementById('bc-progress-fill');
+    const progTxt = document.getElementById('bc-progress-txt');
+    if(progWrap) progWrap.style.display = 'block';
+    if(progTxt) progTxt.textContent = 'বটের জন্য অপেক্ষা করা হচ্ছে... (bot.js চালু আছে তো?)';
+    let unsub = null;
+    unsub = window._onSnapshot(window._doc(window._db,'broadcast_jobs',ref.id), snap=>{
+      const d = snap.data() || {};
+      const p = d.progress || {};
+      if(progFill) progFill.style.width = Math.round((p.done||0)/Math.max(1,p.total||1)*100) + '%';
+      if(d.status === 'sending' && progTxt) progTxt.textContent = (p.done||0) + ' / ' + (p.total||0) + ' পাঠানো হয়েছে (সফল: ' + (p.sent||0) + ', ব্যর্থ: ' + (p.failed||0) + ')';
+      if(d.status === 'done'){
+        const r = d.result || {};
+        if(progFill) progFill.style.width = '100%';
+        if(progTxt) progTxt.textContent = '✅ শেষ — সফল ' + (r.sent||0) + ', ব্যর্থ ' + (r.failed||0) + ' (ব্লক: ' + (r.blocked||0) + ')';
+        toast('✅ ব্রডকাস্ট শেষ: সফল ' + (r.sent||0));
+        if(unsub) unsub();
+      }
+      if(d.status === 'failed'){ if(progTxt) progTxt.textContent = '⚠️ ব্যর্থ: ' + (d.error||''); if(unsub) unsub(); }
+    });
+  }catch(e){ toast('⚠️ কিউতে পাঠানো যায়নি।'); }
 }
 bcMountAll();
 
@@ -3201,6 +3363,150 @@ function userExtraHtml(u){
   const f = (A.userFin||{})[u.id];
   const fin = f ? '<span class="user-fin">ব্যালেন্স ৳' + Math.max(0,f.income-f.withdrawn).toFixed(2) + '</span><span class="user-fin">মোট ইনকাম ৳' + f.income.toFixed(2) + '</span><span class="user-fin">উইথড্র ৳' + f.withdrawn.toFixed(2) + '</span>' : '';
   return '<div class="user-extra">' + fin + '<button class="dm-btn" onclick="openDmModal(\'' + escHtml(u.id) + '\')"><span class="material-icons-round">send</span>মেসেজ</button></div>';
+}
+
+/* ============ REFERRAL TRACKING (admin) =====================
+   Data: referral_clicks (unique visits), referrals (joins; leftAt/status set
+   here by admin), referral_slugs (custom link names), settings/referralRate.
+   Earned = valid joins x rate — computed, never stored. */
+A.ref = { rate:5, clicks:[], joins:[], slugs:[], selected:null };
+async function loadReferralPage(){
+  if(!A.allUsers || !A.allUsers.length){ try{ await loadAllUsers(); }catch(e){} }
+  const [clicks, joins, slugs, rc] = await Promise.all([fbGet('referral_clicks'), fbGet('referrals'), fbGet('referral_slugs'), fbGetDoc('settings','referralRate')]);
+  A.ref.clicks = clicks; A.ref.joins = joins; A.ref.slugs = slugs;
+  A.ref.rate = (rc && rc.ratePerJoin != null && !isNaN(parseFloat(rc.ratePerJoin))) ? parseFloat(rc.ratePerJoin) : 5;
+  document.getElementById('rf-rate').value = A.ref.rate;
+  renderReferralDash();
+  if(A.ref.selected) renderReferralDetail(A.ref.selected);
+}
+function refIsLeft(j){ return !!(j.leftAt || j.status==='left'); }
+function refStats(refId){
+  const dayStart = new Date(); dayStart.setHours(0,0,0,0);
+  const c = A.ref.clicks.filter(x=>x.ref===refId);
+  const j = A.ref.joins.filter(x=>x.ref===refId);
+  const left = j.filter(refIsLeft).length;
+  const valid = j.length - left;
+  return { clicks:c.length, joins:j.length, left, valid, earned: valid*A.ref.rate,
+           todayJoins: j.filter(x=>(x.createdAt||0) >= dayStart.getTime()).length };
+}
+function refUser(refId){ return (A.allUsers||[]).find(u=>String(u.tgUserId||'')===refId || u.id===refId); }
+function refLabel(refId){
+  const u = refUser(refId);
+  if(!u) return refId;
+  const n = [u.tgFirstName,u.tgLastName].filter(Boolean).join(' ').trim();
+  return (n || refId) + (u.tgUsername ? ' @'+u.tgUsername : '');
+}
+function refSlugOf(refId){ const s = A.ref.slugs.find(x=>String(x.userId)===refId); return s ? s.id : ''; }
+function refLink(refId){ const s = refSlugOf(refId); return 'https://t.me/' + MAIN_BOT_USERNAME + '/' + MAIN_APP_SHORT + '?startapp=r-' + (s || refId); }
+function renderReferralDash(){
+  const ids = new Set();
+  A.ref.clicks.forEach(x=>ids.add(x.ref)); A.ref.joins.forEach(x=>ids.add(x.ref));
+  const rows = Array.from(ids).map(id=>({ id, s: refStats(id) })).sort((a,b)=>b.s.valid-a.s.valid || b.s.clicks-a.s.clicks);
+  let tc=0, tj=0, tl=0, te=0, td=0;
+  rows.forEach(r=>{ tc+=r.s.clicks; tj+=r.s.joins; tl+=r.s.left; te+=r.s.earned; td+=r.s.todayJoins; });
+  const set=(id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
+  set('rf-total-clicks', fmtNum(tc)); set('rf-total-joins', fmtNum(tj)); set('rf-total-left', fmtNum(tl));
+  set('rf-total-earned', '৳' + fmtNum(Math.round(te*100)/100)); set('rf-today-joins', fmtNum(td));
+  set('ref-count-sub', rows.length + ' জন প্রোমোটার');
+  const wrap = document.getElementById('rf-dash-list');
+  if(!rows.length){ wrap.innerHTML = '<div class="empty-hint"><span class="material-icons-round">share</span>এখনো কোনো রেফারেল ক্লিক বা জয়েন নেই।</div>'; return; }
+  wrap.innerHTML = rows.map(r=>
+    '<div class="user-row" style="cursor:pointer;" onclick="selectRefUser(\'' + escHtml(r.id) + '\')">' +
+      '<div class="user-avatar-sm">' + escHtml((refLabel(r.id)||'?').slice(0,1).toUpperCase()) + '</div>' +
+      '<div class="user-info-col"><div class="user-name-txt">' + escHtml(refLabel(r.id)) + '</div>' +
+      '<div class="user-sub-row"><span class="user-chip ads">👆 ' + r.s.clicks + ' ক্লিক</span><span class="user-chip unlocks">✅ ' + r.s.valid + ' জয়েন</span>' +
+      (r.s.left ? '<span class="user-chip notg">🚪 ' + r.s.left + ' লিভ</span>' : '') +
+      '<span class="user-chip tg">৳' + r.s.earned.toFixed(2) + '</span></div></div></div>').join('');
+}
+function renderReferralSearch(){
+  const q = document.getElementById('rf-search').value.trim().toLowerCase();
+  const box = document.getElementById('rf-search-results');
+  if(!q){ box.style.display='none'; box.innerHTML=''; return; }
+  const list = (A.allUsers||[]).filter(u=>
+    String(u.tgUserId||'').includes(q) || u.id.toLowerCase().includes(q) ||
+    (u.tgUsername||'').toLowerCase().includes(q) ||
+    ((u.tgFirstName||'')+' '+(u.tgLastName||'')).toLowerCase().includes(q)).slice(0,15);
+  box.style.display = 'block';
+  if(!list.length){ box.innerHTML = '<div class="empty-hint">কোনো ইউজার পাওয়া যায়নি।</div>'; return; }
+  box.innerHTML = list.map(u=>{
+    const id = u.tgUserId ? String(u.tgUserId) : u.id;
+    return '<div class="user-row" style="cursor:pointer;" onclick="selectRefUser(\'' + escHtml(id) + '\')">' +
+      '<div class="user-info-col"><div class="user-name-txt">' + escHtml(refLabel(id)) + '</div><div class="user-id-txt">' + escHtml(id) + '</div></div>' +
+      '<span class="material-icons-round" style="color:var(--text-muted);">chevron_right</span></div>';
+  }).join('');
+}
+function selectRefUser(id){
+  A.ref.selected = id;
+  document.getElementById('rf-search-results').style.display = 'none';
+  renderReferralDetail(id);
+  document.getElementById('rf-detail').scrollIntoView({behavior:'smooth', block:'start'});
+}
+function renderReferralDetail(id){
+  const box = document.getElementById('rf-detail');
+  const s = refStats(id);
+  const slug = refSlugOf(id);
+  const joins = A.ref.joins.filter(x=>x.ref===id).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  box.style.display = 'block';
+  box.innerHTML =
+    '<div class="form-section">' +
+      '<div class="page-title" style="margin-bottom:10px;">' + escHtml(refLabel(id)) + '<small>ID: ' + escHtml(id) + '</small></div>' +
+      '<div class="users-summary-row" style="margin:0 0 12px;">' +
+        '<div class="users-summary-card"><div class="users-summary-val">' + s.clicks + '</div><div class="users-summary-lbl">ক্লিক</div></div>' +
+        '<div class="users-summary-card"><div class="users-summary-val gold">' + s.valid + '</div><div class="users-summary-lbl">সফল জয়েন</div></div>' +
+        '<div class="users-summary-card"><div class="users-summary-val red">' + s.left + '</div><div class="users-summary-lbl">লিভ</div></div>' +
+      '</div>' +
+      '<div class="users-summary-card" style="margin-bottom:14px;"><div class="users-summary-val gold">৳ ' + s.earned.toFixed(2) + '</div><div class="users-summary-lbl">আয় (' + s.valid + ' × ৳' + A.ref.rate + ')</div></div>' +
+      '<div class="form-group"><div class="form-label"><span class="material-icons-round">link</span>রেফারেল লিংক</div>' +
+        '<input class="form-input" id="rf-link-out" readonly value="' + escHtml(refLink(id)) + '" />' +
+        '<button class="cancel-btn" onclick="copyRefAdminLink()"><span class="material-icons-round" style="font-size:16px;vertical-align:-3px;">content_copy</span> লিংক কপি করুন</button></div>' +
+      '<div class="form-group"><div class="form-label"><span class="material-icons-round">edit</span>কাস্টম স্লাগ (ঐচ্ছিক)</div>' +
+        '<input class="form-input" id="rf-slug" placeholder="যেমন: rahim_01" value="' + escHtml(slug) + '" />' +
+        '<div class="form-hint">৩–২৪ অক্ষর: ইংরেজি অক্ষর, সংখ্যা ও _ । স্লাগ সেভ করলে লিংক হবে .../?startapp=r-স্লাগ । পুরনো লিংক (আইডি দিয়ে) কাজ করতে থাকবে।</div>' +
+        '<button class="save-btn" onclick="saveRefSlug()"><span class="material-icons-round">save</span>স্লাগ সেভ করুন</button>' +
+        (slug ? '<button class="del-btn-inline" onclick="removeRefSlug()"><span class="material-icons-round">link_off</span>স্লাগ মুছুন</button>' : '') + '</div>' +
+      '<div class="form-label" style="margin-top:6px;"><span class="material-icons-round">list</span>রেফার করা ইউজার (' + joins.length + ')</div>' +
+      (joins.length ? joins.map(j=>
+        '<div class="user-row" style="padding:10px 0;">' +
+          '<div class="user-info-col"><div class="user-name-txt">' + escHtml(refLabel(j.userId)) + '</div><div class="user-reg-txt">' + fmtDate(j.createdAt) + (refIsLeft(j) ? ' · 🚪 লিভ: ' + fmtDate(j.leftAt) : '') + '</div></div>' +
+          '<button class="dm-btn" style="' + (refIsLeft(j) ? '' : 'border-color:rgba(232,72,85,.4);color:var(--accent2);background:rgba(232,72,85,.1);') + '" onclick="toggleRefLeft(\'' + escHtml(j.id) + '\')">' + (refIsLeft(j) ? 'আবার ভ্যালিড' : 'লিভ চিহ্নিত করুন') + '</button>' +
+        '</div>').join('') : '<div class="empty-hint" style="padding:16px;">এখনো কেউ জয়েন করেনি।</div>') +
+    '</div>';
+}
+function copyRefAdminLink(){
+  const el = document.getElementById('rf-link-out'); if(!el) return;
+  (navigator.clipboard ? navigator.clipboard.writeText(el.value) : Promise.reject()).then(()=>toast('✅ লিংক কপি হয়েছে!')).catch(()=>{ el.select(); document.execCommand('copy'); toast('✅ লিংক কপি হয়েছে!'); });
+}
+async function saveRefSlug(){
+  const id = A.ref.selected; if(!id) return;
+  const slug = document.getElementById('rf-slug').value.trim();
+  if(!/^[A-Za-z0-9_]{3,24}$/.test(slug)){ toast('⚠️ স্লাগ ৩–২৪ অক্ষরের হতে হবে (ইংরেজি অক্ষর, সংখ্যা, _)।'); return; }
+  const taken = A.ref.slugs.find(x=>x.id===slug && String(x.userId)!==id);
+  if(taken){ toast('⚠️ এই স্লাগ অন্য একজন ব্যবহার করছে।'); return; }
+  try{
+    for(const old of A.ref.slugs.filter(x=>String(x.userId)===id && x.id!==slug)){ await fbDelete('referral_slugs', old.id); }
+    await window._setDoc(window._doc(window._db,'referral_slugs',slug), { userId:id, createdAt:Date.now() });
+    toast('✅ স্লাগ সেভ হয়েছে!');
+    await loadReferralPage();
+  }catch(e){ toast('⚠️ সেভ করা যায়নি।'); }
+}
+async function removeRefSlug(){
+  const id = A.ref.selected; const slug = refSlugOf(id); if(!slug) return;
+  try{ await fbDelete('referral_slugs', slug); toast('✅ স্লাগ মুছে ফেলা হয়েছে।'); await loadReferralPage(); }
+  catch(e){ toast('⚠️ মুছতে সমস্যা হয়েছে।'); }
+}
+async function toggleRefLeft(joinId){
+  const j = A.ref.joins.find(x=>x.id===joinId); if(!j) return;
+  try{
+    if(refIsLeft(j)) await fbUpdate('referrals', joinId, { leftAt:null, status:'active' });
+    else await fbUpdate('referrals', joinId, { leftAt:Date.now(), status:'left' });
+    await loadReferralPage();
+  }catch(e){ toast('⚠️ পরিবর্তন করা যায়নি।'); }
+}
+async function saveReferralRate(){
+  const r = parseFloat(document.getElementById('rf-rate').value);
+  if(isNaN(r) || r < 0){ toast('⚠️ সঠিক রেট দিন।'); return; }
+  try{ await fbSet('settings','referralRate',{ ratePerJoin:r }); A.ref.rate = r; toast('✅ রেট সেভ হয়েছে!'); renderReferralDash(); if(A.ref.selected) renderReferralDetail(A.ref.selected); }
+  catch(e){ toast('⚠️ সেভ করা যায়নি।'); }
 }
 
 function openConfirm(text, cb){
