@@ -499,7 +499,7 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
               <span class="upl-icon material-icons-round" style="font-size:22px;">upload_file</span>
               <span class="upl-txt" id="tut-video-status">ভিডিও ফাইল আপলোড করতে ট্যাপ করুন</span>
             </div>
-            <input type="file" accept="video/*" id="tut-video-file" style="display:none;" onchange="handleVideoUpload(this,'tut')" />
+            <input type="file" accept="video/*" id="tut-video-file" style="display:none;" onchange="handleTutTgUpload(this)" />
             <div class="form-hint">অথবা নিচে সরাসরি ভিডিও লিংক (URL) বসাতে পারেন — এখন <b>YouTube লিংক</b> (যেমন youtube.com/watch?v=... বা youtu.be/...), <b>Blogger-এর ভিডিও এম্বেড লিংক</b> (blogger.com/video.g?token=...), অথবা সরাসরি .mp4 ফাইল লিংক — তিনটাই সাপোর্ট করবে, সাইটের ভিতরেই প্লে হবে।</div>
             <div class="form-hint" style="color:var(--gold3);">Blogger-এ ভিডিও আপলোড করার পর পোস্টের সাধারণ URL কপি করলে চলবে না (এটা একটা ওয়েবপেজ, ভিডিও ফাইল না)। সঠিক লিংক পেতে: পোস্ট এডিটরে গিয়ে উপরে ডান দিকে <b>"HTML view"</b>-এ ক্লিক করুন, তারপর <code>&lt;iframe ... src="https://www.blogger.com/video.g?token=..."&gt;</code> — এই অংশ থেকে শুধু <b>src="..."</b>-এর ভেতরের লিংকটা কপি করে এখানে বসান।</div>
             <input class="form-input" id="tut-video-url" placeholder="https://..." style="margin-top:8px;" />
@@ -2118,22 +2118,41 @@ async function loadTutorial(){
     document.getElementById('tut-video-url').value = A.tutorial.url||'';
     document.getElementById('tut-label').value = A.tutorial.label||'';
     if(A.tutorial.thumb) setThumbPreview(document.getElementById('tut-thumb-box'), A.tutorial.thumb);
-    if(A.tutorial.url) document.getElementById('tut-video-status').textContent = '✅ ভিডিও লিংক সেট করা আছে';
+    if(A.tutorial.tgFileId) document.getElementById('tut-video-status').textContent = '✅ টেলিগ্রাম বটে ভিডিও সেট করা আছে (নতুন ভিডিও দিতে ট্যাপ করুন)';
+    else if(A.tutorial.url) document.getElementById('tut-video-status').textContent = '✅ ভিডিও লিংক সেট করা আছে';
   }
+}
+/* Tutorial video -> uploaded to Telegram through the video bot (like normal videos); users get it in their bot chat */
+function handleTutTgUpload(input){
+  const file = input.files[0]; if(!file) return;
+  const st = document.getElementById('tut-video-status');
+  (async ()=>{
+    if(!videoBotReady()){ st.textContent = 'বট সেটিংস লোড হচ্ছে...'; await loadVideoBotSettings(); }
+    if(!videoBotReady()){ st.textContent = '⚠️ ভিডিও বটের টোকেন/চ্যানেল ID নেই — "ভিডিও বট" পেজে সেভ করুন।'; toast('⚠️ ভিডিও বট সেট করা নেই।'); return; }
+    st.textContent = 'টেলিগ্রামে আপলোড হচ্ছে... 0%';
+    tgUploadVideo(file, p=>{ st.textContent = 'টেলিগ্রামে আপলোড হচ্ছে... ' + p + '%'; }).then(r=>{
+      A.pendingTutFileId = r.fileId;
+      document.getElementById('tut-video-url').value = '';
+      st.textContent = '✅ টেলিগ্রামে আপলোড সম্পন্ন — এখন "সেভ করুন" চাপুন';
+      toast('✅ ভিডিও টেলিগ্রামে সংরক্ষিত হয়েছে!');
+    }).catch(err=>{ const msg = tgErrorBn(err.message||''); st.textContent = '⚠️ আপলোড ব্যর্থ: ' + msg; toast('⚠️ ' + msg); });
+  })();
 }
 function renderTutorialPreview(){
   const wrap = document.getElementById('tut-preview-wrap');
   const t = A.tutorial;
-  if(!t || !t.url){ wrap.innerHTML = ''; return; }
+  if(!t || (!t.url && !t.tgFileId)){ wrap.innerHTML = ''; return; }
   wrap.innerHTML = '<div class="tut-preview-card"><div class="tut-preview-thumb">' + (t.thumb?('<img src="'+escHtml(t.thumb)+'"/>'):'') + '</div><div class="tut-preview-label">বর্তমান: ' + escHtml(t.label||'টিউটোরিয়াল ভিডিও') + '</div></div>';
 }
 async function saveTutorial(){
   const url = document.getElementById('tut-video-url').value.trim();
   const label = document.getElementById('tut-label').value.trim() || 'টিউটোরিয়াল ভিডিও';
   const thumb = A.pendingTutThumbUrl || (A.tutorial&&A.tutorial.thumb) || '';
-  if(!url){ toast('⚠️ টিউটোরিয়াল ভিডিওর লিংক বা ফাইল দিন।'); return; }
+  const tgFileId = A.pendingTutFileId || (!url && A.tutorial && A.tutorial.tgFileId) || '';
+  if(!url && !tgFileId){ toast('⚠️ টিউটোরিয়াল ভিডিওর লিংক বা ফাইল দিন।'); return; }
   try{
-    await fbSet('settings','tutorial',{url,label,thumb});
+    await fbSet('settings','tutorial',{url,label,thumb,tgFileId});
+    A.pendingTutFileId = null;
     toast('✅ টিউটোরিয়াল ভিডিও সেভ হয়েছে!');
     loadTutorial();
   }catch(e){ toast('⚠️ সেভ করতে সমস্যা হয়েছে।'); }
