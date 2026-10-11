@@ -795,6 +795,109 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
       </div>
     </div>
 
+    <!-- WELCOME MESSAGE (বটে /start চাপলে যে বার্তা যায়) -->
+    <div class="page" id="page-welcome">
+      <div class="page-head">
+        <div class="page-title" style="color:var(--gold3);">👋 স্বাগত বার্তা<small>ইউজার বটে Start চাপলেই এই বার্তা অটো চলে যাবে</small></div>
+      </div>
+
+      <div class="mgr-card info-card">
+        <div style="font-size:12.5px;line-height:1.8;">
+          নিচে ছবি, লেখা ও দুটি বাটন সাজান → <b>সংরক্ষণ</b> চাপুন। <b>bot.js চালু থাকলে</b> নতুন যে কেউ বটে Start চাপলেই ঠিক এই বার্তা পাবে। বার্তা বদলালে বট রিস্টার্ট লাগবে না (৩০ সেকেন্ডের মধ্যে নিজে নেয়)।
+        </div>
+      </div>
+
+      <div class="mgr-card">
+        <div class="form-section">
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">toggle_on</span>স্বাগত বার্তা চালু</div>
+            <label class="bc-check"><input type="checkbox" id="wl-enabled" checked onchange="renderWelcomePreview()"/> চালু রাখুন (বন্ধ থাকলে সাধারণ ছোট বার্তা যাবে)</label>
+          </div>
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">image</span>থাম্বনেইল / ব্যানার ছবি</div>
+            <input class="form-input" id="wl-image" placeholder="ছবির লিংক (https://...) — অথবা নিচে আপলোড করুন" oninput="renderWelcomePreview()" />
+            <input type="file" id="wl-image-file" accept="image/*" style="margin-top:8px;font-size:12px;" onchange="uploadWelcomeImage(this)" />
+            <div class="form-hint" id="wl-upload-hint">ছবি আপলোডের জন্য ImgBB পেজে API Key সেভ থাকতে হবে। আদর্শ মাপ ১২৮০×৭২০ (১৬:৯)।</div>
+          </div>
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">title</span>শিরোনাম</div>
+            <input class="form-input" id="wl-title" placeholder="🎬 Movi Lover-এ স্বাগতম!" oninput="renderWelcomePreview()" />
+          </div>
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">notes</span>মূল লেখা</div>
+            <textarea class="form-input" id="wl-text" rows="3" placeholder="নতুন নতুন ভিডিও সবার আগে পেতে আমাদের সাথেই থাকুন।" oninput="renderWelcomePreview()"></textarea>
+            <div class="form-hint">নামের জায়গায় <code>{name}</code> লিখলে ইউজারের নাম বসে যাবে।</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mgr-card">
+        <div class="form-section">
+          <div class="page-title" style="font-size:14px;margin-bottom:10px;">বাটন ১ — ভিডিও দেখা (সাইট টেলিগ্রামের ভেতরেই খুলবে)</div>
+          <div class="form-group">
+            <div class="form-label">বাটনের নাম</div>
+            <input class="form-input" id="wl-b1-label" placeholder="▶️ ওয়াচ ভিডিও" oninput="renderWelcomePreview()" />
+          </div>
+          <div class="form-group">
+            <div class="form-label">বিবরণ (বার্তায় বাটনের উপরে দেখাবে)</div>
+            <input class="form-input" id="wl-b1-desc" placeholder="নতুন ও এক্সক্লুসিভ ভিডিও এখানেই দেখুন, টেলিগ্রাম ছেড়ে বের হওয়া লাগবে না।" oninput="renderWelcomePreview()" />
+          </div>
+          <div class="form-group">
+            <div class="form-label">সাইটের সরাসরি লিংক (ঐচ্ছিক, https://...)</div>
+            <input class="form-input" id="wl-site" placeholder="দিলে বাটন সরাসরি সাইট খোলে; খালি রাখলে বটের Mini App লিংক ব্যবহার হয়" />
+          </div>
+
+          <div class="page-title" style="font-size:14px;margin:16px 0 10px;">বাটন ২ — টেলিগ্রাম চ্যানেলে জয়েন</div>
+          <div class="form-group">
+            <div class="form-label">বাটনের নাম</div>
+            <input class="form-input" id="wl-b2-label" placeholder="📢 জয়েন টেলিগ্রাম চ্যানেল" oninput="renderWelcomePreview()" />
+          </div>
+          <div class="form-group">
+            <div class="form-label">বিবরণ</div>
+            <input class="form-input" id="wl-b2-desc" placeholder="সব আপডেট ও অফার সবার আগে পেতে চ্যানেলে যুক্ত হোন।" oninput="renderWelcomePreview()" />
+          </div>
+          <div class="form-group">
+            <div class="form-label">চ্যানেলের লিংক*</div>
+            <input class="form-input" id="wl-b2-url" placeholder="https://t.me/yourchannel" oninput="renderWelcomePreview()" />
+          </div>
+        </div>
+      </div>
+
+      <div class="mgr-card">
+        <div class="form-section">
+          <div class="page-title" style="font-size:14px;margin-bottom:10px;">বটের প্রোফাইল বিবরণ (Start চাপার আগে দেখায়)</div>
+          <div class="form-group">
+            <div class="form-label">বিবরণ (সর্বোচ্চ ৫১২ অক্ষর)</div>
+            <textarea class="form-input" id="wl-bot-desc" rows="3" maxlength="512" placeholder="Movi Lover-এ নতুন ভিডিও সবার আগে দেখুন। Start চাপুন!"></textarea>
+          </div>
+          <div class="form-group">
+            <div class="form-label">ছোট বিবরণ (সর্বোচ্চ ১২০ অক্ষর)</div>
+            <input class="form-input" id="wl-bot-short" maxlength="120" placeholder="নতুন ভিডিও সবার আগে — Movi Lover" />
+          </div>
+        </div>
+      </div>
+
+      <div class="mgr-card">
+        <div class="form-section">
+          <div class="page-title" style="font-size:14px;margin-bottom:10px;">প্রিভিউ</div>
+          <div id="wl-preview" style="max-width:340px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:16px;overflow:hidden;"></div>
+        </div>
+      </div>
+
+      <div class="mgr-card">
+        <div class="form-section">
+          <button class="save-btn" onclick="saveWelcome()"><span class="material-icons-round">save</span>সংরক্ষণ করুন</button>
+          <button class="cancel-btn" onclick="applyWelcomeToTelegram()"><span class="material-icons-round" style="font-size:16px;vertical-align:-3px;">cloud_upload</span> টেলিগ্রামে প্রয়োগ করুন (বিবরণ, কমান্ড, মেনু বাটন)</button>
+          <div class="form-group" style="margin-top:14px;">
+            <div class="form-label">নিজের কাছে টেস্ট পাঠান — আপনার টেলিগ্রাম আইডি</div>
+            <input class="form-input" id="wl-test-id" inputmode="numeric" placeholder="যেমন: 123456789 (আগে বটে একবার Start চেপে রাখুন)" />
+            <button class="cancel-btn" onclick="testWelcome()"><span class="material-icons-round" style="font-size:16px;vertical-align:-3px;">send</span> টেস্ট বার্তা পাঠান</button>
+          </div>
+          <div class="form-hint" id="wl-status"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- REFERRALS -->
     <div class="page" id="page-referrals">
       <div class="page-head">
@@ -1046,6 +1149,7 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
     <div class="nav-item" data-page="channels" onclick="showAdminPage('channels')"><span class="material-icons-round">send</span>চ্যানেল</div>
     <div class="nav-item" data-page="tasks" onclick="showAdminPage('tasks')"><span class="material-icons-round">payments</span>টাস্ক</div>
     <div class="nav-item" data-page="withdrawals" onclick="showAdminPage('withdrawals')"><span class="material-icons-round">account_balance_wallet</span>উইথড্র</div>
+    <div class="nav-item" data-page="welcome" onclick="showAdminPage('welcome')"><span class="material-icons-round">waving_hand</span>স্বাগত</div>
     <div class="nav-item" data-page="referrals" onclick="showAdminPage('referrals')"><span class="material-icons-round">share</span>রেফার</div>
     <div class="nav-item" data-page="imgbb" onclick="showAdminPage('imgbb')"><span class="material-icons-round">add_photo_alternate</span>IMGBB</div>
     <div class="nav-item" data-page="videobot" onclick="showAdminPage('videobot')"><span class="material-icons-round">smart_toy</span>ভিডিও বট</div>
@@ -1412,6 +1516,7 @@ function showAdminPage(name){
   if(name==='broadcast') refreshBroadcastStats();
   if(name==='tasks') loadTasks();
   if(name==='referrals') loadReferralPage();
+  if(name==='welcome') loadWelcomePage();
   if(name==='withdrawals'){ renderWithdrawalsList(); loadIncomeReport(); }
 }
 
@@ -3394,6 +3499,114 @@ function userExtraHtml(u){
   const f = (A.userFin||{})[u.id];
   const fin = f ? '<span class="user-fin">ব্যালেন্স ৳' + Math.max(0,f.income-f.withdrawn).toFixed(2) + '</span><span class="user-fin">মোট ইনকাম ৳' + f.income.toFixed(2) + '</span><span class="user-fin">উইথড্র ৳' + f.withdrawn.toFixed(2) + '</span>' : '';
   return '<div class="user-extra">' + fin + '<button class="dm-btn" onclick="openDmModal(\'' + escHtml(u.id) + '\')"><span class="material-icons-round">send</span>মেসেজ</button></div>';
+}
+
+/* ============ WELCOME MESSAGE (settings/welcome) ============
+   বট (bot.js) প্রতিবার /start-এ এই ডক পড়ে ছবি + লেখা + ২ বাটন পাঠায়। */
+const WL_IDS = { image:'wl-image', title:'wl-title', text:'wl-text', b1Label:'wl-b1-label', b1Desc:'wl-b1-desc', site:'wl-site', b2Label:'wl-b2-label', b2Desc:'wl-b2-desc', b2Url:'wl-b2-url', botDesc:'wl-bot-desc', botShort:'wl-bot-short' };
+const WL_DEFAULTS = {
+  enabled:true, image:'', title:'🎬 Movi Lover-এ স্বাগতম, {name}!',
+  text:'নতুন নতুন ভিডিও সবার আগে পেতে আমাদের সাথেই থাকুন। নিচের দুটি অপশন থেকে শুরু করুন।',
+  b1Label:'▶️ ওয়াচ ভিডিও', b1Desc:'নতুন ও এক্সক্লুসিভ ভিডিও এখানেই দেখুন, টেলিগ্রাম ছেড়ে বের হওয়া লাগবে না।',
+  site:'', b2Label:'📢 জয়েন টেলিগ্রাম চ্যানেল', b2Desc:'সব আপডেট ও অফার সবার আগে পেতে চ্যানেলে যুক্ত হোন।', b2Url:'',
+  botDesc:'Movi Lover-এ নতুন ভিডিও সবার আগে দেখুন। শুরু করতে Start চাপুন!', botShort:'নতুন ভিডিও সবার আগে — Movi Lover'
+};
+function wlEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function welcomeCollect(){
+  const w = { enabled: document.getElementById('wl-enabled').checked };
+  Object.keys(WL_IDS).forEach(k=>{ w[k] = String(document.getElementById(WL_IDS[k]).value || '').trim(); });
+  return w;
+}
+function welcomeCaption(w, name){
+  const nm = name || 'বন্ধু';
+  const parts = [];
+  if(w.title) parts.push('<b>' + wlEsc(w.title).split('{name}').join(wlEsc(nm)) + '</b>');
+  if(w.text) parts.push(wlEsc(w.text).split('{name}').join(wlEsc(nm)));
+  const opts = [];
+  if(w.b1Label) opts.push(wlEsc(w.b1Label) + (w.b1Desc ? '\n' + wlEsc(w.b1Desc) : ''));
+  if(w.b2Label && w.b2Url) opts.push(wlEsc(w.b2Label) + (w.b2Desc ? '\n' + wlEsc(w.b2Desc) : ''));
+  if(opts.length) parts.push(opts.join('\n\n'));
+  return parts.join('\n\n');
+}
+function welcomeButtons(w){
+  const rows = [];
+  if(w.b1Label){
+    rows.push([ /^https:\/\//i.test(w.site||'') ? { text:w.b1Label, web_app:{ url:w.site } } : { text:w.b1Label, url: videoShareLink('') } ]);
+  }
+  if(w.b2Label && /^https?:\/\//i.test(w.b2Url||'')) rows.push([{ text:w.b2Label, url:w.b2Url }]);
+  return rows;
+}
+async function loadWelcomePage(){
+  const d = (await fbGetDoc('settings','welcome')) || {};
+  const w = Object.assign({}, WL_DEFAULTS, d);
+  document.getElementById('wl-enabled').checked = w.enabled !== false;
+  Object.keys(WL_IDS).forEach(k=>{ document.getElementById(WL_IDS[k]).value = w[k] || ''; });
+  renderWelcomePreview();
+}
+function renderWelcomePreview(){
+  const w = welcomeCollect();
+  const box = document.getElementById('wl-preview'); if(!box) return;
+  const btns = welcomeButtons(w);
+  box.innerHTML =
+    (w.image ? '<img src="' + wlEsc(w.image) + '" alt="" style="width:100%;display:block;max-height:200px;object-fit:cover;" onerror="this.style.display=\'none\'">' : '') +
+    '<div style="padding:12px 14px;font-size:13px;line-height:1.6;white-space:pre-wrap;">' + welcomeCaption(w, 'রাহিম') + '</div>' +
+    '<div style="padding:0 10px 12px;display:flex;flex-direction:column;gap:6px;">' +
+      btns.map(r=>'<div style="text-align:center;padding:9px;border-radius:10px;background:rgba(139,92,246,.22);border:1px solid rgba(167,139,250,.45);font-weight:700;font-size:13px;">' + wlEsc(r[0].text) + '</div>').join('') +
+    '</div>';
+}
+async function uploadWelcomeImage(inp){
+  const f = inp.files && inp.files[0]; if(!f) return;
+  const hint = document.getElementById('wl-upload-hint');
+  hint.textContent = 'আপলোড হচ্ছে...';
+  try{
+    const url = await uploadToImgBB(f, null);
+    document.getElementById('wl-image').value = url;
+    hint.textContent = '✅ আপলোড হয়েছে।';
+    renderWelcomePreview();
+  }catch(e){ hint.textContent = '⚠️ ' + (e && e.message ? e.message : 'আপলোড ব্যর্থ'); }
+}
+function wlStatus(msg, bad){ const el = document.getElementById('wl-status'); if(el){ el.textContent = msg; el.style.color = bad ? 'var(--accent2)' : 'var(--green)'; } }
+async function saveWelcome(){
+  const w = welcomeCollect();
+  if(w.b2Label && !/^https?:\/\//i.test(w.b2Url)){ toast('⚠️ চ্যানেলের লিংক দিন (https://t.me/...)।'); return; }
+  if(w.site && !/^https:\/\//i.test(w.site)){ toast('⚠️ সাইটের লিংক https:// দিয়ে শুরু হতে হবে।'); return; }
+  try{ await fbSet('settings','welcome', w); toast('✅ স্বাগত বার্তা সংরক্ষিত হয়েছে!'); wlStatus('সংরক্ষিত। bot.js চালু থাকলে এখন থেকেই নতুন Start-এ এই বার্তা যাবে।'); }
+  catch(e){ toast('⚠️ সংরক্ষণ হয়নি।'); wlStatus('সংরক্ষণ ব্যর্থ — লগইন ও Firestore Rules দেখুন।', true); }
+}
+async function wlTg(method, body){
+  const r = await fetch('https://api.telegram.org/bot' + bcToken() + '/' + method, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body||{}) });
+  return r.json();
+}
+/* বটের প্রোফাইল বিবরণ, কমান্ড ও মেনু বাটন টেলিগ্রামে সেট করে (এগুলো Bot API দিয়ে সরাসরি সেট হয়) */
+async function applyWelcomeToTelegram(){
+  if(!bcToken()){ toast('⚠️ আগে "ভিডিও বট" পেজে বটের টোকেন সংরক্ষণ করুন।'); return; }
+  const w = welcomeCollect();
+  wlStatus('টেলিগ্রামে প্রয়োগ হচ্ছে...');
+  const out = [];
+  try{
+    let r = await wlTg('setMyDescription', { description: w.botDesc.slice(0,512) }); out.push('বিবরণ ' + (r.ok?'✅':'❌ '+r.description));
+    r = await wlTg('setMyShortDescription', { short_description: w.botShort.slice(0,120) }); out.push('ছোট বিবরণ ' + (r.ok?'✅':'❌ '+r.description));
+    r = await wlTg('setMyCommands', { commands:[{command:'start',description:'বট চালু করুন'},{command:'mylink',description:'আমার রেফারেল লিংক'}] }); out.push('কমান্ড ' + (r.ok?'✅':'❌ '+r.description));
+    if(/^https:\/\//i.test(w.site)){
+      r = await wlTg('setChatMenuButton', { menu_button:{ type:'web_app', text: (w.b1Label||'সাইট').replace(/[<>]/g,'').slice(0,30), web_app:{ url:w.site } } }); out.push('মেনু বাটন ' + (r.ok?'✅':'❌ '+r.description));
+    } else out.push('মেনু বাটন: সাইটের লিংক না দেওয়ায় বাদ');
+    wlStatus(out.join(' · '), out.some(x=>x.indexOf('❌')>-1));
+  }catch(e){ wlStatus('টেলিগ্রামে পৌঁছানো যায়নি (নেটওয়ার্ক/টোকেন দেখুন)।', true); }
+}
+async function testWelcome(){
+  if(!bcToken()){ toast('⚠️ আগে বটের টোকেন সংরক্ষণ করুন।'); return; }
+  const id = String(document.getElementById('wl-test-id').value||'').replace(/\D/g,'');
+  if(!id){ toast('⚠️ আপনার টেলিগ্রাম আইডি দিন।'); return; }
+  const w = welcomeCollect(); const cap = welcomeCaption(w, 'টেস্ট'); const kb = { inline_keyboard: welcomeButtons(w) };
+  try{
+    let r;
+    if(w.image && cap.length <= 1000) r = await wlTg('sendPhoto', { chat_id:id, photo:w.image, caption:cap, parse_mode:'HTML', reply_markup:kb });
+    else {
+      if(w.image) await wlTg('sendPhoto', { chat_id:id, photo:w.image });
+      r = await wlTg('sendMessage', { chat_id:id, text:cap || ' ', parse_mode:'HTML', reply_markup:kb, disable_web_page_preview:true });
+    }
+    wlStatus(r.ok ? '✅ টেস্ট বার্তা গেছে — টেলিগ্রাম খুলে দেখুন।' : '❌ ' + (r.description||'ব্যর্থ') + ' (আগে বটে Start চেপেছেন তো?)', !r.ok);
+  }catch(e){ wlStatus('সংযোগ ব্যর্থ।', true); }
 }
 
 /* ============ REFERRAL TRACKING (admin) =====================
