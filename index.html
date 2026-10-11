@@ -894,6 +894,8 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
             <button class="cancel-btn" onclick="testWelcome()"><span class="material-icons-round" style="font-size:16px;vertical-align:-3px;">send</span> টেস্ট বার্তা পাঠান</button>
           </div>
           <div class="form-hint" id="wl-status"></div>
+          <button class="save-btn" style="margin-top:12px;" onclick="diagnoseBot()"><span class="material-icons-round">troubleshoot</span>বট যাচাই করুন (বার্তা না এলে এটা চাপুন)</button>
+          <div id="wl-diag" style="display:none;margin-top:12px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);font-size:12.5px;line-height:1.9;white-space:pre-wrap;"></div>
         </div>
       </div>
     </div>
@@ -3614,20 +3616,108 @@ async function applyWelcomeToTelegram(){
     wlStatus(out.join(' · '), out.some(x=>x.indexOf('❌')>-1));
   }catch(e){ wlStatus('টেলিগ্রামে পৌঁছানো যায়নি (নেটওয়ার্ক/টোকেন দেখুন)।', true); }
 }
+function wlTgErrorBn(d){
+  d = String(d||'');
+  if(/chat not found/i.test(d)) return 'এই আইডির কাউকে বট চেনে না — সঠিক টেলিগ্রাম আইডি দিয়েছেন তো? আর আগে নতুন বটে একবার Start চাপতে হবে।';
+  if(/blocked by the user|bot was blocked/i.test(d)) return 'আপনি এই বটকে ব্লক করে রেখেছেন — আনব্লক করে Start চাপুন।';
+  if(/can't initiate conversation|user is deactivated/i.test(d)) return 'বট আপনাকে আগে মেসেজ দিতে পারে না — বটে গিয়ে Start চাপুন।';
+  if(/wrong file identifier|failed to get HTTP URL|wrong type of the web page content|IMAGE_PROCESS_FAILED/i.test(d)) return 'ছবির লিংক টেলিগ্রাম নিতে পারছে না — লিংকটি সরাসরি ছবির (jpg/png) এবং পাবলিক হতে হবে।';
+  if(/BUTTON_URL_INVALID|BUTTON_TYPE_INVALID/i.test(d)) return 'কোনো বাটনের লিংক ঠিক নয় — https:// দিয়ে সঠিক লিংক দিন।';
+  if(/can't parse entities/i.test(d)) return 'লেখায় এমন চিহ্ন আছে যা টেলিগ্রাম বোঝেনি — < > চিহ্ন সরিয়ে দেখুন।';
+  if(/Unauthorized|not found/i.test(d)) return 'বটের টোকেন ভুল বা বাতিল (Revoke) করা — BotFather থেকে নতুন টোকেন নিয়ে "ভিডিও বট" পেজে সংরক্ষণ করুন।';
+  return d;
+}
 async function testWelcome(){
   if(!bcToken()){ toast('⚠️ আগে বটের টোকেন সংরক্ষণ করুন।'); return; }
   const id = String(document.getElementById('wl-test-id').value||'').replace(/\D/g,'');
-  if(!id){ toast('⚠️ আপনার টেলিগ্রাম আইডি দিন।'); return; }
+  if(!id){ toast('⚠️ আপনার টেলিগ্রাম আইডি (শুধু সংখ্যা) দিন।'); return; }
   const w = welcomeCollect(); const cap = welcomeCaption(w, 'টেস্ট'); const kb = { inline_keyboard: welcomeButtons(w) };
+  const text = cap || '🎬 স্বাগতম!';
+  wlStatus('পাঠানো হচ্ছে...');
   try{
-    let r;
-    if(w.image && cap.length <= 1000) r = await wlTg('sendPhoto', { chat_id:id, photo:w.image, caption:cap, parse_mode:'HTML', reply_markup:kb });
-    else {
+    let r, note = '';
+    if(w.image && cap.length <= 1000){
+      r = await wlTg('sendPhoto', { chat_id:id, photo:w.image, caption:cap, parse_mode:'HTML', reply_markup:kb });
+      if(!r.ok && /wrong file|HTTP URL|web page content|IMAGE_PROCESS/i.test(r.description||'')){
+        note = ' (ছবির লিংক কাজ করেনি, তাই শুধু লেখা পাঠানো হলো: ' + wlTgErrorBn(r.description) + ')';
+        r = await wlTg('sendMessage', { chat_id:id, text, parse_mode:'HTML', reply_markup:kb, disable_web_page_preview:true });
+      }
+    } else {
       if(w.image) await wlTg('sendPhoto', { chat_id:id, photo:w.image });
-      r = await wlTg('sendMessage', { chat_id:id, text:cap || ' ', parse_mode:'HTML', reply_markup:kb, disable_web_page_preview:true });
+      r = await wlTg('sendMessage', { chat_id:id, text, parse_mode:'HTML', reply_markup:kb, disable_web_page_preview:true });
     }
-    wlStatus(r.ok ? '✅ টেস্ট বার্তা গেছে — টেলিগ্রাম খুলে দেখুন।' : '❌ ' + (r.description||'ব্যর্থ') + ' (আগে বটে Start চেপেছেন তো?)', !r.ok);
-  }catch(e){ wlStatus('সংযোগ ব্যর্থ।', true); }
+    // বাটনের লিংকে সমস্যা থাকলে বাটন ছাড়া লেখা অন্তত যাক, আর কারণ বলি
+    if(!r.ok && /BUTTON_/i.test(r.description||'')){
+      const why = wlTgErrorBn(r.description);
+      const r2 = await wlTg('sendMessage', { chat_id:id, text, parse_mode:'HTML', disable_web_page_preview:true });
+      wlStatus(r2.ok ? ('⚠️ বার্তা গেছে কিন্তু বাটন ছাড়া — ' + why) : ('❌ ' + wlTgErrorBn(r2.description)), true); return;
+    }
+    wlStatus(r.ok ? ('✅ টেস্ট বার্তা গেছে — টেলিগ্রাম খুলে দেখুন।' + note) : ('❌ ' + wlTgErrorBn(r.description)), !r.ok);
+  }catch(e){ wlStatus('❌ টেলিগ্রামে পৌঁছানো যায়নি (ইন্টারনেট/VPN/অ্যাডব্লকার দেখুন)।', true); }
+}
+
+/* "বট যাচাই করুন": টোকেন, বট সার্ভার (bot.js), ওয়েবহুক, জমে থাকা Start, শেষ ত্রুটি ও স্বাগত বার্তা — সব এক জায়গায় */
+function wlAgo(ts){
+  if(!ts) return 'কখনো না';
+  const s = Math.round((Date.now()-ts)/1000);
+  if(s < 90) return s + ' সেকেন্ড আগে';
+  if(s < 5400) return Math.round(s/60) + ' মিনিট আগে';
+  if(s < 172800) return Math.round(s/3600) + ' ঘণ্টা আগে';
+  return Math.round(s/86400) + ' দিন আগে';
+}
+async function diagnoseBot(){
+  const box = document.getElementById('wl-diag');
+  box.style.display = 'block'; box.textContent = 'যাচাই করা হচ্ছে...';
+  const L = []; let cause = '';
+  const token = bcToken();
+  if(!token){ box.textContent = '❌ বটের টোকেন সংরক্ষিত নেই।\n→ "ভিডিও বট" পেজে নতুন বটের টোকেন বসিয়ে সংরক্ষণ করুন।'; return; }
+  // ১) টোকেন
+  let me = null;
+  try{
+    const r = await wlTg('getMe', {});
+    if(r.ok){ me = r.result; L.push('✅ টোকেন ঠিক আছে — বট: @' + me.username); }
+    else { L.push('❌ টোকেন কাজ করছে না: ' + wlTgErrorBn(r.description)); cause = 'বটের টোকেন ভুল/বাতিল। BotFather → /mybots → বট → API Token থেকে নতুন টোকেন নিয়ে "ভিডিও বট" পেজে সংরক্ষণ করুন।'; }
+  }catch(e){ L.push('❌ টেলিগ্রামে পৌঁছানো যায়নি (ইন্টারনেট/VPN/অ্যাডব্লকার)।'); }
+  // ২) বট সার্ভার (bot.js)
+  let st = null;
+  try{ st = await fbGetDoc('settings','botStatus'); }catch(e){}
+  const alive = !!(st && st.lastBeat && (Date.now()-st.lastBeat) < 180000);
+  if(alive) L.push('✅ বট সার্ভার (bot.js) চালু — শেষ সংকেত ' + wlAgo(st.lastBeat));
+  else {
+    L.push('❌ বট সার্ভার (bot.js) চলছে না — ' + (st && st.lastBeat ? ('শেষ সংকেত ' + wlAgo(st.lastBeat)) : 'কখনো সংকেত পাইনি'));
+    if(!cause) cause = 'bot.js কোথাও চালু নেই। Start চাপলে বার্তা পাঠানোর কাজ ওই প্রোগ্রামই করে — এটা বন্ধ থাকলে কিছুই যাবে না। SETUP-bn.md-এর ধাপ ৪ অনুযায়ী bot.js চালু করুন (কম্পিউটার বন্ধ করলে এটাও বন্ধ হয়, তাই Railway/Render/VPS-এ রাখুন)।';
+  }
+  // ৩) ওয়েবহুক ও জমে থাকা মেসেজ
+  if(me){
+    try{
+      const wi = await wlTg('getWebhookInfo', {});
+      if(wi.ok){
+        const x = wi.result || {};
+        if(x.url) L.push('⚠️ এই বটে ওয়েবহুক সেট করা আছে (' + x.url + ') — অন্য কোনো সার্ভিস বটের মেসেজ ধরছে। bot.js চালু করলে সেটি ওয়েবহুক মুছে নিজে মেসেজ নেয়।');
+        if(x.pending_update_count > 0) L.push('❌ ' + x.pending_update_count + 'টি মেসেজ/Start জমে আছে, কেউ নিচ্ছে না' + (!alive ? ' — এটাই প্রমাণ যে bot.js চলছে না।' : '।'));
+        else L.push('✅ জমে থাকা কোনো মেসেজ নেই');
+        if(x.last_error_message) L.push('⚠️ টেলিগ্রামের শেষ ওয়েবহুক ত্রুটি: ' + x.last_error_message);
+      }
+    }catch(e){}
+  }
+  // ৪) bot.js-এর শেষ Start ও শেষ ত্রুটি
+  if(st && st.lastStart) L.push('ℹ️ শেষ /start পেয়েছে: ' + wlAgo(st.lastStart) + ' (ইউজার ' + (st.lastStartUser||'?') + ')');
+  else if(alive) L.push('ℹ️ bot.js চালু, কিন্তু এখনো কোনো /start পায়নি — আপনি ঠিক এই বটেই (@' + (me?me.username:'?') + ') Start চাপছেন তো?');
+  if(st && st.lastError){
+    L.push('⚠️ bot.js-এর শেষ ত্রুটি (' + wlAgo(st.lastErrorAt) + '): ' + st.lastError);
+    if(/permission|PERMISSION_DENIED|Missing or insufficient/i.test(st.lastError) && !cause) cause = 'bot.js Firestore-এ ঢুকতে পারছে না — serviceAccount.json এই Firebase প্রজেক্টের কি না দেখুন।';
+  }
+  // ৫) স্বাগত বার্তা সংরক্ষিত?
+  const wd = await fbGetDoc('settings','welcome');
+  if(!wd) L.push('❌ স্বাগত বার্তা এখনো সংরক্ষণ করা হয়নি — আগে "সংরক্ষণ করুন" চাপুন; নইলে বট শুধু সাধারণ ছোট বার্তা পাঠায়।');
+  else if(wd.enabled === false) L.push('⚠️ স্বাগত বার্তা বন্ধ করা আছে — "চালু রাখুন" টিক দিয়ে সংরক্ষণ করুন।');
+  else L.push('✅ স্বাগত বার্তা সংরক্ষিত ও চালু' + (wd.image ? '' : ' (ছবি দেওয়া নেই)'));
+  // ৬) সাইট লিংকের বট
+  const sd = await fbGetDoc('settings','site');
+  if(me && sd && sd.botUsername && sd.botUsername.toLowerCase() !== me.username.toLowerCase()) L.push('⚠️ সাইট/রেফার লিংক এখনো অন্য বটের (@' + sd.botUsername + ') — "ভিডিও বট" পেজে সংরক্ষণ চাপলে ঠিক হবে।');
+  L.push('');
+  L.push(cause ? ('👉 সম্ভাব্য মূল কারণ: ' + cause) : '👉 সব ঠিক দেখাচ্ছে। এখনো না এলে বটে /start চেপে ১০ সেকেন্ড পর আবার "বট যাচাই করুন" চাপুন — "শেষ /start" ও "শেষ ত্রুটি" দেখলেই কারণ বোঝা যাবে।');
+  box.textContent = L.join('\n');
 }
 
 /* ============ REFERRAL TRACKING (admin) =====================
