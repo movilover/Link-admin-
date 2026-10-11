@@ -721,6 +721,15 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
             <div class="form-label"><span class="material-icons-round">timer</span>ভিডিও কত মিনিট থাকবে</div>
             <input class="form-input" type="number" min="1" id="vb-retention" placeholder="15" />
           </div>
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">alternate_email</span>মেইন বটের ইউজারনেম (সাইট ও রেফার লিংকের জন্য)</div>
+            <input class="form-input" id="vb-site-bot" placeholder="যেমন: MyNewBot (টোকেন সংরক্ষণ করলে নিজে থেকে বসে যায়)" autocomplete="off" autocapitalize="off" spellcheck="false" />
+          </div>
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">apps</span>মিনি অ্যাপের শর্ট নাম (ঐচ্ছিক)</div>
+            <input class="form-input" id="vb-site-app" placeholder="যেমন: webapp (খালি রাখলে Main Mini App লিংক হবে)" autocomplete="off" autocapitalize="off" spellcheck="false" />
+            <div class="form-hint">BotFather → /newapp দিয়ে সাইটের জন্য মিনি অ্যাপ বানালে তার শর্ট নাম এখানে দিন। অথবা খালি রেখে BotFather → বট → Bot Settings → Configure Mini App → Enable → URL বসান — তাহলে লিংক হবে <code>t.me/বট?startapp=...</code>।</div>
+          </div>
           <button class="save-btn" onclick="saveVideoBotSettings()"><span class="material-icons-round">save</span>সংরক্ষণ করুন</button>
           <button class="cancel-btn" onclick="testVideoBot()"><span class="material-icons-round" style="font-size:16px;vertical-align:-3px;">wifi_tethering</span> চ্যানেলে টেস্ট মেসেজ পাঠান</button>
         </div>
@@ -1793,7 +1802,19 @@ async function loadVideoBotSettings(){
   document.getElementById('vb-token').value = A.videobot.token || '';
   document.getElementById('vb-chat-id').value = A.videobot.chatId || '';
   document.getElementById('vb-retention').value = A.videobot.retentionMinutes || 15;
+  try{
+    const sd = await window._getDoc(window._doc(window._db,'settings','site'));
+    const s = sd.exists() ? sd.data() : null;
+    if(s){ applySiteLinkSettings(s); }
+    document.getElementById('vb-site-bot').value = (s && s.botUsername) || A.videobot.botUsername || '';
+    document.getElementById('vb-site-app').value = (s && typeof s.appShort === 'string') ? s.appShort : '';
+  }catch(e){}
   renderVideoBotStatus();
+}
+/* settings/site = { botUsername, appShort }  — পাবলিক পড়া যায়, লেখে শুধু এডমিন */
+function applySiteLinkSettings(s){
+  if(s && s.botUsername) MAIN_BOT_USERNAME = String(s.botUsername).replace(/^@/,'');
+  if(s && typeof s.appShort === 'string') MAIN_APP_SHORT = s.appShort.replace(/[^A-Za-z0-9_]/g,'');
 }
 function renderVideoBotStatus(){
   const box = document.getElementById('vb-status-box');
@@ -1846,6 +1867,14 @@ async function saveVideoBotSettings(){
   try{
     await fbSet('settings','videobot',{ token, chatId, botUsername, retentionMinutes });
     A.videobot = { token, chatId, botUsername, retentionMinutes };
+    // সাইট/রেফার লিংকের বট: ফিল্ডে হাতে লেখা থাকলে সেটা, নইলে টোকেনের আসল বটের ইউজারনেম
+    const siteBot = String((document.getElementById('vb-site-bot').value || botUsername)).trim().replace(/^@/,'');
+    const siteApp = String(document.getElementById('vb-site-app').value || '').trim().replace(/[^A-Za-z0-9_]/g,'');
+    document.getElementById('vb-site-bot').value = siteBot;
+    await fbSet('settings','site',{ botUsername: siteBot, appShort: siteApp });
+    applySiteLinkSettings({ botUsername: siteBot, appShort: siteApp });
+    // ব্রডকাস্ট বাটনের টোকেনও এখন নতুন বটের টোকেনে
+    A.telegram = Object.assign({}, A.telegram, { botToken: token });
     renderVideoBotStatus();
     showVbDiag('ok','✅ সব ঠিক আছে — বট @'+botUsername+' চ্যানেলের অ্যাডমিন, সংরক্ষিত হয়েছে। এখন ভিডিও আপলোড করতে পারবেন।');
   }catch(e){ showVbDiag('bad','Firebase-এ সংরক্ষণ হয়নি: ' + (e && e.code ? e.code : 'অনুমতি/নেটওয়ার্ক') + ' — অ্যাডমিন ইমেইল-পাসওয়ার্ড দিয়ে লগইন আছে কি না এবং Rules Publish হয়েছে কি না দেখুন।'); }
@@ -2861,10 +2890,12 @@ function refreshBroadcastStats(){
    - sendPhoto with caption (HTML) + inline_keyboard
    - runs fully in the background; the admin never waits on it
    ===================================================================== */
-const MAIN_BOT_USERNAME = 'movilovervairal_bot';
-const MAIN_APP_SHORT = 'webapp';
-function bcToken(){ return (A.telegram && A.telegram.botToken) || (A.videobot && A.videobot.token) || ''; }
-function videoShareLink(vid){ return 'https://t.me/' + MAIN_BOT_USERNAME + '/' + MAIN_APP_SHORT + (vid ? ('?startapp=v-' + vid) : ''); }
+let MAIN_BOT_USERNAME = 'movilovervairal_bot'; // ফলব্যাক; আসল মান ভিডিও বট পেজ → settings/site থেকে আসে
+let MAIN_APP_SHORT = 'webapp';
+// নতুন বটের টোকেন (ভিডিও বট পেজে বসানো) আগে; পুরনো আলাদা টেলিগ্রাম সেটিংসের টোকেন শুধু ফলব্যাক
+function bcToken(){ return (A.videobot && A.videobot.token) || (A.telegram && A.telegram.botToken) || ''; }
+function mainLinkBase(){ return 'https://t.me/' + MAIN_BOT_USERNAME + (MAIN_APP_SHORT ? '/' + MAIN_APP_SHORT : ''); }
+function videoShareLink(vid){ return mainLinkBase() + (vid ? ('?startapp=v-' + vid) : (MAIN_APP_SHORT ? '' : '?startapp=home')); }
 function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
 
 function bcComposerHtml(p){
@@ -3397,7 +3428,7 @@ function refLabel(refId){
   return (n || refId) + (u.tgUsername ? ' @'+u.tgUsername : '');
 }
 function refSlugOf(refId){ const s = A.ref.slugs.find(x=>String(x.userId)===refId); return s ? s.id : ''; }
-function refLink(refId){ const s = refSlugOf(refId); return 'https://t.me/' + MAIN_BOT_USERNAME + '/' + MAIN_APP_SHORT + '?startapp=r-' + (s || refId); }
+function refLink(refId){ const s = refSlugOf(refId); return mainLinkBase() + '?startapp=r-' + (s || refId); }
 function renderReferralDash(){
   const ids = new Set();
   A.ref.clicks.forEach(x=>ids.add(x.ref)); A.ref.joins.forEach(x=>ids.add(x.ref));
