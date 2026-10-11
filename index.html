@@ -1247,7 +1247,8 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
             <div class="form-hint">ক্যাপশন ও বাটনের লিংকে <b>{VIDEO_LINK}</b> লিখলে সেখানে এই ভিডিওর নিজস্ব শেয়ার লিংক বসে যাবে।</div>
           </div>
           <div id="v-bc-mount"></div>
-          <div class="form-hint" style="color:var(--green);">⚡ বট সার্ভার (bot.js) চালু থাকলে ভিডিও সেভ হওয়ার সাথে সাথে থাম্বনেইল, টাইটেল ও "Watch Now" বাটনসহ সব বট-ইউজারের কাছে নিজে থেকেই চলে যাবে — এখানে কিছু করতে হবে না। বট সার্ভার না চালালে নিচের "সব বট-ইউজার" টিক দিন।</div>
+          <div class="form-hint" id="v-bot-alive" style="font-weight:700;">বট সার্ভারের অবস্থা যাচাই হচ্ছে...</div>
+          <div class="form-hint">বট সার্ভার (bot.js) চালু থাকলে ভিডিও সেভ হওয়ার সাথে সাথে থাম্বনেইল, টাইটেল ও "Watch Now" বাটনসহ সবার কাছে নিজে থেকেই চলে যাবে। বন্ধ থাকলে নিচের "সব বট-ইউজার" টিক দিয়ে ব্রাউজার থেকে পাঠান।</div>
           <div class="form-hint" style="color:var(--gold3);">সেভ চাপার পর পোস্ট ব্যাকগ্রাউন্ডে যাবে, আপনাকে অপেক্ষা করতে হবে না। তবে পাঠানো শেষ না হওয়া পর্যন্ত এই ট্যাব বন্ধ করবেন না।</div>
         </div>
       </div>
@@ -2274,7 +2275,12 @@ function openVideoForm(id){
   {
     const T = A.telegram || {};
     const defBtns = T.bcDefaultButtons || [{text:'▶️ ভিডিওটি দেখুন', url:'{VIDEO_LINK}'},{text:'ℹ️ কিভাবে ভিডিও দেখবেন', url:''}];
-    bcInitComposer('v', { buttons:defBtns, toUsers:false }); // ইউজারদের কাছে বট সার্ভার নিজেই ইনস্ট্যান্ট পাঠায়
+    // বট সার্ভার (bot.js) চালু থাকলে সে-ই সবাইকে পাঠায়, তাই ব্রাউজার থেকে পাঠানো বন্ধ; সার্ভার বন্ধ থাকলে আগের মতোই ব্রাউজার থেকে যায়
+    bcInitComposer('v', { buttons:defBtns, toUsers:!A.botAlive });
+    refreshBotAlive().then(()=>{
+      const cb = document.getElementById('v-bc-to-users');
+      if(cb && !id && document.getElementById('form-modal').classList.contains('open')) cb.checked = !A.botAlive;
+    });
     document.getElementById('v-bc-enabled').checked = !id && !!bcToken();
     document.getElementById('v-bc-caption').value = '';
     bcToggleVideoWrap();
@@ -3306,7 +3312,10 @@ async function sendManualBroadcast(){
   const url = document.getElementById('bc-thumb-url').value.trim() || A.pendingBcThumbUrl || '';
   if(!text){ toast('⚠️ একটি বার্তা লিখুন।'); return; }
   const viaSrv = document.getElementById('bc-via-server');
-  if(viaSrv && viaSrv.checked){ return enqueueServerBroadcast(text, url); }
+  if(viaSrv && viaSrv.checked){
+    if(await refreshBotAlive()){ return enqueueServerBroadcast(text, url); }
+    toast('⚠️ বট সার্ভার বন্ধ — ব্রাউজার থেকে পাঠানো হচ্ছে।');
+  }
   if(!bcToken()){ toast('⚠️ আগে সেটিংসে গিয়ে বট টোকেন বসান।'); return; }
   const c = bcCollect('bc');
   if(c.invalid){ toast('⚠️ বাটনের লেবেল ও সঠিক লিংক (https://...) দুটোই দিন।'); return; }
@@ -3499,6 +3508,18 @@ function userExtraHtml(u){
   const f = (A.userFin||{})[u.id];
   const fin = f ? '<span class="user-fin">ব্যালেন্স ৳' + Math.max(0,f.income-f.withdrawn).toFixed(2) + '</span><span class="user-fin">মোট ইনকাম ৳' + f.income.toFixed(2) + '</span><span class="user-fin">উইথড্র ৳' + f.withdrawn.toFixed(2) + '</span>' : '';
   return '<div class="user-extra">' + fin + '<button class="dm-btn" onclick="openDmModal(\'' + escHtml(u.id) + '\')"><span class="material-icons-round">send</span>মেসেজ</button></div>';
+}
+
+/* বট সার্ভার চালু আছে কি? bot.js প্রতি মিনিটে settings/botStatus-এ হার্টবিট লেখে (৩ মিনিটের মধ্যে = চালু) */
+A.botAlive = false;
+async function refreshBotAlive(){
+  try{
+    const s = await fbGetDoc('settings','botStatus');
+    A.botAlive = !!(s && s.lastBeat && (Date.now() - s.lastBeat) < 180000);
+  }catch(e){ A.botAlive = false; }
+  const el = document.getElementById('v-bot-alive');
+  if(el){ el.textContent = A.botAlive ? '🟢 বট সার্ভার চালু আছে — নিজেই সবাইকে পাঠাবে' : '🔴 বট সার্ভার বন্ধ — নিচের "সব বট-ইউজার" টিক রাখুন, ব্রাউজার থেকে যাবে'; el.style.color = A.botAlive ? 'var(--green)' : 'var(--accent2)'; }
+  return A.botAlive;
 }
 
 /* ============ WELCOME MESSAGE (settings/welcome) ============
