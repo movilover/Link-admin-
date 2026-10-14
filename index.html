@@ -831,6 +831,59 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
       </div>
     </div>
 
+    <!-- MIGRATION (পুরোনো বট -> নতুন বট) -->
+    <div class="page" id="page-migrate">
+      <div class="page-head">
+        <div class="page-title" style="color:var(--gold3);">🔁 বট মাইগ্রেশন<small>পুরোনো বটের ইউজারদের নতুন বটে আনুন</small></div>
+      </div>
+
+      <div class="mgr-card info-card">
+        <div style="font-size:12.5px;line-height:1.9;">
+          <b>কীভাবে কাজ করে:</b> নতুন বট আপনার সব ইউজারকে একটা বার্তা পাঠায়, তাতে নিজের ID-সহ সাইন করা "নতুন বটে Start দিন" বাটন থাকে। ইউজার Start চাপলেই তার আগের অ্যাকাউন্ট (ব্যালেন্স, হিস্ট্রি সব) নতুন বটের সাথে নিজে থেকে যুক্ত হয়ে যায়।<br>
+          <b>অ্যাকাউন্ট হারায় না:</b> Telegram ID সব বটের কাছে একই, তাই ডাটা সরানোর দরকারই নেই।<br>
+          <b style="color:var(--accent2);">⚠️ বড় সীমা:</b> যে ইউজার নতুন বটে একবারও Start দেয়নি, তাকে নতুন বট প্রথমে মেসেজ পাঠাতে <u>পারে না</u> (Telegram-এর নিয়ম)। তাই ৭০০০ জনের বেশিরভাগের কাছে এই বার্তা পৌঁছাবে না এবং "পৌঁছানো যায়নি" গোনা হবে। পৌঁছানোর কার্যকর পথ: সাইটে খুললে আসা "বট মেসেজ পাঠাতে পারবে?" Allow, আপনার চ্যানেল/গ্রুপে নতুন বটের লিংক পিন করা, আর সাইটের ঘোষণা (এডমিন → ঘোষণা)।
+        </div>
+      </div>
+
+      <div class="users-summary-row">
+        <div class="users-summary-card"><div class="users-summary-val" id="mg-total">0</div><div class="users-summary-lbl">টেলিগ্রাম ইউজার (সাইটে)</div></div>
+        <div class="users-summary-card"><div class="users-summary-val gold" id="mg-onbot">0</div><div class="users-summary-lbl">নতুন বটে যুক্ত</div></div>
+        <div class="users-summary-card"><div class="users-summary-val" id="mg-pending">0</div><div class="users-summary-lbl">পাঠানো বাকি</div></div>
+      </div>
+      <div class="users-summary-row" style="margin-top:0;">
+        <div class="users-summary-card"><div class="users-summary-val" id="mg-sent">0</div><div class="users-summary-lbl">বার্তা পাঠানো হয়েছে</div></div>
+        <div class="users-summary-card"><div class="users-summary-val red" id="mg-unreach">0</div><div class="users-summary-lbl">পৌঁছানো যায়নি</div></div>
+        <div class="users-summary-card"><div class="users-summary-val gold" id="mg-synced">0</div><div class="users-summary-lbl">অ্যাকাউন্ট যুক্ত</div></div>
+      </div>
+
+      <div class="mgr-card">
+        <div class="form-section">
+          <div class="form-hint" id="mg-bot-state" style="font-weight:700;">বটের অবস্থা যাচাই হচ্ছে...</div>
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">notes</span>বার্তা</div>
+            <textarea class="form-input" id="mg-text" rows="6"></textarea>
+            <div class="form-hint"><code>{name}</code> লিখলে ইউজারের নাম বসবে।</div>
+          </div>
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">smart_button</span>বাটনের লেখা</div>
+            <input class="form-input" id="mg-btn" />
+            <div class="form-hint">বাটনের লিংক নিজে থেকে বসে: <code>https://t.me/নতুন_বট?start=sync_…</code> (ইউজার-ভেদে আলাদা, সাইন করা)।</div>
+          </div>
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">image</span>ছবি (ঐচ্ছিক, লিংক)</div>
+            <input class="form-input" id="mg-img" placeholder="https://..." />
+          </div>
+          <label class="bc-check"><input type="checkbox" id="mg-only" checked/> শুধু যাদের আগে পাঠানো হয়নি (আবার চালালে পুরোনোদের ডুপ্লিকেট যাবে না — থেমে গেলে এভাবেই বাকিটা চলে)</label>
+          <div class="form-hint" id="mg-estimate"></div>
+          <button class="save-btn" id="mg-send" onclick="startMigration()"><span class="material-icons-round">send</span>মাইগ্রেশন বার্তা পাঠান</button>
+          <div id="mg-progress-wrap" style="display:none;margin-top:12px;">
+            <div style="height:8px;border-radius:8px;background:rgba(255,255,255,.1);overflow:hidden;"><div id="mg-progress-fill" style="height:100%;width:0;background:linear-gradient(90deg,#8b5cf6,#f5c542);transition:width .4s;"></div></div>
+            <div class="form-hint" id="mg-progress-txt"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- THUMBNAIL STYLE -->
     <div class="page" id="page-thumbstyle">
       <div class="page-head">
@@ -1238,6 +1291,7 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
     <div class="nav-item" data-page="channels" onclick="showAdminPage('channels')"><span class="material-icons-round">send</span>চ্যানেল</div>
     <div class="nav-item" data-page="tasks" onclick="showAdminPage('tasks')"><span class="material-icons-round">payments</span>টাস্ক</div>
     <div class="nav-item" data-page="withdrawals" onclick="showAdminPage('withdrawals')"><span class="material-icons-round">account_balance_wallet</span>উইথড্র</div>
+    <div class="nav-item" data-page="migrate" onclick="showAdminPage('migrate')"><span class="material-icons-round">sync_alt</span>মাইগ্রেশন</div>
     <div class="nav-item" data-page="thumbstyle" onclick="showAdminPage('thumbstyle')"><span class="material-icons-round">auto_awesome</span>থাম্বনেইল</div>
     <div class="nav-item" data-page="welcome" onclick="showAdminPage('welcome')"><span class="material-icons-round">waving_hand</span>স্বাগত</div>
     <div class="nav-item" data-page="referrals" onclick="showAdminPage('referrals')"><span class="material-icons-round">share</span>রেফার</div>
@@ -1609,6 +1663,7 @@ function showAdminPage(name){
   if(name==='referrals') loadReferralPage();
   if(name==='welcome') loadWelcomePage();
   if(name==='thumbstyle') loadThumbStylePage();
+  if(name==='migrate') loadMigratePage();
   if(name==='withdrawals'){ renderWithdrawalsList(); loadIncomeReport(); }
 }
 
@@ -3613,6 +3668,65 @@ async function refreshBotAlive(){
   return A.botAlive;
 }
 
+/* ============ MIGRATION (পুরোনো বট -> নতুন বট) ============
+   এডমিন broadcast_jobs-এ type:'migration' জব বানায়; bot.js (v4-migration) ৪৫ms গতিতে একে একে পাঠায়, প্রগ্রেস লেখে। */
+const MG_DEFAULT_TEXT = '🔔 {name}, আমরা নতুন বটে এসেছি!\n\nআগের বটটি বন্ধ হয়ে গেছে। আপনার অ্যাকাউন্ট, ব্যালেন্স ও হিস্ট্রি আগের মতোই থাকবে — কিছুই হারাবে না।\n\nনিচের বাটনে চেপে নতুন বটে Start দিন, আপনার অ্যাকাউন্ট নিজে থেকেই যুক্ত হয়ে যাবে।';
+function mgIdOf(u){
+  const f = ['tgUserId','telegram_id','chat_id'];
+  for(let i=0;i<f.length;i++){ const v = u[f[i]]; if(v != null && /^\d{3,15}$/.test(String(v).trim())) return String(v).trim(); }
+  return '';
+}
+A.mg = { pending:0 };
+async function loadMigratePage(){
+  const t = document.getElementById('mg-text'); if(!t.value) t.value = MG_DEFAULT_TEXT;
+  const b = document.getElementById('mg-btn'); if(!b.value) b.value = '🚀 নতুন বটে Start দিন';
+  const [users, bots, st] = await Promise.all([fbGet('users'), fbGet('bot_users'), fbGetDoc('settings','botStatus')]);
+  const ids = new Set(); users.forEach(u=>{ const id = mgIdOf(u); if(id) ids.add(id); });
+  const onBot = new Set(bots.filter(x=>x.startedAt && x.active !== false).map(x=>x.id));
+  const done = new Set(bots.filter(x=>x.migrationStatus).map(x=>x.id));
+  let pending = 0; ids.forEach(id=>{ if(!onBot.has(id) && !done.has(id)) pending++; });
+  A.mg.pending = pending;
+  const set = (id,v)=>{ const el = document.getElementById(id); if(el) el.textContent = v; };
+  set('mg-total', fmtNum(ids.size)); set('mg-onbot', fmtNum(onBot.size)); set('mg-pending', fmtNum(pending));
+  set('mg-sent', fmtNum(bots.filter(x=>x.migrationStatus === 'sent' || x.migrationStatus === 'synced').length));
+  set('mg-unreach', fmtNum(bots.filter(x=>x.migrationStatus === 'unreachable').length));
+  set('mg-synced', fmtNum(users.filter(u=>u.botSyncedAt).length));
+  const mins = Math.max(1, Math.ceil(pending * 0.052 / 60));
+  document.getElementById('mg-estimate').textContent = pending ? ('এখন পাঠানো বাকি: ' + fmtNum(pending) + ' জন — আনুমানিক ' + mins + ' মিনিট (প্রতি ৪৫ms-এ ১টি, Telegram-এর সীমার নিচে)।') : 'পাঠানোর মতো কেউ বাকি নেই।';
+  const alive = !!(st && st.lastBeat && (Date.now() - st.lastBeat) < 180000);
+  const okVer = st && st.version === 'v4-migration';
+  const el = document.getElementById('mg-bot-state');
+  if(alive && okVer){ el.textContent = '🟢 বট সার্ভার চালু (' + st.version + ')'; el.style.color = 'var(--green)'; }
+  else if(alive){ el.textContent = '🔴 সার্ভারে bot.js-এর পুরোনো সংস্করণ চলছে (' + (st.version||'?') + ') — নতুন bot.js ও migration.js দুটোই বসিয়ে আবার চালু করুন।'; el.style.color = 'var(--accent2)'; }
+  else { el.textContent = '🔴 বট সার্ভার (bot.js) চলছে না — আগে চালু করুন, নইলে বার্তা কিউতেই পড়ে থাকবে।'; el.style.color = 'var(--accent2)'; }
+  A.mg.ready = alive && okVer;
+}
+async function startMigration(){
+  const text = document.getElementById('mg-text').value.trim();
+  const buttonText = document.getElementById('mg-btn').value.trim() || '🚀 নতুন বটে Start দিন';
+  const imageUrl = document.getElementById('mg-img').value.trim();
+  const onlyUnsent = document.getElementById('mg-only').checked;
+  if(!text){ toast('⚠️ বার্তা লিখুন।'); return; }
+  if(imageUrl && !/^https?:\/\//i.test(imageUrl)){ toast('⚠️ ছবির লিংক https:// দিয়ে শুরু হতে হবে।'); return; }
+  if(!A.mg.ready){ toast('⚠️ বট সার্ভার (v4-migration) চালু নেই।'); return; }
+  openConfirm('মাইগ্রেশন বার্তা এখন ' + fmtNum(A.mg.pending) + ' জনকে পাঠানো শুরু হবে। শুরু করবেন?', async ()=>{
+    try{
+      const ref = await fbAdd('broadcast_jobs', { type:'migration', text, buttonText, imageUrl, onlyUnsent, status:'queued' });
+      toast('🚀 শুরু হয়েছে — বট এখন একে একে পাঠাচ্ছে।');
+      const wrap = document.getElementById('mg-progress-wrap'), fill = document.getElementById('mg-progress-fill'), txt = document.getElementById('mg-progress-txt');
+      wrap.style.display = 'block'; txt.textContent = 'বটের জন্য অপেক্ষা করা হচ্ছে...';
+      let unsub = null;
+      unsub = window._onSnapshot(window._doc(window._db,'broadcast_jobs',ref.id), snap=>{
+        const d = snap.data() || {}, p = d.progress || {};
+        fill.style.width = Math.round((p.done||0) / Math.max(1, p.total||1) * 100) + '%';
+        if(d.status === 'sending') txt.textContent = (p.done||0) + ' / ' + (p.total||0) + ' — সফল ' + (p.sent||0) + ', পৌঁছানো যায়নি ' + (p.unreachable||0) + ', ব্যর্থ ' + (p.failed||0);
+        if(d.status === 'done'){ const r = d.result || {}; fill.style.width = '100%'; txt.textContent = '✅ শেষ — সফল ' + (r.sent||0) + ', পৌঁছানো যায়নি ' + (r.unreachable||0) + ', ব্যর্থ ' + (r.failed||0); toast('✅ মাইগ্রেশন বার্তা পাঠানো শেষ।'); if(unsub) unsub(); loadMigratePage(); }
+        if(d.status === 'failed'){ txt.textContent = '⚠️ ব্যর্থ: ' + (d.error||''); if(unsub) unsub(); }
+      });
+    }catch(e){ toast('⚠️ কিউতে দেওয়া যায়নি।'); }
+  });
+}
+
 /* ============ THUMBNAIL STYLE (settings/thumbStyle) ============ */
 const TS_DEFAULT = { wm:true, wmText:'Movi Lover', wmOp:35, wmPos:'br', glow:true, glowColor:'#8b5cf6', glowInt:50, pulse:true, speed:3.2, sheen:false, phText:'Movi Lover' };
 function tsClamp(v,a,b,d){ v = parseFloat(v); return isNaN(v) ? d : Math.min(b, Math.max(a, v)); }
@@ -3819,8 +3933,7 @@ async function diagnoseBot(){
   let st = null;
   try{ st = await fbGetDoc('settings','botStatus'); }catch(e){}
   const alive = !!(st && st.lastBeat && (Date.now()-st.lastBeat) < 180000);
-  const NEW_BOT_VER = 'v3-welcome';
-  const oldBot = alive && st.version !== NEW_BOT_VER;
+  const oldBot = alive && ['v3-welcome','v4-migration'].indexOf(st.version) < 0;
   if(alive) L.push('✅ বট সার্ভার (bot.js) চালু — শেষ সংকেত ' + wlAgo(st.lastBeat) + ' · সংস্করণ: ' + (st.version || 'পুরোনো (সংস্করণ লেখা নেই)'));
   if(oldBot){
     L.push('❌ আপনি bot.js-এর পুরোনো সংস্করণ চালাচ্ছেন — তাতে ছবিসহ স্বাগত বার্তার ফিচারই নেই, তাই সাধারণ ছোট বার্তা যাচ্ছে।');
