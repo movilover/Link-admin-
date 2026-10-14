@@ -831,6 +831,43 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
       </div>
     </div>
 
+    <!-- CHANNEL POST (একবার সেটআপ, তারপর প্রতিটি নতুন ভিডিওতে নিজে থেকে) -->
+    <div class="page" id="page-chanpost">
+      <div class="page-head">
+        <div class="page-title" style="color:var(--gold3);">📣 চ্যানেল পোস্ট<small>একবার সেটআপ — এরপর প্রতিটি নতুন ভিডিওতে নিজে থেকে পোস্ট</small></div>
+      </div>
+      <div class="mgr-card info-card">
+        <div style="font-size:12.5px;line-height:1.9;">
+          এখানে একবার চ্যানেল ID, বাটন আর ছবির ধরন ঠিক করে সংরক্ষণ করলে, এরপর ভিডিও আপলোড ফর্মে এগুলো নিজে থেকেই বসে থাকবে। নতুন ভিডিও সেভ করলেই চ্যানেলে <b>থাম্বনেইল + টাইটেল + বিবরণ + ২টি বাটন</b> (ওয়াচ ভিডিও, জয়েন টেলিগ্রাম চ্যানেল) পোস্ট হয়। <b>শর্ত:</b> বট চ্যানেলের Admin হতে হবে (Post Messages অনুমতিসহ), আর এডমিন প্যানেল ব্রাউজারে খোলা থাকতে হবে।
+        </div>
+      </div>
+      <div class="mgr-card">
+        <div class="form-section">
+          <div class="form-group"><div class="form-label"><span class="material-icons-round">campaign</span>পোস্ট করার চ্যানেল ID</div>
+            <input class="form-input" id="cp-chat" placeholder="-1001234567890 (কমা দিয়ে একাধিক)" />
+            <div class="form-hint">প্রাইভেট চ্যানেলের ID সাধারণত <code>-100…</code> দিয়ে শুরু হয়।</div></div>
+          <div class="form-group"><div class="form-label">বাটন ১ — লেখা (লিংক: ভিডিওর সাইট লিংক, নিজে বসে)</div>
+            <input class="form-input" id="cp-b1" placeholder="▶️ ওয়াচ ভিডিও" /></div>
+          <div class="form-group"><div class="form-label">বাটন ২ — লেখা</div>
+            <input class="form-input" id="cp-b2" placeholder="📢 জয়েন টেলিগ্রাম চ্যানেল" /></div>
+          <div class="form-group"><div class="form-label">বাটন ২ — চ্যানেল জয়েন লিংক</div>
+            <input class="form-input" id="cp-join" placeholder="https://t.me/yourchannel" /></div>
+          <div class="form-group"><div class="form-label"><span class="material-icons-round">auto_awesome</span>ছবির ধরন</div>
+            <select class="form-select" id="cp-fx">
+              <option value="glow">ব্র্যান্ড গ্লো ফ্রেম (পুরো স্পষ্ট ছবি + কিনারায় আলো + Movi Lover লেখা)</option>
+              <option value="none">কোনো ইফেক্ট নয়</option>
+              <option value="blur">ব্লার</option>
+              <option value="spoiler">টেলিগ্রাম স্পয়লার</option>
+              <option value="both">ব্লার + স্পয়লার</option>
+            </select>
+            <div class="form-hint">গ্লোর রং, তীব্রতা ও লেখা "থাম্বনেইল" ট্যাবের সেটিং থেকে আসে।</div></div>
+          <button class="save-btn" onclick="saveChanPost()"><span class="material-icons-round">save</span>সংরক্ষণ করুন</button>
+          <button class="cancel-btn" onclick="testChanPost()"><span class="material-icons-round" style="font-size:16px;vertical-align:-3px;">send</span> চ্যানেলে টেস্ট পোস্ট পাঠান</button>
+          <div class="form-hint" id="cp-status"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- MIGRATION (পুরোনো বট -> নতুন বট) -->
     <div class="page" id="page-migrate">
       <div class="page-head">
@@ -1291,6 +1328,7 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
     <div class="nav-item" data-page="channels" onclick="showAdminPage('channels')"><span class="material-icons-round">send</span>চ্যানেল</div>
     <div class="nav-item" data-page="tasks" onclick="showAdminPage('tasks')"><span class="material-icons-round">payments</span>টাস্ক</div>
     <div class="nav-item" data-page="withdrawals" onclick="showAdminPage('withdrawals')"><span class="material-icons-round">account_balance_wallet</span>উইথড্র</div>
+    <div class="nav-item" data-page="chanpost" onclick="showAdminPage('chanpost')"><span class="material-icons-round">campaign</span>চ্যানেল</div>
     <div class="nav-item" data-page="migrate" onclick="showAdminPage('migrate')"><span class="material-icons-round">sync_alt</span>মাইগ্রেশন</div>
     <div class="nav-item" data-page="thumbstyle" onclick="showAdminPage('thumbstyle')"><span class="material-icons-round">auto_awesome</span>থাম্বনেইল</div>
     <div class="nav-item" data-page="welcome" onclick="showAdminPage('welcome')"><span class="material-icons-round">waving_hand</span>স্বাগত</div>
@@ -1664,6 +1702,7 @@ function showAdminPage(name){
   if(name==='welcome') loadWelcomePage();
   if(name==='thumbstyle') loadThumbStylePage();
   if(name==='migrate') loadMigratePage();
+  if(name==='chanpost') loadChanPostPage();
   if(name==='withdrawals'){ renderWithdrawalsList(); loadIncomeReport(); }
 }
 
@@ -2061,6 +2100,7 @@ async function loadVideoBotSettings(){
     document.getElementById('vb-site-bot').value = (s && s.botUsername) || A.videobot.botUsername || '';
     document.getElementById('vb-site-app').value = (s && typeof s.appShort === 'string') ? s.appShort : '';
   }catch(e){}
+  try{ A.welcomeDoc = await fbGetDoc('settings','welcome'); A.thumbStyle = await fbGetDoc('settings','thumbStyle'); }catch(e){}
   renderVideoBotStatus();
 }
 /* settings/site = { botUsername, appShort }  — পাবলিক পড়া যায়, লেখে শুধু এডমিন */
@@ -2420,7 +2460,7 @@ function openVideoForm(id){
   A.vThumbFile = null; A.lastVideoFile = null;
   {
     const T = A.telegram || {};
-    const defBtns = T.bcDefaultButtons || [{text:'▶️ ভিডিওটি দেখুন', url:'{VIDEO_LINK}'},{text:'ℹ️ কিভাবে ভিডিও দেখবেন', url:''}];
+    const defBtns = T.bcDefaultButtons || [{text:'▶️ ওয়াচ ভিডিও', url:'{VIDEO_LINK}'},{text:'📢 জয়েন টেলিগ্রাম চ্যানেল', url:((A.welcomeDoc && A.welcomeDoc.b2Url) || '')}];
     // বট সার্ভার (bot.js) চালু থাকলে সে-ই সবাইকে পাঠায়, তাই ব্রাউজার থেকে পাঠানো বন্ধ; সার্ভার বন্ধ থাকলে আগের মতোই ব্রাউজার থেকে যায়
     bcInitComposer('v', { buttons:defBtns, toUsers:!A.botAlive });
     refreshBotAlive().then(()=>{
@@ -3104,7 +3144,7 @@ async function saveAnnouncementSettings(){
 /* ============ TELEGRAM BOT / BROADCAST ============ */
 async function loadTelegramSettings(){
   const cfg = await fbGetDoc('settings','telegram');
-  A.telegram = { botToken:(cfg&&cfg.botToken)||'', autoNotify: !!(cfg&&cfg.autoNotify), broadcastChatId:(cfg&&cfg.broadcastChatId)||'', bcBlur:(cfg&&cfg.bcBlur)||'blur', bcDefaultButtons:(cfg&&cfg.bcDefaultButtons)||null };
+  A.telegram = { botToken:(cfg&&cfg.botToken)||'', autoNotify: !!(cfg&&cfg.autoNotify), broadcastChatId:(cfg&&cfg.broadcastChatId)||'', bcBlur:(cfg&&cfg.bcBlur)||'glow', bcDefaultButtons:(cfg&&cfg.bcDefaultButtons)||null };
   document.getElementById('set-bc-chat').value = A.telegram.broadcastChatId;
   document.getElementById('set-bot-token').value = A.telegram.botToken;
   document.getElementById('set-auto-notify').checked = A.telegram.autoNotify;
@@ -3159,6 +3199,7 @@ function bcComposerHtml(p){
   return '' +
   '<div class="form-group"><div class="form-label"><span class="material-icons-round">blur_on</span>ছবির ইফেক্ট</div>' +
     '<select class="form-select" id="'+p+'-bc-blur">' +
+      '<option value="glow">ব্র্যান্ড গ্লো ফ্রেম (পুরো স্পষ্ট ছবি + কিনারায় আলো + Movi Lover লেখা)</option>' +
       '<option value="blur">ব্লার (ছবিতেই গসিয়ান ব্লার)</option>' +
       '<option value="spoiler">টেলিগ্রাম স্পয়লার (has_spoiler)</option>' +
       '<option value="both">ব্লার + স্পয়লার</option>' +
@@ -3195,7 +3236,7 @@ function bcInitComposer(p, o){
   if(!document.getElementById(p+'-bc-btns')) return;
   document.getElementById(p+'-bc-btns').innerHTML = '';
   (o.buttons||[]).forEach(b=>bcAddBtnRow(p, b.text, b.url));
-  document.getElementById(p+'-bc-blur').value = (A.telegram && A.telegram.bcBlur) || 'blur';
+  document.getElementById(p+'-bc-blur').value = (A.telegram && A.telegram.bcBlur) || 'glow';
   document.getElementById(p+'-bc-chat').value = (A.telegram && A.telegram.broadcastChatId) || '';
   document.getElementById(p+'-bc-to-chat').checked = !!(A.telegram && A.telegram.broadcastChatId);
   document.getElementById(p+'-bc-to-users').checked = !!o.toUsers;
@@ -3331,7 +3372,57 @@ function blurImageBlob(blob){
     img.src = u;
   });
 }
+/* ---- ব্র্যান্ড গ্লো ফ্রেম: ছবি পুরো স্পষ্ট থাকে; কিনারায় নরম রঙিন আলো, সরু সোনালি রেখা, কোণে হালকা ব্র্যান্ড লেখা ---- */
+function glowImageBlob(blob){
+  return new Promise((resolve, reject)=>{
+    const ts = A.thumbStyle || {};
+    const col = /^#[0-9a-f]{6}$/i.test(ts.glowColor||'') ? ts.glowColor : '#8b5cf6';
+    const inten = Math.min(1, Math.max(0, (ts.glowInt != null ? parseFloat(ts.glowInt) : 50) / 100));
+    const wmText = String(ts.wmText || 'Movi Lover');
+    const wmOp = Math.min(1, Math.max(0, (ts.wmOp != null ? parseFloat(ts.wmOp) : 35) / 100));
+    const rgb = [parseInt(col.slice(1,3),16), parseInt(col.slice(3,5),16), parseInt(col.slice(5,7),16)].join(',');
+    const img = new Image(); const u = URL.createObjectURL(blob);
+    img.onload = ()=>{
+      try{
+        const sc = Math.min(1, 1280 / img.width);
+        const w = Math.round(img.width*sc), h = Math.round(img.height*sc);
+        const c = document.createElement('canvas'); c.width = w; c.height = h;
+        const ctx = c.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const g = Math.round(Math.min(w,h) * (0.05 + 0.10*inten));          // আলোর প্রস্থ
+        const a = 0.25 + 0.55*inten;                                          // আলোর ঘনত্ব
+        const edge = (x0,y0,x1,y1, rx,ry,rw,rh)=>{
+          const gr = ctx.createLinearGradient(x0,y0,x1,y1);
+          gr.addColorStop(0, 'rgba('+rgb+','+a+')'); gr.addColorStop(1, 'rgba('+rgb+',0)');
+          ctx.fillStyle = gr; ctx.fillRect(rx,ry,rw,rh);
+        };
+        edge(0,0,0,g, 0,0,w,g); edge(0,h,0,h-g, 0,h-g,w,g); edge(0,0,g,0, 0,0,g,h); edge(w,0,w-g,0, w-g,0,g,h);
+        ctx.lineWidth = Math.max(2, Math.round(Math.min(w,h)*0.004));
+        ctx.strokeStyle = 'rgba(245,197,66,0.85)';
+        const o = ctx.lineWidth/2 + 2; ctx.strokeRect(o, o, w-2*o, h-2*o);
+        const fs = Math.max(14, Math.round(Math.min(w,h)*0.045));
+        ctx.font = '700 ' + fs + 'px sans-serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic';
+        ctx.shadowColor = 'rgba(0,0,0,0.65)'; ctx.shadowBlur = fs*0.35;
+        ctx.fillStyle = 'rgba(255,255,255,' + wmOp + ')';
+        ctx.fillText(wmText, w - g*0.6 - 6, h - g*0.6 - 4);
+        c.toBlob(b=>{ URL.revokeObjectURL(u); b ? resolve(b) : reject(new Error('blob')); }, 'image/jpeg', 0.9);
+      }catch(e){ URL.revokeObjectURL(u); reject(e); }
+    };
+    img.onerror = ()=>{ URL.revokeObjectURL(u); reject(new Error('image load')); };
+    img.src = u;
+  });
+}
 async function bcPreparePhoto(src, mode){
+  if(mode === 'glow'){
+    if(!src || (!src.file && !src.url)) return { photo:null, spoiler:false };
+    try{
+      const original = src.file || await (await fetch(src.url, { mode:'cors' })).blob();
+      return { photo:{ blob: await glowImageBlob(original) }, spoiler:false };
+    }catch(e){
+      console.warn('glow frame failed, sending original', e);
+      return { photo: src.file ? { blob:src.file } : { url:src.url }, spoiler:false };
+    }
+  }
   const wantBlur = mode==='blur' || mode==='both';
   let spoiler = mode==='spoiler' || mode==='both';
   if(!src || (!src.file && !src.url)) return { photo:null, spoiler:false };
@@ -3666,6 +3757,49 @@ async function refreshBotAlive(){
   const el = document.getElementById('v-bot-alive');
   if(el){ el.textContent = A.botAlive ? '🟢 বট সার্ভার চালু আছে — নিজেই সবাইকে পাঠাবে' : '🔴 বট সার্ভার বন্ধ — নিচের "সব বট-ইউজার" টিক রাখুন, ব্রাউজার থেকে যাবে'; el.style.color = A.botAlive ? 'var(--green)' : 'var(--accent2)'; }
   return A.botAlive;
+}
+
+/* ============ CHANNEL POST (একবার সেটআপ) — settings/telegram: broadcastChatId, bcDefaultButtons, bcBlur ============ */
+async function loadChanPostPage(){
+  if(!A.welcomeDoc){ try{ A.welcomeDoc = await fbGetDoc('settings','welcome'); }catch(e){} }
+  const T = A.telegram || {}, btns = T.bcDefaultButtons || [];
+  const g = id=>document.getElementById(id);
+  g('cp-chat').value = T.broadcastChatId || '';
+  g('cp-b1').value = (btns[0] && btns[0].text) || '▶️ ওয়াচ ভিডিও';
+  g('cp-b2').value = (btns[1] && btns[1].text) || ((A.welcomeDoc && A.welcomeDoc.b2Label) || '📢 জয়েন টেলিগ্রাম চ্যানেল');
+  g('cp-join').value = (btns[1] && btns[1].url) || ((A.welcomeDoc && A.welcomeDoc.b2Url) || '');
+  g('cp-fx').value = T.bcBlur || 'glow';
+}
+function cpCollect(){
+  const g = id=>document.getElementById(id);
+  return { chat:g('cp-chat').value.trim(), b1:g('cp-b1').value.trim() || '▶️ ওয়াচ ভিডিও', b2:g('cp-b2').value.trim() || '📢 জয়েন টেলিগ্রাম চ্যানেল', join:g('cp-join').value.trim(), fx:g('cp-fx').value };
+}
+async function saveChanPost(){
+  const c = cpCollect(), st = document.getElementById('cp-status');
+  if(!c.chat){ toast('⚠️ চ্যানেল ID দিন।'); return; }
+  if(c.join && !/^https?:\/\//i.test(c.join)){ toast('⚠️ জয়েন লিংক https:// দিয়ে শুরু হতে হবে।'); return; }
+  const bcDefaultButtons = [{ text:c.b1, url:'{VIDEO_LINK}' }];
+  if(c.join) bcDefaultButtons.push({ text:c.b2, url:c.join });
+  try{
+    await fbSet('settings','telegram',{ broadcastChatId:c.chat, bcDefaultButtons, bcBlur:c.fx });
+    A.telegram = Object.assign({}, A.telegram, { broadcastChatId:c.chat, bcDefaultButtons, bcBlur:c.fx });
+    const sc = document.getElementById('set-bc-chat'); if(sc) sc.value = c.chat;
+    toast('✅ সংরক্ষিত — এখন থেকে নতুন ভিডিও আপলোডে এটাই বসে থাকবে।');
+    st.textContent = 'সংরক্ষিত। ভিডিও আপলোড ফর্ম খুললে চ্যানেল, বাটন ও ছবির ধরন নিজে থেকে বসানো থাকবে।'; st.style.color = 'var(--green)';
+  }catch(e){ toast('⚠️ সংরক্ষণ হয়নি।'); st.textContent = 'সংরক্ষণ ব্যর্থ — লগইন ও Firestore Rules দেখুন।'; st.style.color = 'var(--accent2)'; }
+}
+async function testChanPost(){
+  const c = cpCollect(), st = document.getElementById('cp-status');
+  if(!bcToken()){ toast('⚠️ আগে "ভিডিও বট" পেজে বটের টোকেন সংরক্ষণ করুন।'); return; }
+  if(!c.chat){ toast('⚠️ চ্যানেল ID দিন।'); return; }
+  const img = (A.welcomeDoc && A.welcomeDoc.image) || '';
+  const rows = [[{ text:c.b1, url: videoShareLink('') }]];
+  if(c.join && /^https?:\/\//i.test(c.join)) rows.push([{ text:c.b2, url:c.join }]);
+  st.style.color = 'var(--gold3)'; st.textContent = 'টেস্ট পোস্ট পাঠানো হচ্ছে...';
+  try{
+    await bcRunJob({ src: img ? { url:img } : null, blurMode:c.fx, caption:'🎬 <b>টেস্ট পোস্ট</b>\n\nচ্যানেল পোস্ট ঠিকমতো কাজ করছে কি না যাচাই।', buttons:rows, chatIds:c.chat.split(/[\s,]+/).filter(Boolean), userIds:[], label:'টেস্ট পোস্ট' });
+    st.textContent = 'পাঠানো হয়েছে — চ্যানেলে দেখুন। না এলে: বট কি চ্যানেলের Admin (Post Messages সহ)? ID ঠিক আছে?';
+  }catch(e){ st.style.color = 'var(--accent2)'; st.textContent = 'টেস্ট পোস্ট ব্যর্থ।'; }
 }
 
 /* ============ MIGRATION (পুরোনো বট -> নতুন বট) ============
