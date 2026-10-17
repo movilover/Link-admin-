@@ -4,13 +4,14 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <title>Movi Lover — Admin</title>
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin/><link rel="preconnect" href="https://firestore.googleapis.com" crossorigin/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@500;600;700&family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
 
 <!-- Firebase -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, onSnapshot, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, onSnapshot, getDoc, setDoc, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
   import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
@@ -43,6 +44,7 @@
   window._updateDoc = updateDoc;
   window._deleteDoc = deleteDoc;
   window._query = query;
+  window._where = where;
   window._orderBy = orderBy;
   window._onSnapshot = onSnapshot;
   window._getDoc = getDoc;
@@ -124,7 +126,7 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0
 
 /* ============ CARDS / LISTS ============ */
 .mgr-card { margin:10px 16px; background:linear-gradient(180deg,var(--bg-card),#0e0a17); border:1px solid var(--border); border-radius:16px; overflow:hidden; box-shadow:0 6px 20px rgba(0,0,0,0.35); }
-.vid-row { display:flex; gap:12px; padding:12px; }
+.vid-row { display:flex; gap:12px; padding:12px; content-visibility:auto; contain-intrinsic-size:auto 84px; }
 .vid-thumb { width:96px; height:72px; border-radius:12px; object-fit:cover; background:linear-gradient(135deg,#241b33,#100b1a); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:22px; overflow:hidden; position:relative; border:1px solid var(--border); }
 .vid-thumb img { width:100%; height:100%; object-fit:cover; }
 .vid-body { flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center; gap:3px; }
@@ -269,7 +271,7 @@ nav { height:var(--nav-h); flex-shrink:0; background:linear-gradient(180deg,#0a0
 .users-summary-val.red { color:var(--accent2); }
 .users-summary-lbl { font-size:10.5px; color:var(--text-muted); margin-top:2px; letter-spacing:0.5px; }
 .user-search-wrap { margin:10px 16px 0; }
-.user-row { display:flex; align-items:center; gap:12px; padding:13px 14px; border-bottom:1px solid var(--border); }
+.user-row { display:flex; align-items:center; gap:12px; padding:13px 14px; border-bottom:1px solid var(--border); content-visibility:auto; contain-intrinsic-size:auto 120px; }
 .user-row:last-child { border-bottom:none; }
 .user-avatar-sm { width:38px; height:38px; border-radius:11px; background:linear-gradient(135deg,var(--purple),var(--accent)); display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:800; color:#fff; flex-shrink:0; }
 .user-info-col { flex:1; min-width:0; }
@@ -1280,7 +1282,7 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
           </div>
 
           <div class="form-group">
-            <div class="form-label"><span class="material-icons-round">image</span>থাম্বনেইল / ছবি (ঐচ্ছিক, ১৬:৯ সুন্দর দেখায়)</div>
+            <div class="form-label"><span class="material-icons-round">image</span>থাম্বনেইল / ছবি (ঐচ্ছিক — না দিলে সাইটের রঙের সুন্দর ডিফল্ট ডিজাইন দেখাবে)</div>
             <div class="thumb-upload-box" style="aspect-ratio:auto;padding:12px;flex-direction:row;gap:10px;" id="ann-icon-box" onclick="document.getElementById('ann-icon-file').click()">
               <span class="upl-icon material-icons-round" style="font-size:20px;">add_photo_alternate</span>
               <span class="upl-txt">ছবি আপলোড করুন (ImgBB-তে আপলোড হবে)</span>
@@ -1291,7 +1293,7 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
 
           <div class="form-group">
             <div class="form-label"><span class="material-icons-round">title</span>শিরোনাম (ঐচ্ছিক)</div>
-            <input class="form-input" id="ann-title" placeholder="📢 আমাদের টেলিগ্রাম চ্যানেলে জয়েন করুন" />
+            <input class="form-input" id="ann-title" placeholder="সকল ভাইরাল ভিডিও পেতে আমাদের টেলিগ্রাম চ্যানেলে জয়েন করুন (খালি রাখলে এটাই)" />
           </div>
 
           <div class="form-group">
@@ -1675,16 +1677,25 @@ async function enterApp(){
   A_isEntered = true;
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').classList.add('visible');
-  await Promise.all([loadCategories(), loadChannels(), loadTutorial(), loadSettingsForm(), loadAdNetworkSettingsForm(), loadWithdrawSettingsForm(), loadTelegramSettings(), loadAllUsers(), loadTasks(), loadImgbbSettings(), loadDailyAdTaskSettings(), loadReferralBannerSettings(), loadAnnouncementSettings(), loadVideoBotSettings()]);
+  // লাইভ লিস্ট সাথে সাথে শুরু — কিছুর জন্য অপেক্ষা নয়
   subscribeVideosAdmin();
   subscribeWithdrawals();
-  setTimeout(loadIncomeReport, 800);
-  setTimeout(sweepDeliveries, 3000);
-  setInterval(sweepDeliveries, 60000);
+  // হালকা সেটিংস একসাথে (UI আটকায় না)
+  Promise.all([loadCategories(), loadChannels(), loadTutorial(), loadSettingsForm(), loadAdNetworkSettingsForm(), loadWithdrawSettingsForm(), loadTelegramSettings(), loadTasks(), loadImgbbSettings(), loadDailyAdTaskSettings(), loadReferralBannerSettings(), loadAnnouncementSettings(), loadVideoBotSettings()].map(p=>Promise.resolve(p).catch(e=>console.warn(e))));
+  // ভারী কাজ (হাজার হাজার ইউজার ডক) পরে, ব্যাকগ্রাউন্ডে
+  setTimeout(()=>{ loadAllUsers(); }, 1800);
+  setTimeout(sweepDeliveries, 6000);
+  setInterval(sweepDeliveries, 120000);
 }
 
 /* ---------- firestore helpers ---------- */
 async function fbGet(col){ try{ const s=await window._getDocs(window._col(window._db,col)); return s.docs.map(d=>({id:d.id,...d.data()})); }catch(e){return [];} }
+const _fcache = {};
+async function fbGetCached(col, ttl){
+  const c = _fcache[col];
+  if(c && Date.now() - c.t < (ttl||120000)) return c.v;
+  const v = await fbGet(col); _fcache[col] = { t:Date.now(), v }; return v;
+}
 async function fbAdd(col,data){ return await window._addDoc(window._col(window._db,col),{...data,createdAt:Date.now()}); }
 async function fbGetDoc(col,id){ try{ const d=await window._getDoc(window._doc(window._db,col,id)); return d.exists()?{id:d.id,...d.data()}:null; }catch(e){return null;} }
 async function fbUpdate(col,id,data){ await window._updateDoc(window._doc(window._db,col,id),data); }
@@ -1700,7 +1711,7 @@ function showAdminPage(name){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   document.querySelector('.nav-item[data-page="'+name+'"]').classList.add('active');
-  if(name==='users') loadAllUsers();
+  if(name==='users'){ if(!A.allUsers || Date.now() - (A._usersAt||0) > 90000) loadAllUsers(); else renderUsersList(); }
   if(name==='broadcast') refreshBroadcastStats();
   if(name==='tasks') loadTasks();
   if(name==='referrals') loadReferralPage();
@@ -1729,7 +1740,7 @@ async function loadAllUsers(){
                  createdAt:b.startedAt||0, lastSeenAt:b.lastSeenAt||0, adsWatched:0, unlockedCount:0, _bot:b, _botOnly:true });
   });
   users.sort((a,b)=>(b.lastAdAt||b.lastSeenAt||b.createdAt||0)-(a.lastAdAt||a.lastSeenAt||a.createdAt||0));
-  A.allUsers = users;
+  A.allUsers = users; A._usersAt = Date.now();
   const totalAds = users.reduce((sum,u)=>sum+(u.adsWatched||0),0);
   const totalUnlocks = users.reduce((sum,u)=>sum+(u.unlockedCount||0),0);
   const dayStartMs = (()=>{ const d=new Date(); d.setHours(0,0,0,0); return d.getTime(); })();
@@ -1759,6 +1770,9 @@ function renderUsersList(){
     wrap.innerHTML = '<div class="empty-hint"><span class="material-icons-round">group_off</span>' + (q?'কোনো মিল পাওয়া যায়নি।':'এখনো কোনো ইউজার সাইটে ভিজিট করেনি।') + '</div>';
     return;
   }
+  if(q !== A._lastUserQ){ A._lastUserQ = q; A.usersLimit = 60; }
+  const total = list.length, limit = A.usersLimit || 60;
+  list = list.slice(0, limit);
   wrap.innerHTML = list.map(u=>{
     const displayName = [u.tgFirstName,u.tgLastName].filter(Boolean).join(' ').trim();
     const nameLine = displayName
@@ -1781,7 +1795,7 @@ function renderUsersList(){
         '</div>' +
       '</div>' +
     '</div>';
-  }).join('');
+  }).join('') + (total > limit ? '<div style="padding:14px;text-align:center;"><button class="cancel-btn" onclick="A.usersLimit=(A.usersLimit||60)+120;renderUsersList()">আরও দেখান (' + (total-limit) + ' জন বাকি)</button></div>' : '');
 }
 function botChipHtml(u){
   if(u._bot){
@@ -2193,9 +2207,13 @@ async function testVideoBot(){
 async function sweepDeliveries(){
   if(!videoBotReady()) return;
   try{
-    const all = await fbGet('tg_deliveries');
     const now = Date.now();
-    for(const d of all.filter(x=>(x.deleteAt||0) <= now)){
+    let due;
+    try{
+      const qs = await window._getDocs(window._query(window._col(window._db,'tg_deliveries'), window._where('deleteAt','<=',now)));
+      due = qs.docs.map(d=>({id:d.id,...d.data()}));
+    }catch(e){ due = (await fbGet('tg_deliveries')).filter(x=>(x.deleteAt||0) <= now); }
+    for(const d of due){
       for(const mid of (d.messageIds||[])){
         try{ await fetch('https://api.telegram.org/bot'+A.videobot.token+'/deleteMessage', {
           method:'POST', headers:{'Content-Type':'application/json'},
@@ -2337,7 +2355,7 @@ function renderVideosList(){
     const adsN = Math.max(1, parseInt(v.adsRequired)||3);
     const directLinkCount = Object.keys(v.directLinkSets || v.directLinks || {}).length;
     return '<div class="vid-row" style="border-bottom:1px solid var(--border);">' +
-      '<div class="vid-thumb">' + (v.thumbnail?('<img src="'+escHtml(v.thumbnail)+'" onerror="this.style.display=\'none\'"/>'):'🎬') + '</div>' +
+      '<div class="vid-thumb">' + (v.thumbnail?('<img loading="lazy" decoding="async" src="'+escHtml(v.thumbnail)+'" onerror="this.style.display=\'none\'"/>'):'🎬') + '</div>' +
       '<div class="vid-body">' +
         '<div class="vid-title">' + escHtml(v.title||'শিরোনামহীন') + '</div>' +
         '<div class="vid-meta-row">' +
@@ -2817,9 +2835,9 @@ async function loadWithdrawalsFallback(){
    non-rejected withdrawals), and total actually paid out. */
 async function loadIncomeReport(){
   const [completions, dailyAds, vRewards] = await Promise.all([
-    fbGet('task_completions'),
-    fbGet('daily_ad_tasks'),
-    fbGet('video_rewards')
+    fbGetCached('task_completions'),
+    fbGetCached('daily_ad_tasks'),
+    fbGetCached('video_rewards')
   ]);
   const dayStart = new Date(); dayStart.setHours(0,0,0,0);
   const dayStartMs = dayStart.getTime();
@@ -3131,7 +3149,7 @@ async function loadAnnouncementSettings(){
 async function saveAnnouncementSettings(){
   const text = document.getElementById('ann-text').value.trim();
   const enabled = document.getElementById('ann-enabled').checked;
-  if(enabled && !text){ toast('⚠️ পপআপ চালু রাখতে হলে মেসেজ টেক্সট দিন।'); return; }
+  if(enabled && !document.getElementById('ann-btn-url').value.trim()){ toast('⚠️ পপআপ চালু রাখতে টেলিগ্রাম চ্যানেলের লিংক দিন।'); return; }
   const data = {
     enabled,
     icon: document.getElementById('ann-icon-url').value.trim(),
@@ -3739,7 +3757,7 @@ async function sendDm(){
 /* ============ PER-USER MONEY SUMMARY (admin users list) ============ */
 async function loadUserFinance(){
   try{
-    const [comps, dailies, vrs, wds] = await Promise.all([fbGet('task_completions'), fbGet('daily_ad_tasks'), fbGet('video_rewards'), fbGet('withdrawals')]);
+    const [comps, dailies, vrs, wds] = await Promise.all([fbGetCached('task_completions'), fbGetCached('daily_ad_tasks'), fbGetCached('video_rewards'), fbGetCached('withdrawals')]);
     const m = {}; const g = id => (m[id] = m[id] || { income:0, withdrawn:0 });
     comps.forEach(c=>{ if(c.userId) g(c.userId).income += (c.totalEarned||0); });
     dailies.forEach(d=>{ if(d.userId) g(d.userId).income += (d.earned||0); });
