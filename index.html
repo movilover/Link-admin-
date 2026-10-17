@@ -1270,23 +1270,28 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
 
       <div class="mgr-card">
         <div class="form-section">
-          <div class="form-label" style="margin-bottom:12px;"><span class="material-icons-round">campaign</span>ঘোষণা ব্যানার (হেডারের নিচে)<span style="font-weight:400;color:var(--text-muted);font-size:11px;display:block;margin-top:3px;">সাইটে ঢুকলেই স্লাইড-ডাউন হয়ে দেখাবে, সাউন্ডসহ — যেমন "নতুন চ্যানেলে যোগ দিন"</span></div>
+          <div class="form-label" style="margin-bottom:12px;"><span class="material-icons-round">campaign</span>ঘোষণা পপআপ (হোম পেজের মাঝখানে)<span style="font-weight:400;color:var(--text-muted);font-size:11px;display:block;margin-top:3px;">ইউজার সাইটে ঢুকলেই সুন্দর কার্ড আকারে সামনে আসবে, "টুং" শব্দসহ। উপরের কোণে ✕ চাপলে বন্ধ হবে — যেমন "টেলিগ্রাম চ্যানেলে জয়েন করুন"</span></div>
 
           <div class="form-group">
             <div class="toggle-row">
-              <div class="toggle-label"><span class="material-icons-round" style="color:var(--green);font-size:18px;">visibility</span>ব্যানার চালু রাখুন</div>
+              <div class="toggle-label"><span class="material-icons-round" style="color:var(--green);font-size:18px;">visibility</span>পপআপ চালু রাখুন</div>
               <label class="switch"><input type="checkbox" id="ann-enabled"/><span class="slider-tg"></span></label>
             </div>
           </div>
 
           <div class="form-group">
-            <div class="form-label"><span class="material-icons-round">image</span>আইকন / লোগো (ঐচ্ছিক)</div>
+            <div class="form-label"><span class="material-icons-round">image</span>থাম্বনেইল / ছবি (ঐচ্ছিক, ১৬:৯ সুন্দর দেখায়)</div>
             <div class="thumb-upload-box" style="aspect-ratio:auto;padding:12px;flex-direction:row;gap:10px;" id="ann-icon-box" onclick="document.getElementById('ann-icon-file').click()">
               <span class="upl-icon material-icons-round" style="font-size:20px;">add_photo_alternate</span>
-              <span class="upl-txt">আইকন আপলোড করুন (ImgBB-তে আপলোড হবে)</span>
+              <span class="upl-txt">ছবি আপলোড করুন (ImgBB-তে আপলোড হবে)</span>
             </div>
             <input type="file" accept="image/*" id="ann-icon-file" style="display:none;" onchange="handleThumbUpload(this,'ann')" />
             <input class="form-input" id="ann-icon-url" placeholder="https://... (অথবা সরাসরি লিংক)" style="margin-top:8px;" />
+          </div>
+
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">title</span>শিরোনাম (ঐচ্ছিক)</div>
+            <input class="form-input" id="ann-title" placeholder="📢 আমাদের টেলিগ্রাম চ্যানেলে জয়েন করুন" />
           </div>
 
           <div class="form-group">
@@ -1297,7 +1302,7 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
           <div class="form-row2">
             <div class="form-group">
               <div class="form-label"><span class="material-icons-round">smart_button</span>বাটনের টেক্সট</div>
-              <input class="form-input" id="ann-btn-text" placeholder="যোগ দিন" />
+              <input class="form-input" id="ann-btn-text" placeholder="📢 জয়েন টেলিগ্রাম চ্যানেল" />
             </div>
             <div class="form-group">
               <div class="form-label"><span class="material-icons-round">link</span>বাটনের লিংক</div>
@@ -1306,7 +1311,7 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
           </div>
 
           <button class="save-btn" onclick="saveAnnouncementSettings()"><span class="material-icons-round">save</span>সেভ ও সবাইকে আবার দেখান</button>
-          <div class="form-hint">Save করলেই যারা আগে ব্যানার বন্ধ করে দিয়েছিল তাদের কাছেও এই নতুন ভার্সনটা আবার দেখাবে (একটা ভার্সন নাম্বার অটো বাড়ে)।</div>
+          <div class="form-hint">Save করলেই যারা আগে পপআপ বন্ধ করে দিয়েছিল তাদের কাছেও এই নতুন ভার্সনটা আবার দেখাবে (একটা ভার্সন নাম্বার অটো বাড়ে)।</div>
         </div>
       </div>
 
@@ -3118,6 +3123,7 @@ async function loadAnnouncementSettings(){
   document.getElementById('ann-enabled').checked = !!A.announcement.enabled;
   document.getElementById('ann-icon-url').value = A.announcement.icon || '';
   if(A.announcement.icon) setThumbPreview(document.getElementById('ann-icon-box'), A.announcement.icon);
+  document.getElementById('ann-title').value = A.announcement.title || '';
   document.getElementById('ann-text').value = A.announcement.text || '';
   document.getElementById('ann-btn-text').value = A.announcement.buttonText || '';
   document.getElementById('ann-btn-url').value = A.announcement.buttonUrl || '';
@@ -3125,10 +3131,11 @@ async function loadAnnouncementSettings(){
 async function saveAnnouncementSettings(){
   const text = document.getElementById('ann-text').value.trim();
   const enabled = document.getElementById('ann-enabled').checked;
-  if(enabled && !text){ toast('⚠️ ব্যানার চালু রাখতে হলে মেসেজ টেক্সট দিন।'); return; }
+  if(enabled && !text){ toast('⚠️ পপআপ চালু রাখতে হলে মেসেজ টেক্সট দিন।'); return; }
   const data = {
     enabled,
     icon: document.getElementById('ann-icon-url').value.trim(),
+    title: document.getElementById('ann-title').value.trim(),
     text,
     buttonText: document.getElementById('ann-btn-text').value.trim(),
     buttonUrl: document.getElementById('ann-btn-url').value.trim(),
@@ -3137,7 +3144,7 @@ async function saveAnnouncementSettings(){
   try{
     await fbSet('settings','announcement', data);
     A.announcement = data;
-    toast('✅ ব্যানার সেভ হয়েছে — যারা আগে বন্ধ করেছিল তারাও এখন আবার দেখবে!');
+    toast('✅ পপআপ সেভ হয়েছে — যারা আগে বন্ধ করেছিল তারাও এখন আবার দেখবে!');
   }catch(e){ toast('⚠️ সমস্যা হয়েছে।'); }
 }
 
