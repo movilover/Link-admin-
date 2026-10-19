@@ -1128,6 +1128,8 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
           <div class="form-group"><div class="form-label"><span class="material-icons-round">support_agent</span>সাপোর্ট / যোগাযোগ লিংক</div><input class="form-input" id="set-admin-contact" placeholder="https://t.me/yourusername" /><div class="form-hint">ইউজার সাইটের প্রোফাইল পেজে "সাপোর্ট / যোগাযোগ" মেনু আইটেম হিসেবে দেখাবে (খালি রাখলে আইটেমটি লুকানো থাকবে)।</div></div>
           <div class="form-group"><div class="form-label"><span class="material-icons-round">timer</span>আনলক ল্যান্ডিং পেজে অপেক্ষার সময় (সেকেন্ড)</div><input class="form-input" type="number" min="5" max="120" id="set-landing-wait" placeholder="7" /><div class="form-hint">ভিডিও আনলকের প্রতিটি ধাপে ইউজারকে ল্যান্ডিং পেজে এত সেকেন্ড থাকতে হবে (ডিফল্ট ৭)। টাস্কের অপেক্ষার সময় প্রতিটি টাস্কে আলাদাভাবে সেট হয়।</div></div>
           <div class="form-group"><div class="form-label"><span class="material-icons-round">payments</span>প্রতি ভিডিও আনলকে রিওয়ার্ড (৳)</div><input class="form-input" type="number" min="0" step="0.01" id="set-video-reward" placeholder="1" /><div class="form-hint">ইউজার একটি ভিডিওর সব অ্যাড দেখা শেষ করলে ওয়ালেটে এই টাকা জমা হবে (প্রতি ইউজার প্রতি ভিডিওতে একবার)। ০ দিলে রিওয়ার্ড বন্ধ।</div></div>
+          <div class="form-group"><div class="form-label"><span class="material-icons-round">android</span>অ্যাপ ডাউনলোড লিংক (APK)</div><input class="form-input" id="set-app-url" placeholder="https://github.com/ইউজার/রিপো/releases/latest/download/MoviLover.apk" /><div class="form-hint">দিলে সাইটের উপরে "অ্যাপ ডাউনলোড" বাটন আসবে এবং বটের স্বাগত বার্তায় ডাউনলোড বাটন যাবে। অ্যাপের ভিতরে ও iPhone-এ বাটন দেখাবে না।</div></div>
+          <div class="form-group"><div class="toggle-row"><div class="toggle-label"><span class="material-icons-round" style="color:var(--green);font-size:18px;">visibility</span>অ্যাপ ডাউনলোড বাটন চালু রাখুন</div><label class="switch"><input type="checkbox" id="set-app-on" checked/><span class="slider-tg"></span></label></div></div>
           <button class="save-btn" onclick="saveGeneralSettings()"><span class="material-icons-round">save</span>সেভ করুন</button>
         </div>
       </div>
@@ -3629,7 +3631,7 @@ bcMountAll();
 /* ============ GENERAL SETTINGS ============ */
 async function loadSettingsForm(){
   const site = await fbGetDoc('settings','site');
-  if(site){ document.getElementById('set-site-name').value = site.name||''; document.getElementById('set-admin-contact').value = site.adminContactUrl||''; }
+  if(site){ document.getElementById('set-site-name').value = site.name||''; document.getElementById('set-admin-contact').value = site.adminContactUrl||''; document.getElementById('set-app-url').value = site.appUrl||''; document.getElementById('set-app-on').checked = site.appEnabled !== false; }
   const ld = await fbGetDoc('settings','landing');
   document.getElementById('set-landing-wait').value = (ld && ld.unlockWaitSeconds) || 7;
   const rw = await fbGetDoc('settings','rewards');
@@ -3642,7 +3644,9 @@ async function saveGeneralSettings(){
     const unlockWaitSeconds = Math.max(5, Math.min(120, parseInt(document.getElementById('set-landing-wait').value)||7));
     const videoReward = Math.max(0, parseFloat(document.getElementById('set-video-reward').value));
     await fbSet('settings','rewards',{ videoReward: isNaN(videoReward) ? 1 : videoReward });
-    await fbSet('settings','site',{name, adminContactUrl});
+    const appUrl = document.getElementById('set-app-url').value.trim();
+    if(appUrl && !/^https:\/\//i.test(appUrl)){ toast('⚠️ অ্যাপ লিংক https:// দিয়ে শুরু হতে হবে।'); return; }
+    await fbSet('settings','site',{name, adminContactUrl, appUrl, appEnabled: document.getElementById('set-app-on').checked});
     await fbSet('settings','landing',{ unlockWaitSeconds });
     toast('✅ সেটিংস সেভ হয়েছে!');
   }catch(e){ toast('⚠️ সেভ করতে সমস্যা হয়েছে।'); }
