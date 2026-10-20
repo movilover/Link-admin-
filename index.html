@@ -581,7 +581,7 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
             </div>
             <input type="file" accept="video/*" id="tut-video-file" style="display:none;" onchange="handleTutTgUpload(this)" />
             <div class="form-hint">অথবা নিচে সরাসরি ভিডিও লিংক (URL) বসাতে পারেন — এখন <b>YouTube লিংক</b> (যেমন youtube.com/watch?v=... বা youtu.be/...), <b>Blogger-এর ভিডিও এম্বেড লিংক</b> (blogger.com/video.g?token=...), অথবা সরাসরি .mp4 ফাইল লিংক — তিনটাই সাপোর্ট করবে, সাইটের ভিতরেই প্লে হবে।</div>
-            <div class="form-hint" style="color:var(--gold3);">Blogger-এ ভিডিও আপলোড করার পর পোস্টের সাধারণ URL কপি করলে চলবে না (এটা একটা ওয়েবপেজ, ভিডিও ফাইল না)। সঠিক লিংক পেতে: পোস্ট এডিটরে গিয়ে উপরে ডান দিকে <b>"HTML view"</b>-এ ক্লিক করুন, তারপর <code>&lt;iframe ... src="https://www.blogger.com/video.g?token=..."&gt;</code> — এই অংশ থেকে শুধু <b>src="..."</b>-এর ভেতরের লিংকটা কপি করে এখানে বসান।</div>
+            <div class="form-hint" style="color:var(--gold3);">Blogger-এ ভিডিও আপলোড করার পর পোস্টের <b>সাধারণ লিংক</b> (যেমন https://আপনার.blogspot.com/2026/10/post.html) সরাসরি বসালেই চলবে — সাইট/অ্যাপ নিজে পোস্ট থেকে ভিডিওটি খুঁজে সাইটের ভেতরেই চালাবে। পোস্টে একাধিক ভিডিও থাকলে নিজে থেকে পার্ট ১, পার্ট ২... হবে।</div>
             <input class="form-input" id="tut-video-url" placeholder="https://..." style="margin-top:8px;" />
           </div>
           <div class="form-group">
@@ -758,6 +758,11 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
           <div class="form-group">
             <div class="form-label"><span class="material-icons-round">timer</span>ভিডিও কত মিনিট থাকবে</div>
             <input class="form-input" type="number" min="1" id="vb-retention" placeholder="15" />
+          </div>
+          <div class="form-group">
+            <div class="form-label"><span class="material-icons-round">cloud_sync</span>স্ট্রিম সার্ভার লিংক (ঐচ্ছিক — ২০MB+ টেলিগ্রাম ভিডিও অ্যাপ/সাইটে চালাতে)</div>
+            <input class="form-input" id="vb-stream-url" placeholder="https://movielover-stream.onrender.com" autocomplete="off" autocapitalize="off" spellcheck="false" />
+            <div class="form-hint">টেলিগ্রামের ২০MB-এর বড় ভিডিও সাইটের প্লেয়ারে চালাতে স্ট্রিম সার্ভার লাগে (গাইড দেখুন)। খালি রাখলে শুধু ২০MB পর্যন্ত চলবে।</div>
           </div>
           <div class="form-group">
             <div class="form-label"><span class="material-icons-round">alternate_email</span>মেইন বটের ইউজারনেম (সাইট ও রেফার লিংকের জন্য)</div>
@@ -2114,6 +2119,7 @@ async function loadVideoBotSettings(){
   document.getElementById('vb-token').value = A.videobot.token || '';
   document.getElementById('vb-chat-id').value = A.videobot.chatId || '';
   document.getElementById('vb-retention').value = A.videobot.retentionMinutes || 15;
+  document.getElementById('vb-stream-url').value = A.videobot.streamUrl || '';
   try{
     const sd = await window._getDoc(window._doc(window._db,'settings','site'));
     const s = sd.exists() ? sd.data() : null;
@@ -2156,6 +2162,9 @@ async function saveVideoBotSettings(){
   document.getElementById('vb-token').value = token;
   document.getElementById('vb-chat-id').value = chatId;
   const retentionMinutes = Math.max(1, parseInt(document.getElementById('vb-retention').value)||15);
+  let streamUrl = String(document.getElementById('vb-stream-url').value||'').trim().replace(/\/+$/,'');
+  if(streamUrl && !/^https:\/\//i.test(streamUrl)){ toast('⚠️ স্ট্রিম সার্ভার লিংক https:// দিয়ে শুরু হতে হবে।'); return; }
+  document.getElementById('vb-stream-url').value = streamUrl;
   if(!token || !chatId){ toast('⚠️ টোকেন ও চ্যানেল ID দুটোই দিন।'); return; }
   if(!/^\d{6,}:[A-Za-z0-9_-]{30,}$/.test(token)){ showVbDiag('bad','টোকেনের ফরম্যাট ঠিক নয়। সঠিক ফরম্যাট: 123456789:AAxxxxxxxx… (BotFather-এর দেওয়া পুরো টোকেন কপি করুন, আর কিছু নয়)'); return; }
   let botUsername = '', botId = 0;
@@ -2178,8 +2187,8 @@ async function saveVideoBotSettings(){
     if(ch.result.id && String(ch.result.id)!==chatId && /^@/.test(chatId)){ /* keep @username; works for sendVideo */ }
   }catch(e){ showVbDiag('bad','চ্যানেল যাচাই করা যায়নি (নেটওয়ার্ক)।'); return; }
   try{
-    await fbSet('settings','videobot',{ token, chatId, botUsername, retentionMinutes });
-    A.videobot = { token, chatId, botUsername, retentionMinutes };
+    await fbSet('settings','videobot',{ token, chatId, botUsername, retentionMinutes, streamUrl });
+    A.videobot = { token, chatId, botUsername, retentionMinutes, streamUrl };
     // সাইট/রেফার লিংকের বট: ফিল্ডে হাতে লেখা থাকলে সেটা, নইলে টোকেনের আসল বটের ইউজারনেম
     const siteBot = String((document.getElementById('vb-site-bot').value || botUsername)).trim().replace(/^@/,'');
     const siteApp = String(document.getElementById('vb-site-app').value || '').trim().replace(/[^A-Za-z0-9_]/g,'');
