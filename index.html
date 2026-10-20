@@ -528,6 +528,26 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
           <div class="users-summary-lbl">বট ব্লক/লিভ</div>
         </div>
       </div>
+      <div class="users-summary-row" style="margin-top:0;">
+        <div class="users-summary-card">
+          <div class="users-summary-val gold" id="users-app-total">0</div>
+          <div class="users-summary-lbl">মোট অ্যাপ ইউজার</div>
+        </div>
+        <div class="users-summary-card">
+          <div class="users-summary-val" id="users-app-dl">0</div>
+          <div class="users-summary-lbl">ডাউনলোড বাটন ক্লিক</div>
+        </div>
+        <div class="users-summary-card">
+          <div class="users-summary-val" id="users-app-today">0</div>
+          <div class="users-summary-lbl">আজ অ্যাপ খুলেছে</div>
+        </div>
+      </div>
+      <div id="user-filter-row" style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 0;">
+        <button class="cancel-btn" data-uf="all" onclick="setUserFilter('all')">সব ইউজার</button>
+        <button class="cancel-btn" data-uf="app" onclick="setUserFilter('app')">📱 অ্যাপ ইউজার</button>
+        <button class="cancel-btn" data-uf="dl" onclick="setUserFilter('dl')">⬇️ ডাউনলোড ক্লিক</button>
+        <button class="cancel-btn" data-uf="web" onclick="setUserFilter('web')">🌐 অ্যাপ ছাড়া</button>
+      </div>
       <div class="user-search-wrap">
         <input class="form-input" id="user-search-input" placeholder="ইউজার আইডি, নাম বা ইউজারনেম দিয়ে খুঁজুন..." oninput="renderUsersList()" />
       </div>
@@ -1755,6 +1775,9 @@ async function loadAllUsers(){
   setT('users-new-today', users.filter(u=>(u.createdAt||0)>=dayStartMs).length);
   setT('users-bot-active', users.filter(u=>u._bot && u._bot.active!==false).length);
   setT('users-bot-blocked', users.filter(u=>u._bot && u._bot.active===false).length);
+  setT('users-app-total', users.filter(u=>u.isApp).length);
+  setT('users-app-dl', users.filter(u=>(u.appDlClicks||0)>0 || u.appDlAt).length);
+  setT('users-app-today', users.filter(u=>(u.appLastAt||0)>=dayStartMs).length);
   document.getElementById('users-total-val').textContent = users.length;
   document.getElementById('users-ads-val').textContent = fmtNum(totalAds);
   document.getElementById('users-unlocks-val').textContent = fmtNum(totalUnlocks);
@@ -1767,6 +1790,14 @@ function renderUsersList(){
   const qEl = document.getElementById('user-search-input');
   const q = (qEl ? qEl.value : '').trim().toLowerCase();
   let list = A.allUsers;
+  const uf = A.userFilter || 'all';
+  document.querySelectorAll('#user-filter-row [data-uf]').forEach(b=>{
+    const on = b.dataset.uf === uf;
+    b.style.borderColor = on ? 'var(--gold)' : ''; b.style.color = on ? 'var(--gold)' : ''; b.style.fontWeight = on ? '700' : '';
+  });
+  if(uf==='app') list = list.filter(u=>u.isApp);
+  else if(uf==='dl') list = list.filter(u=>(u.appDlClicks||0)>0 || u.appDlAt);
+  else if(uf==='web') list = list.filter(u=>!u.isApp);
   if(q) list = list.filter(u=>{
     const idMatch = u.id.toLowerCase().includes(q);
     const nameMatch = (u.tgFirstName||'').toLowerCase().includes(q) || (u.tgLastName||'').toLowerCase().includes(q);
@@ -1797,12 +1828,19 @@ function renderUsersList(){
           '<span class="user-chip ads"><span class="material-icons-round">smart_display</span>' + (u.adsWatched||0) + ' অ্যাড দেখেছে</span>' +
           '<span class="user-chip unlocks"><span class="material-icons-round">lock_open</span>' + (u.unlockedCount||0) + ' আনলক</span>' +
           '<span class="user-chip active"><span class="material-icons-round">check_circle</span>সচল</span>' +
-          botChipHtml(u) +
+          appChipHtml(u) + botChipHtml(u) +
           (u._botOnly?'<span class="user-chip notg"><span class="material-icons-round">language</span>সাইটে আসেনি</span>':'') +
         '</div>' +
       '</div>' +
     '</div>';
   }).join('') + (total > limit ? '<div style="padding:14px;text-align:center;"><button class="cancel-btn" onclick="A.usersLimit=(A.usersLimit||60)+120;renderUsersList()">আরও দেখান (' + (total-limit) + ' জন বাকি)</button></div>' : '');
+}
+function setUserFilter(f){ A.userFilter = f; A.usersLimit = 60; renderUsersList(); }
+function appChipHtml(u){
+  let h = '';
+  if(u.isApp) h += '<span class="user-chip active"><span class="material-icons-round">android</span>অ্যাপ ইউজার' + (u.appVer?' v'+escHtml(String(u.appVer)):'') + (u.appLastAt?' · শেষ: '+fmtDate(u.appLastAt):'') + '</span>';
+  if((u.appDlClicks||0)>0 || u.appDlAt) h += '<span class="user-chip tg"><span class="material-icons-round">download</span>ডাউনলোড ক্লিক ' + (u.appDlClicks||1) + 'x' + (u.appDlAt?' · '+fmtDate(u.appDlAt):'') + '</span>';
+  return h;
 }
 function botChipHtml(u){
   if(u._bot){
