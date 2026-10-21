@@ -469,6 +469,10 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
 .tr-pick-add .material-icons-round{font-size:18px}
 .tr-pick-cat{font-size:11px;color:var(--text-muted);margin-top:2px}
 .icon-action.tr-on{color:#ff9a4d;border-color:rgba(255,154,77,.45);background:rgba(255,154,77,.12)}
+.cp-check{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;margin:2px 0 8px;border-radius:12px;border:1px solid rgba(255,154,77,.3);background:rgba(255,154,77,.07);cursor:pointer}
+.cp-check input{width:18px;height:18px;margin-top:2px;accent-color:#ff9a4d;flex-shrink:0}
+.cp-check b{display:block;font-size:13px;color:#ffd3a8}.cp-check span{display:block;font-size:11.5px;color:var(--text-muted);line-height:1.45;margin-top:2px}
+.cat-chip-hide{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:700;background:rgba(255,154,77,.16);color:#ff9a4d;vertical-align:1px}
 </style>
 <style id="cat-v4">
 .cat-card { margin:10px 16px; }
@@ -627,6 +631,7 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
             <div class="form-label"><span class="material-icons-round">label</span>ক্যাটাগরির নাম</div>
             <input class="form-input" id="new-cat-label" placeholder="যেমন: Movies, Series, Drama, Comedy" />
           </div>
+          <label class="cp-check"><input type="checkbox" id="new-cat-hide" /><div><b>হোম পেজে দেখাবে না</b><span>চালু থাকলে এই ক্যাটাগরির ভিডিও হোমের "সকল ভিডিও"-তে আসবে না — শুধু ক্যাটাগরিতে ঢুকলে দেখা যাবে (যেমন Series, Movie, Natok, Bachelor Point)।</span></div></label>
           <button class="save-btn" onclick="addCategory()"><span class="material-icons-round">add_circle</span>ক্যাটাগরি যুক্ত করুন</button>
           <button class="cancel-btn seed-btn" onclick="seedDefaultCats()">🎬 ডিফল্ট ৪টি যুক্ত করুন (Movies · Series · Drama · Comedy)</button>
         </div>
@@ -2495,6 +2500,7 @@ function renderCategoriesList(){
         '<div class="cp-row"><input class="form-input" id="ce-label-' + c.id + '" value="' + escHtml(c.label) + '" placeholder="নাম" /><input class="form-input" id="ce-emoji-' + c.id + '" value="' + escHtml(c.emoji||'') + '" placeholder="🎬" maxlength="4" style="max-width:70px;text-align:center;" /></div>' +
         '<div class="cp-row"><select class="form-select" id="ce-iconkey-' + c.id + '">' + iconOptionsHtml(c.iconKey) + '</select></div>' +
         '<div class="cp-row"><input class="form-input" id="ce-icon-' + c.id + '" value="' + escHtml(c.iconUrl||'') + '" placeholder="আইকন ছবির লিংক (ঐচ্ছিক)" /><label class="cp-up"><span class="material-icons-round">upload</span><input type="file" accept="image/*" style="display:none;" onchange="uploadCatImage(this,\'ce-icon-' + c.id + '\')"/></label></div>' +
+        '<label class="cp-check"><input type="checkbox" id="ce-hide-' + c.id + '" ' + (c.homeHidden?'checked':'') + ' onchange="toggleCatHomeHidden(\'' + c.id + '\',this.checked)" /><div><b>হোম পেজে দেখাবে না</b><span>চালু থাকলে এই ক্যাটাগরির ভিডিও হোমের "সকল ভিডিও"-তে আসবে না — শুধু ক্যাটাগরিতে ঢুকলে দেখা যাবে (যেমন Series, Movie, Natok, Bachelor Point)।</span></div></label>' +
         '<button class="save-btn" style="padding:11px;font-size:13.5px;" onclick="saveCatEdit(\'' + c.id + '\')"><span class="material-icons-round">save</span>সেটিং সেভ করুন</button>' +
         '<div class="cp-title">সাব-ক্যাটাগরি (লোগোসহ বাটন)</div>' +
         (subs.length ? subs.map(sb=>
@@ -2515,7 +2521,7 @@ function renderCategoriesList(){
       '</div>' +
       '<div class="cat-rank">' + (ci+1) + '</div>' +
       '<div class="cat-emoji-box">' + catIconBoxAdmin(c) + '</div>' +
-      '<div class="cat-info"><div class="cat-name">' + escHtml(c.label) + '</div><div class="cat-key">' + subs.length + 'টি সাব-ক্যাটাগরি</div></div>' +
+      '<div class="cat-info"><div class="cat-name">' + escHtml(c.label) + (c.homeHidden ? '<span class="cat-chip-hide">শুধু ভেতরে</span>' : '') + '</div><div class="cat-key">' + subs.length + 'টি সাব-ক্যাটাগরি</div></div>' +
       '<div class="icon-action edit" onclick="toggleCatPanel(\'' + c.id + '\')"><span class="material-icons-round">' + (open ? 'expand_less' : 'tune') + '</span></div>' +
       '<div class="icon-action del" onclick="confirmDeleteCategory(\'' + c.id + '\',\'' + escHtml(c.label).replace(/'/g,'') + '\')"><span class="material-icons-round">delete</span></div>' +
     '</div>' + panel + '</div>';
@@ -2542,6 +2548,11 @@ async function moveCategory(id, dir){
     toast('✅ ক্যাটাগরির ক্রম সেভ হয়েছে।');
   }catch(e){ toast('⚠️ ক্রম সেভ করা যায়নি।'); loadCategories(); }
 }
+async function toggleCatHomeHidden(id, on){
+  const c = A.categories.find(x=>x.id===id); if(c) c.homeHidden = !!on;
+  try{ await fbUpdate('categories', id, { homeHidden: !!on }); toast(on ? '✅ এখন শুধু ক্যাটাগরির ভিতরে দেখাবে।' : '✅ এখন হোম পেজেও দেখাবে।'); renderCategoriesList(); }
+  catch(e){ toast('⚠️ সেভ করা যায়নি।'); loadCategories(); }
+}
 function toggleCatPanel(id){ A.openCatId = (A.openCatId === id) ? null : id; renderCategoriesList(); }
 async function uploadCatImage(inp, targetId){
   const f = inp.files && inp.files[0]; if(!f) return;
@@ -2561,7 +2572,7 @@ async function saveCatEdit(id){
   const label = document.getElementById('ce-label-' + id).value.trim();
   if(!label){ toast('⚠️ ক্যাটাগরির নাম লিখুন।'); return; }
   try{
-    await fbUpdate('categories', id, { label, emoji: document.getElementById('ce-emoji-' + id).value.trim(), iconUrl: document.getElementById('ce-icon-' + id).value.trim(), iconKey: document.getElementById('ce-iconkey-' + id).value });
+    await fbUpdate('categories', id, { label, emoji: document.getElementById('ce-emoji-' + id).value.trim(), iconUrl: document.getElementById('ce-icon-' + id).value.trim(), iconKey: document.getElementById('ce-iconkey-' + id).value, homeHidden: !!(document.getElementById('ce-hide-' + id) || {}).checked });
     toast('✅ সেটিং সেভ হয়েছে।'); loadCategories();
   }catch(e){ toast('⚠️ সেভ করা যায়নি।'); }
 }
@@ -2615,7 +2626,9 @@ async function addCategory(){
   if(!label){ toast('⚠️ ক্যাটাগরির নাম লিখুন।'); return; }
   const key = slugify(label);
   try{
-    await fbAdd('categories', { key, label, emoji, iconUrl, iconKey, subs: [], order: Date.now() });
+    const homeHidden = !!document.getElementById('new-cat-hide').checked;
+    await fbAdd('categories', { key, label, emoji, iconUrl, iconKey, homeHidden, subs: [], order: Date.now() });
+    document.getElementById('new-cat-hide').checked = false;
     document.getElementById('new-cat-label').value=''; document.getElementById('new-cat-emoji').value=''; document.getElementById('new-cat-icon').value=''; document.getElementById('new-cat-iconkey').value='';
     toast('✅ ক্যাটাগরি যুক্ত হয়েছে!');
     loadCategories();
