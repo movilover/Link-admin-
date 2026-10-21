@@ -453,6 +453,23 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
 .tsp-range { width:100%; accent-color:#8b5cf6; }
 .tsp-val { color:var(--gold3); font-weight:700; margin-left:6px; }
 </style>
+<style id="admin-v6">
+.cat-order-btns{display:flex;flex-direction:column;gap:3px;flex-shrink:0}
+.cat-order-btn{width:28px;height:22px;border-radius:7px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text-muted);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.cat-order-btn .material-icons-round{font-size:17px}
+.cat-order-btn:active{transform:scale(.9)}
+.cat-order-btn.off{opacity:.25;pointer-events:none}
+.cat-rank{width:24px;height:24px;border-radius:8px;background:rgba(168,85,247,.16);color:#c4b0ff;font-family:'Rajdhani',sans-serif;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-right:2px}
+.cat-ico-prev{width:56px;height:56px;border-radius:14px;overflow:hidden;background:rgba(168,85,247,.14);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid var(--border)}
+.cat-ico-prev img{width:100%;height:100%;object-fit:cover}
+.tr-search{margin:0 16px 8px;max-width:560px;margin-left:auto;margin-right:auto;padding:0 16px}
+.tr-pick-row{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--border)}
+.tr-pick-row:last-child{border-bottom:none}
+.tr-pick-add{width:30px;height:30px;border-radius:9px;border:1px solid rgba(35,180,122,.4);background:rgba(35,180,122,.12);color:#23b47a;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.tr-pick-add .material-icons-round{font-size:18px}
+.tr-pick-cat{font-size:11px;color:var(--text-muted);margin-top:2px}
+.icon-action.tr-on{color:#ff9a4d;border-color:rgba(255,154,77,.45);background:rgba(255,154,77,.12)}
+</style>
 <style id="cat-v4">
 .cat-card { margin:10px 16px; }
 .cat-card .cat-row { border-bottom:none; }
@@ -510,6 +527,22 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
         <div class="page-title" style="font-size:14px;">সকল ভিডিও</div>
       </div>
       <div class="mgr-card" id="videos-list"></div>
+    </div>
+
+    <!-- TRENDING -->
+    <div class="page" id="page-trending">
+      <div class="page-head">
+        <div class="page-title">ট্রেন্ডিং ভিডিও<small>এখানে যেগুলো বাছবেন সেগুলোই ইউজার সাইটের "Trending Now" এ এই ক্রমে দেখাবে। ইউজার কোনো ট্রেন্ডিং ভিডিওতে ট্যাপ করলে ওই ভিডিওর ক্যাটাগরির সব ভিডিও পাশাপাশি দুই কলামে খুলবে।</small></div>
+      </div>
+      <div class="page-head" style="padding-top:2px;">
+        <div class="page-title" style="font-size:14px;"><span class="material-icons-round" style="font-size:16px;vertical-align:-3px;color:#ff9a4d;">local_fire_department</span> বর্তমান ট্রেন্ডিং<small id="trend-count-sub"></small></div>
+      </div>
+      <div class="mgr-card" id="trending-mgr-list"></div>
+      <div class="page-head" style="padding-top:2px;">
+        <div class="page-title" style="font-size:14px;"><span class="material-icons-round" style="font-size:16px;vertical-align:-3px;color:var(--gold3);">add_circle</span> ট্রেন্ডিংয়ে ভিডিও যুক্ত করুন</div>
+      </div>
+      <div class="tr-search"><input class="form-input" id="trend-search" placeholder="ভিডিওর নাম বা নম্বর লিখে খুঁজুন..." oninput="renderTrendingPicker()" /></div>
+      <div class="mgr-card" id="trending-picker-list"></div>
     </div>
 
     <!-- USERS -->
@@ -1388,7 +1421,8 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
     <div class="nav-item active" data-page="videos" onclick="showAdminPage('videos')"><span class="material-icons-round">movie</span>ভিডিও</div>
     <div class="nav-item" data-page="users" onclick="showAdminPage('users')"><span class="material-icons-round">group</span>ইউজার</div>
     <div class="nav-item" data-page="categories" onclick="showAdminPage('categories')"><span class="material-icons-round">category</span>ক্যাটাগরি</div>
-    <div class="nav-item" data-page="tutorial" onclick="showAdminPage('tutorial')"><span class="material-icons-round">menu_book</span>টিউটোরিয়াল</div>
+    <div class="nav-item" data-page="trending" onclick="showAdminPage('trending')"><span class="material-icons-round">local_fire_department</span>ট্রেন্ডিং</div>
+<div class="nav-item" data-page="tutorial" onclick="showAdminPage('tutorial')"><span class="material-icons-round">menu_book</span>টিউটোরিয়াল</div>
     <div class="nav-item" data-page="channels" onclick="showAdminPage('channels')"><span class="material-icons-round">send</span>চ্যানেল</div>
     <div class="nav-item" data-page="tasks" onclick="showAdminPage('tasks')"><span class="material-icons-round">payments</span>টাস্ক</div>
     <div class="nav-item" data-page="withdrawals" onclick="showAdminPage('withdrawals')"><span class="material-icons-round">account_balance_wallet</span>উইথড্র</div>
@@ -1788,6 +1822,7 @@ function showAdminPage(name){
   document.querySelector('.nav-item[data-page="'+name+'"]').classList.add('active');
   if(name==='users'){ if(!A.allUsers || Date.now() - (A._usersAt||0) > 90000) loadAllUsers(); else renderUsersList(); }
   if(name==='broadcast') refreshBroadcastStats();
+  if(name==='trending'){ renderTrendingManager(); renderTrendingPicker(); }
   if(name==='tasks') loadTasks();
   if(name==='referrals') loadReferralPage();
   if(name==='welcome') loadWelcomePage();
@@ -2472,7 +2507,13 @@ function renderCategoriesList(){
         '<button class="save-btn" style="padding:11px;font-size:13.5px;" onclick="addSub(\'' + c.id + '\')"><span class="material-icons-round">add_circle</span>সাব-ক্যাটাগরি যুক্ত করুন</button>' +
       '</div>';
     }
+    const ci = A.categories.indexOf(c), cn = A.categories.length;
     return '<div class="mgr-card cat-card"><div class="cat-row">' +
+      '<div class="cat-order-btns">' +
+        '<div class="cat-order-btn ' + (ci===0?'off':'') + '" onclick="moveCategory(\'' + c.id + '\',-1)" title="উপরে/আগে আনুন"><span class="material-icons-round">keyboard_arrow_up</span></div>' +
+        '<div class="cat-order-btn ' + (ci===cn-1?'off':'') + '" onclick="moveCategory(\'' + c.id + '\',1)" title="নিচে/পরে নিন"><span class="material-icons-round">keyboard_arrow_down</span></div>' +
+      '</div>' +
+      '<div class="cat-rank">' + (ci+1) + '</div>' +
       '<div class="cat-emoji-box">' + catIconBoxAdmin(c) + '</div>' +
       '<div class="cat-info"><div class="cat-name">' + escHtml(c.label) + '</div><div class="cat-key">' + subs.length + 'টি সাব-ক্যাটাগরি</div></div>' +
       '<div class="icon-action edit" onclick="toggleCatPanel(\'' + c.id + '\')"><span class="material-icons-round">' + (open ? 'expand_less' : 'tune') + '</span></div>' +
@@ -2485,6 +2526,22 @@ function renderCategorySelect(){
   const opts = [{key:'all',label:'সব (ডিফল্ট)'}].concat(A.categories);
   sel.innerHTML = opts.map(c=>'<option value="'+c.key+'">'+escHtml(c.label)+'</option>').join('');
 }
+/* ক্যাটাগরির ক্রম: ↑ ↓ চাপলেই ইউজার সাইটে সঙ্গে সঙ্গে নতুন ক্রমে দেখায় */
+async function moveCategory(id, dir){
+  const list = A.categories.slice();
+  const i = list.findIndex(x=>x.id===id), j = i + dir;
+  if(i < 0 || j < 0 || j >= list.length) return;
+  const tmp = list[i]; list[i] = list[j]; list[j] = tmp;
+  A.categories = list;                       // সঙ্গে সঙ্গে স্ক্রিনে বদলায়
+  renderCategoriesList(); renderCategorySelect();
+  try{
+    for(let k = 0; k < list.length; k++){
+      const want = (k + 1) * 10;
+      if(list[k].order !== want){ list[k].order = want; await fbUpdate('categories', list[k].id, { order: want }); }
+    }
+    toast('✅ ক্যাটাগরির ক্রম সেভ হয়েছে।');
+  }catch(e){ toast('⚠️ ক্রম সেভ করা যায়নি।'); loadCategories(); }
+}
 function toggleCatPanel(id){ A.openCatId = (A.openCatId === id) ? null : id; renderCategoriesList(); }
 async function uploadCatImage(inp, targetId){
   const f = inp.files && inp.files[0]; if(!f) return;
@@ -2492,7 +2549,11 @@ async function uploadCatImage(inp, targetId){
   try{
     const url = await uploadToImgBB(f, null);
     document.getElementById(targetId).value = url;
-    toast('✅ ছবি আপলোড হয়েছে — এখন সেভ/যুক্ত করুন।');
+    if(/^ce-icon-/.test(targetId)){            // বিদ্যমান ক্যাটাগরির ছবি সঙ্গে সঙ্গে সেভ
+      const cid = targetId.replace(/^ce-icon-/, '');
+      await fbUpdate('categories', cid, { iconUrl: url });
+      toast('✅ ক্যাটাগরির ছবি সেভ হয়েছে।'); loadCategories();
+    } else toast('✅ ছবি আপলোড হয়েছে — এখন সেভ/যুক্ত করুন।');
   }catch(e){ toast('⚠️ ' + (e && e.message ? e.message : 'আপলোড ব্যর্থ')); }
   inp.value = '';
 }
@@ -2576,6 +2637,7 @@ function subscribeVideosAdmin(){
       A.videos = snap.docs.map(d=>({id:d.id,...d.data()}));
       renderVideosList();
       renderPinnedManagerList();
+      try{ renderTrendingManager(); renderTrendingPicker(); }catch(e){}
       ensureVideoNumbers();
     }, ()=>loadVideosFallback());
   }catch(e){ loadVideosFallback(); }
@@ -2585,6 +2647,7 @@ async function loadVideosFallback(){
   A.videos.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
   renderVideosList();
   renderPinnedManagerList();
+  try{ renderTrendingManager(); renderTrendingPicker(); }catch(e){}
 }
 function catLabelAdmin(key){
   if(key==='all'||!key) return 'সব';
@@ -2620,11 +2683,13 @@ function renderVideosList(){
           (partsCount>1?('<span class="vid-chip" style="background:rgba(217,165,63,0.15);color:var(--gold3);">📼 ' + partsCount + ' পার্ট</span>'):'') +
           (directLinkCount>0?('<span class="vid-chip" style="background:rgba(35,180,122,0.16);color:var(--green);">🔗 ' + directLinkCount + ' ডাইরেক্ট লিংক</span>'):'') +
           (v.featured?'<span class="vid-chip" style="background:rgba(35,180,122,0.18);color:var(--green);">NEW</span>':'') +
+          (v.trending?'<span class="vid-chip" style="background:rgba(255,154,77,0.16);color:#ff9a4d;">🔥 ট্রেন্ডিং</span>':'') +
           (v.pinned?'<span class="vid-chip pin"><span class="material-icons-round" style="font-size:11px;vertical-align:-2px;">push_pin</span> পিন করা</span>':'') +
         '</div>' +
         '<span class="vid-stat-sm"><span class="material-icons-round" style="font-size:13px;">visibility</span>' + fmtNum(v.views||0) + '</span>' +
       '</div>' +
       '<div class="vid-actions">' +
+        '<div class="icon-action ' + (v.trending?'tr-on':'') + '" onclick="toggleTrendingVideo(\'' + v.id + '\')" title="ট্রেন্ডিংয়ে যোগ/সরান"><span class="material-icons-round">local_fire_department</span></div>' +
         '<div class="icon-action ' + (v.pinned?'pin-on':'') + '" onclick="togglePinVideo(\'' + v.id + '\')" title="পিন করুন/আনপিন করুন"><span class="material-icons-round">push_pin</span></div>' +
         '<div class="icon-action edit" onclick="openVideoForm(\'' + v.id + '\')"><span class="material-icons-round">edit</span></div>' +
         '<div class="icon-action del" onclick="confirmDeleteVideoRow(\'' + v.id + '\',\'' + escHtml(v.title||'ভিডিও') + '\')"><span class="material-icons-round">delete</span></div>' +
@@ -2686,6 +2751,72 @@ async function movePinOrder(id, dir){
   try{
     await fbUpdate('videos', a.id, { pinOrder: bOrder });
     await fbUpdate('videos', b.id, { pinOrder: aOrder });
+  }catch(e){ toast('⚠️ ক্রম পরিবর্তন ব্যর্থ হয়েছে।'); }
+}
+
+/* ============ TRENDING MANAGER ============ */
+function getTrendingSorted(){
+  return A.videos.filter(v=>v.trending).sort((x,y)=>(x.trendOrder||0)-(y.trendOrder||0));
+}
+function renderTrendingManager(){
+  const wrap = document.getElementById('trending-mgr-list'); if(!wrap) return;
+  const list = getTrendingSorted();
+  const sub = document.getElementById('trend-count-sub'); if(sub) sub.textContent = list.length ? list.length + 'টি ভিডিও' : '';
+  if(!list.length){
+    wrap.innerHTML = '<div class="empty-hint" style="padding:22px 20px;"><span class="material-icons-round" style="font-size:30px;">local_fire_department</span>এখনো কোনো ট্রেন্ডিং ভিডিও নেই। নিচের তালিকা থেকে + চেপে যুক্ত করুন।</div>';
+    return;
+  }
+  wrap.innerHTML = list.map((v,i)=>
+    '<div class="pin-list-row">' +
+      '<div class="pin-rank-badge">' + (i+1) + '</div>' +
+      '<div class="pin-list-thumb">' + (v.thumbnail?('<img src="'+escHtml(v.thumbnail)+'" onerror="this.style.display=\'none\'"/>'):'') + '</div>' +
+      '<div class="pin-list-title">' + escHtml(v.title||'ভিডিও') + '<div class="tr-pick-cat">' + catLabelAdmin(v.category) + '</div></div>' +
+      '<div class="pin-order-btns">' +
+        '<div class="pin-order-btn" onclick="moveTrendOrder(\'' + v.id + '\',-1)" title="উপরে সরান"><span class="material-icons-round">keyboard_arrow_up</span></div>' +
+        '<div class="pin-order-btn" onclick="moveTrendOrder(\'' + v.id + '\',1)" title="নিচে সরান"><span class="material-icons-round">keyboard_arrow_down</span></div>' +
+      '</div>' +
+      '<div class="pin-unpin-btn" onclick="toggleTrendingVideo(\'' + v.id + '\')" title="ট্রেন্ডিং থেকে সরান"><span class="material-icons-round">close</span></div>' +
+    '</div>').join('');
+}
+function renderTrendingPicker(){
+  const wrap = document.getElementById('trending-picker-list'); if(!wrap) return;
+  const q = ((document.getElementById('trend-search')||{}).value || '').trim().toLowerCase();
+  let list = A.videos.filter(v=>!v.trending);
+  if(q) list = list.filter(v=>String(v.title||'').toLowerCase().includes(q) || String(v.videoNo||'') === q.replace('#',''));
+  if(!list.length){ wrap.innerHTML = '<div class="empty-hint" style="padding:18px 20px;">' + (q ? 'কোনো ভিডিও পাওয়া যায়নি।' : 'সব ভিডিওই ট্রেন্ডিংয়ে আছে।') + '</div>'; return; }
+  wrap.innerHTML = list.slice(0,40).map(v=>
+    '<div class="tr-pick-row">' +
+      '<div class="pin-list-thumb">' + (v.thumbnail?('<img loading="lazy" src="'+escHtml(v.thumbnail)+'" onerror="this.style.display=\'none\'"/>'):'') + '</div>' +
+      '<div class="pin-list-title">' + escHtml(v.title||'ভিডিও') + '<div class="tr-pick-cat">' + (v.videoNo?'#'+v.videoNo+' · ':'') + catLabelAdmin(v.category) + '</div></div>' +
+      '<div class="tr-pick-add" onclick="toggleTrendingVideo(\'' + v.id + '\')" title="ট্রেন্ডিংয়ে যোগ করুন"><span class="material-icons-round">add</span></div>' +
+    '</div>').join('') + (list.length > 40 ? '<div class="empty-hint" style="padding:10px;">আরও ' + (list.length-40) + 'টি আছে — খুঁজে বের করতে সার্চ করুন।</div>' : '');
+}
+async function toggleTrendingVideo(id){
+  const v = A.videos.find(x=>x.id===id); if(!v) return;
+  try{
+    if(v.trending){
+      v.trending = false;
+      await fbUpdate('videos', id, { trending:false });
+      toast('✅ ট্রেন্ডিং থেকে সরানো হয়েছে।');
+    } else {
+      const maxOrder = A.videos.filter(x=>x.trending).reduce((m,x)=>Math.max(m,x.trendOrder||0),0);
+      v.trending = true; v.trendOrder = maxOrder + 1;
+      await fbUpdate('videos', id, { trending:true, trendOrder: maxOrder + 1 });
+      toast('🔥 ট্রেন্ডিংয়ে যুক্ত হয়েছে!');
+    }
+    renderTrendingManager(); renderTrendingPicker(); renderVideosList();
+  }catch(e){ toast('⚠️ সমস্যা হয়েছে।'); }
+}
+async function moveTrendOrder(id, dir){
+  const list = getTrendingSorted();
+  const i = list.findIndex(x=>x.id===id), j = i + dir;
+  if(i < 0 || j < 0 || j >= list.length) return;
+  const tmp = list[i]; list[i] = list[j]; list[j] = tmp;
+  try{
+    for(let k = 0; k < list.length; k++){
+      if(list[k].trendOrder !== k + 1){ list[k].trendOrder = k + 1; await fbUpdate('videos', list[k].id, { trendOrder: k + 1 }); }
+    }
+    renderTrendingManager();
   }catch(e){ toast('⚠️ ক্রম পরিবর্তন ব্যর্থ হয়েছে।'); }
 }
 
