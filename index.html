@@ -1211,6 +1211,15 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
       <div class="page-head">
         <div class="page-title">সেটিংস</div>
       </div>
+      <div class="mgr-card" id="dmca-card">
+        <div class="form-section">
+          <div class="form-label" style="font-size:14px;font-weight:700;margin-bottom:10px;"><span class="material-icons-round" style="color:#ff9a4d;">gavel</span>কপিরাইট / DMCA যোগাযোগ</div>
+          <div class="form-group"><div class="form-label"><span class="material-icons-round">mail</span>সাপোর্ট / কপিরাইট ইমেইল (Gmail)</div><input class="form-input" id="set-dmca-email" type="email" inputmode="email" placeholder="yourname@gmail.com" /></div>
+          <div class="form-group"><div class="form-label"><span class="material-icons-round">notes</span>নোটিশে বাড়তি লেখা (ঐচ্ছিক)</div><textarea class="form-textarea" id="set-dmca-notice" placeholder="খালি রাখলে ডিফল্ট লেখা দেখাবে"></textarea></div>
+          <div class="form-hint">এই ইমেইল সাইট ও অ্যাপের "DMCA / Copyright Notice" পেজে দেখাবে। অভিযোগ এলে যাচাই করে দ্রুত ভিডিও সরিয়ে দিন।</div>
+          <button class="save-btn" onclick="saveDmcaSettings()"><span class="material-icons-round">save</span>ইমেইল সেভ করুন</button>
+        </div>
+      </div>
       <div class="mgr-card">
         <div class="form-section">
           <div class="form-group"><div class="form-label"><span class="material-icons-round">badge</span>সাইটের নাম</div><input class="form-input" id="set-site-name" placeholder="Movi Lover" /></div>
@@ -1241,11 +1250,8 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
             <div class="form-hint">একাধিক হলে কমা দিয়ে লিখুন। ভিডিও পোস্টের টার্গেট হিসেবে এটাই বসে থাকবে; বটকে ওই চ্যানেল/গ্রুপে অ্যাডমিন করতে হবে।</div>
           </div>
           <div class="form-group">
-            <div class="toggle-row">
-              <div class="toggle-label"><span class="material-icons-round" style="color:var(--purple2);font-size:18px;">notifications_active</span>নতুন ভিডিও আপলোড হলে স্বয়ংক্রিয়ভাবে সবাইকে জানাও</div>
-              <label class="switch"><input type="checkbox" id="set-auto-notify"/><span class="slider-tg"></span></label>
-            </div>
-            <div class="form-hint">চালু থাকলে, নতুন ভিডিও যুক্ত করার সাথে সাথেই থাম্বনেইল ও টাইটেল সহ একটি বার্তা সব টেলিগ্রাম-ইউজারের কাছে চলে যাবে।</div>
+            <input type="checkbox" id="set-auto-notify" style="display:none" />
+            <div class="form-hint" style="padding:10px 12px;border-radius:12px;background:rgba(35,180,122,.08);border:1px solid rgba(35,180,122,.3);color:#7fe0b4;">🔕 নতুন ভিডিও আপলোডে স্বয়ংক্রিয় মেসেজ <b>স্থায়ীভাবে বন্ধ</b>। শুধু "ব্রডকাস্ট" পেজ থেকে নিজে পাঠালে মেসেজ যাবে।</div>
           </div>
           <button class="save-btn" onclick="saveTelegramSettings()"><span class="material-icons-round">save</span>বট সেভ করুন</button>
           <div class="form-hint" style="margin-top:10px;">কাস্টম বার্তা বা ছবি সহ বার্তা যেকোনো সময় পাঠাতে চাইলে নিচের নেভিগেশনের "ব্রডকাস্ট" পেজে যান।</div>
@@ -1538,7 +1544,8 @@ nav { background:linear-gradient(180deg,#0a0710 0%,#120c1d 100%); border-top:1px
         <div class="form-hint">পিন করলে এই ভিডিওটি ইউজার সাইটের হোম পেজের সবচেয়ে উপরে একটি আলাদা সারিতে দেখাবে (সাধারণ তালিকাতেও থাকবে, লুকাবে না)। কোন ভিডিও আগে/পরে দেখাবে তা "ভিডিও" পেজের "পিন করা ভিডিও" তালিকা থেকে ↑ ↓ দিয়ে সাজানো যাবে।</div>
       </div>
 
-      <div class="form-group">
+      <div class="form-hint" style="margin:6px 0 14px;padding:10px 12px;border-radius:12px;background:rgba(35,180,122,.08);border:1px solid rgba(35,180,122,.3);color:#7fe0b4;">🔕 ভিডিও আপলোড/এডিট করলে ইউজার, বট বা চ্যানেলে <b>কোনো মেসেজ যায় না</b>। ইউজার শুধু বটে ঢুকলে/Start চাপলে দেখতে পাবে। মেসেজ পাঠাতে চাইলে শুধু "ব্রডকাস্ট" পেজ থেকে নিজে পাঠান।</div>
+      <div class="form-group" style="display:none !important" id="v-bc-disabled-group">
         <div class="toggle-row">
           <div class="toggle-label"><span class="material-icons-round" style="color:#63b3ff;font-size:18px;">send</span>সেভ করলে টেলিগ্রামে পোস্ট করুন</div>
           <label class="switch"><input type="checkbox" id="v-bc-enabled" onchange="bcToggleVideoWrap()"/><span class="slider-tg"></span></label>
@@ -2893,7 +2900,7 @@ function openVideoForm(id){
       const cb = document.getElementById('v-bc-to-users');
       if(cb && !id && document.getElementById('form-modal').classList.contains('open')) cb.checked = !A.botAlive;
     });
-    document.getElementById('v-bc-enabled').checked = !id && !!bcToken();
+    document.getElementById('v-bc-enabled').checked = false;   // স্বয়ংক্রিয় মেসেজ সম্পূর্ণ বন্ধ
     document.getElementById('v-bc-caption').value = '';
     bcToggleVideoWrap();
   }
@@ -2907,12 +2914,7 @@ async function saveVideo(){
   const parts = partBlocks.map(b=>({url:b.querySelector('.part-url-input').value.trim(), tgFileId:b.dataset.fileid||'', tgMessageId:b.dataset.msgid||''})).filter(p=>p.url||p.tgFileId);
   if(!title){ toast('⚠️ ভিডিওর টাইটেল দিন।'); return; }
   if(!parts.length){ toast('⚠️ অন্তত একটি ভিডিও পার্ট (আপলোড বা লিংক) দিন।'); return; }
-  let bcJob = null;
-  if(document.getElementById('v-bc-enabled').checked){
-    if(!bcToken()){ toast('⚠️ টেলিগ্রামে পোস্ট করতে আগে সেটিংসে বট টোকেন বসান।'); return; }
-    bcJob = collectVideoBcJob(title);
-    if(!bcJob) return;
-  }
+  const bcJob = null;   // ভিডিও সেভ করলে কোনো টেলিগ্রাম/বট মেসেজ তৈরি হয় না
 
   const directLinks = {}, directLinkSets = {};
   let missingSlot = null, badSlot = null;
@@ -2964,8 +2966,9 @@ async function saveVideo(){
     pinned: wantPinned,
     pinOrder: wantPinned ? pinOrder : 0,
   };
-  // ব্রাউজার নিজেই ইউজারদের পাঠালে বট সার্ভার যেন আবার না পাঠায় (ডুপ্লিকেট এড়াতে)
-  if(bcJob && bcJob.userIds && bcJob.userIds.length) data.skipBotBroadcast = true;
+  // বট সার্ভার (bot.js) যেন নতুন/এডিট করা ভিডিওর জন্য কাউকে মেসেজ না পাঠায়
+  data.skipBotBroadcast = true;
+  data.noAutoNotify = true;
   try{
     if(A.editingVideoId){
       await fbUpdate('videos', A.editingVideoId, data);
@@ -2977,11 +2980,6 @@ async function saveVideo(){
       toast('✅ নতুন ভিডিও যুক্ত হয়েছে! ইউজার সাইটে এটির জন্য এখনই একটি আলাদা শেয়ার লিংক তৈরি হয়ে যাবে।');
     }
     closeFormModal();
-    if(isNew){
-      try{
-        await fbAdd('notifications', { title: '🎬 নতুন ভিডিও যুক্ত হয়েছে!', body: title, type:'new_video' });
-      }catch(e){}
-    }
     if(bcJob){ startBcJob(bcJob, newVideoId || editingId); }
   }catch(e){ toast('⚠️ সেভ করতে সমস্যা হয়েছে।'); }
   btn.disabled = false; btn.innerHTML = '<span class="material-icons-round">save</span>সেভ করুন';
@@ -3575,16 +3573,17 @@ async function saveAnnouncementSettings(){
 /* ============ TELEGRAM BOT / BROADCAST ============ */
 async function loadTelegramSettings(){
   const cfg = await fbGetDoc('settings','telegram');
-  A.telegram = { botToken:(cfg&&cfg.botToken)||'', autoNotify: !!(cfg&&cfg.autoNotify), broadcastChatId:(cfg&&cfg.broadcastChatId)||'', bcBlur:(cfg&&cfg.bcBlur)||'glow', bcDefaultButtons:(cfg&&cfg.bcDefaultButtons)||null };
+  A.telegram = { botToken:(cfg&&cfg.botToken)||'', autoNotify: false, broadcastChatId:(cfg&&cfg.broadcastChatId)||'', bcBlur:(cfg&&cfg.bcBlur)||'glow', bcDefaultButtons:(cfg&&cfg.bcDefaultButtons)||null };
   document.getElementById('set-bc-chat').value = A.telegram.broadcastChatId;
   document.getElementById('set-bot-token').value = A.telegram.botToken;
-  document.getElementById('set-auto-notify').checked = A.telegram.autoNotify;
+  document.getElementById('set-auto-notify').checked = false;
+  if(cfg && cfg.autoNotify){ try{ await fbSet('settings','telegram',{ autoNotify:false }); }catch(e){} }   // সার্ভারে থাকা পুরনো ON মান বন্ধ করে দাও
   updateBcTgStatus();
   bcInitComposer('bc', { buttons:[], toUsers:true });
 }
 async function saveTelegramSettings(){
   const botToken = document.getElementById('set-bot-token').value.trim();
-  const autoNotify = document.getElementById('set-auto-notify').checked;
+  const autoNotify = false;
   try{
     const broadcastChatId = document.getElementById('set-bc-chat').value.trim();
     await fbSet('settings','telegram',{botToken,autoNotify,broadcastChatId});
@@ -4040,6 +4039,14 @@ async function loadSettingsForm(){
   document.getElementById('set-landing-wait').value = (ld && ld.unlockWaitSeconds) || 7;
   const rw = await fbGetDoc('settings','rewards');
   document.getElementById('set-video-reward').value = (rw && rw.videoReward != null) ? rw.videoReward : 1;
+  try{ document.getElementById('set-dmca-email').value = (site && site.dmcaEmail) || ''; document.getElementById('set-dmca-notice').value = (site && site.dmcaNotice) || ''; }catch(e){}
+}
+async function saveDmcaSettings(){
+  const dmcaEmail = document.getElementById('set-dmca-email').value.trim();
+  const dmcaNotice = document.getElementById('set-dmca-notice').value.trim().slice(0, 800);
+  if(dmcaEmail && !/^[^\s@<>"']+@[^\s@<>"']+\.[^\s@<>"']+$/.test(dmcaEmail)){ toast('⚠️ সঠিক ইমেইল ঠিকানা দিন।'); return; }
+  try{ await fbSet('settings','site',{ dmcaEmail, dmcaNotice }); toast('✅ কপিরাইট ইমেইল সেভ হয়েছে।'); }
+  catch(e){ toast('⚠️ সেভ করা যায়নি।'); }
 }
 async function saveGeneralSettings(){
   const name = document.getElementById('set-site-name').value.trim() || 'Movi Lover';
