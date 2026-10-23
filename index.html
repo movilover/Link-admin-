@@ -2108,7 +2108,7 @@ function createPartBlock(data){
     '<input class="form-input part-url-input" placeholder="https://... (এই পার্টের ভিডিও লিংক)" style="margin-top:8px;" value="' + escHtml(data.url||'') + '" oninput="onPartUrlInput(this)" />';
   document.getElementById('v-parts-container').appendChild(wrap);
   if(data.url){ wrap.querySelector('.part-video-status').textContent = '✅ ভিডিও লিংক সেট করা আছে'; }
-  if(data.tgFileId){ wrap.dataset.fileid = data.tgFileId; wrap.dataset.msgid = data.tgMessageId || ''; wrap.querySelector('.part-video-status').textContent = '✅ টেলিগ্রামে সংরক্ষিত আছে (নতুন ফাইল দিলে বদলে যাবে)'; }
+  if(data.tgFileId){ wrap.dataset.fileid = data.tgFileId; wrap.dataset.msgid = data.tgMessageId || ''; wrap.dataset.chatid = data.tgChatId || ''; wrap.querySelector('.part-video-status').textContent = '✅ টেলিগ্রামে সংরক্ষিত আছে (নতুন ফাইল দিলে বদলে যাবে)'; }
   renumberParts();
   return wrap;
 }
@@ -2194,6 +2194,7 @@ function runTgUpload(file, block, statusEl){
   tgUploadVideo(file, p=>{ statusEl.textContent = 'টেলিগ্রামে আপলোড হচ্ছে... ' + p + '%'; }).then(r=>{
     block.dataset.fileid = r.fileId;
     block.dataset.msgid = String(r.messageId||'');
+    block.dataset.chatid = String((A.videobot && A.videobot.chatId) || '');
     block.querySelector('.part-url-input').value = '';
     statusEl.textContent = '✅ টেলিগ্রামে আপলোড সম্পন্ন';
     toast('✅ ভিডিও টেলিগ্রামে সংরক্ষিত হয়েছে!');
@@ -2911,7 +2912,7 @@ function closeFormModal(){ document.getElementById('form-modal').classList.remov
 async function saveVideo(){
   const title = document.getElementById('v-title').value.trim();
   const partBlocks = Array.prototype.slice.call(document.querySelectorAll('#v-parts-container .part-block'));
-  const parts = partBlocks.map(b=>({url:b.querySelector('.part-url-input').value.trim(), tgFileId:b.dataset.fileid||'', tgMessageId:b.dataset.msgid||''})).filter(p=>p.url||p.tgFileId);
+  const parts = partBlocks.map(b=>({url:b.querySelector('.part-url-input').value.trim(), tgFileId:b.dataset.fileid||'', tgMessageId:b.dataset.msgid||'', tgChatId:b.dataset.chatid||''})).filter(p=>p.url||p.tgFileId);
   if(!title){ toast('⚠️ ভিডিওর টাইটেল দিন।'); return; }
   if(!parts.length){ toast('⚠️ অন্তত একটি ভিডিও পার্ট (আপলোড বা লিংক) দিন।'); return; }
   const bcJob = null;   // ভিডিও সেভ করলে কোনো টেলিগ্রাম/বট মেসেজ তৈরি হয় না
